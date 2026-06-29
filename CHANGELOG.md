@@ -4,15 +4,27 @@
 
 ## [Unreleased]
 
-### Fixed
-
-- Fix concurrency bug where the DOM engine was shared globally across all `HTML` instances. Each exporter now uses its own engine via a context variable.
-
 ## [v6.0.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v6.0.0)
+
+### Added
+
+- Add experimental Markdown export via `DOM.MARKDOWN`, with `MARKDOWN_CONFIG` and `build_markdown_config()`.
+- Re-export the public API from the `draftjs_exporter` package root (`Exporter`, `HTML_CONFIG`, types, constants).
+- Improve static type annotations with `TypedDict` definitions for configuration and ContentState.
+
+### Changed
+
+- Raise the lower bound of the optional `lxml` dependency to `>=4.6.5`.
+- Performance improvements when exporting content.
+- Move the repository to wagtail/draftjs_exporter.
 
 ### Removed
 
 - Remove support for Python 3.7, 3.8, 3.9.
+
+### Fixed
+
+- Fix concurrency bug where the DOM engine was shared globally across all `HTML` instances. Each exporter now uses its own engine via a context variable ([#122](https://github.com/wagtail/draftjs_exporter/issues/122)).
 
 ## [v5.2.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v5.2.0)
 
