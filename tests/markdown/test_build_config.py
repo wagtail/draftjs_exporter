@@ -4,10 +4,10 @@ import pytest
 
 from draftjs_exporter.html import HTML
 from draftjs_exporter.markdown import CONFIG, MarkdownOptions, build_markdown_config
-from draftjs_exporter.types import ContentState
+from draftjs_exporter.types import Block, ContentState
 
 
-def _text_block(text: str, block_type: str = "unstyled", **kwargs) -> dict:
+def _text_block(text: str, block_type: str = "unstyled", **kwargs) -> Block:
     return {
         "key": kwargs.get("key", "a"),
         "text": text,

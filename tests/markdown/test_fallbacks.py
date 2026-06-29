@@ -10,7 +10,7 @@ from draftjs_exporter.markdown.fallbacks import (
     style_fallback,
 )
 from draftjs_exporter.markdown.helpers import block
-from draftjs_exporter.types import Element, Props
+from draftjs_exporter.types import ContentState, Element, Props
 
 LOGGER = "draftjs_exporter.markdown.fallbacks"
 
@@ -171,7 +171,7 @@ def test_config_has_entity_fallback():
 
 # -- Custom fallbacks via MarkdownOptions -------------------------------------
 
-UNKNOWN_STYLE_CONTENT = {
+UNKNOWN_STYLE_CONTENT: ContentState = {
     "entityMap": {},
     "blocks": [
         {
@@ -185,7 +185,7 @@ UNKNOWN_STYLE_CONTENT = {
     ],
 }
 
-UNKNOWN_BLOCK_CONTENT = {
+UNKNOWN_BLOCK_CONTENT: ContentState = {
     "entityMap": {},
     "blocks": [
         {
@@ -199,7 +199,7 @@ UNKNOWN_BLOCK_CONTENT = {
     ],
 }
 
-UNKNOWN_ENTITY_CONTENT = {
+UNKNOWN_ENTITY_CONTENT: ContentState = {
     "entityMap": {"0": {"type": "CUSTOM", "mutability": "MUTABLE", "data": {}}},
     "blocks": [
         {
