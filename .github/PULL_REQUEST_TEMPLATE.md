@@ -10,8 +10,8 @@ Here, please add a description of your pull request and instructions for the rev
 
 - [ ] Stay on point and keep it small so it can be easily reviewed. For example, try to apply any general refactoring separately outside of the PR.
 - [ ] Consider adding unit tests, especially for bug fixes. If you don't, tell us why.
-- [ ] All new and existing tests pass, with 100% test coverage (`make test-coverage`)
-- [ ] Linting passes (`make lint`)
+- [ ] All new and existing tests pass, with 100% test coverage (`just test-coverage`)
+- [ ] Linting passes (`just lint`)
 - [ ] Consider updating documentation. If you don't, tell us why.
 - [ ] List the environments / platforms in which you tested your changes.
 

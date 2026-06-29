@@ -19,19 +19,20 @@ jobs:
         with:
           python-version-file: "pyproject.toml"
       - uses: astral-sh/setup-uv@v7
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
       - run: uv sync --dev
       - run: uv run ruff check --output-format=github .
       - run: uv run ruff format --check
       - run: uv run mypy draftjs_exporter tests
       - run: uv run ty check --output-format=github .
-      - run: uv run make benchmark
-      - run: make build
+      - run: uv run just benchmark
+      - run: just build
       - uses: actions/setup-node@v6
         with:
           node-version-file: ".nvmrc"
       - run: npm ci
       - run: npm run lint
-      - run: uv run make test-coverage
+      - run: uv run just test-coverage
   test_compatibility:
     needs: test
     runs-on: ubuntu-slim
@@ -53,8 +54,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - uses: astral-sh/setup-uv@v7
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
       - run: uv sync --dev
-      - run: uv run make test
+      - run: uv run just test
   test_lower_bound:
     needs: test
     runs-on: ubuntu-slim
@@ -64,7 +66,8 @@ jobs:
         with:
           python-version: "3.10"
       - uses: astral-sh/setup-uv@v7
-      - run: make test-compatibility
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
+      - run: just test-compatibility
   test_experimental:
     # Ad-hoc job to test experimental support without having to adjust all of our project for compatibility.
     needs: test

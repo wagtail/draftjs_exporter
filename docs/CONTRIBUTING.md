@@ -12,7 +12,7 @@ Please note that this project is released with a [Contributor Code of Conduct](d
 
 > Requirements: [`uv`](https://github.com/astral-sh/uv)
 
-Clone the repository, configure the git hooks, then initialize with `make init`.
+Clone the repository, configure the git hooks, then initialize with `just init`.
 
 ```sh
 git clone git@github.com:wagtail/draftjs_exporter.git
@@ -20,28 +20,28 @@ cd draftjs_exporter/
 # Install the git hooks.
 ./.githooks/deploy
 # Install the Python environment.
-make init
+just init
 ```
 
 ### Commands
 
-- `make help`: See what commands are available.
-- `make init`: Install dependencies and initialise for development.
-- `make lint`: Lint the project.
-- `make format`: Format project files.
-- `make test`: Test the project.
-- `make test-watch`: Restarts the tests whenever a file changes.
-- `make test-coverage`: Run the tests while generating test coverage data.
-- `make test-compatibility`: Compatibility-focused test suite.
-- `make dev`: Restarts the example whenever a file changes.
-- `make benchmark`: Runs a one-off performance (speed, memory) benchmark.
-- `make clean-pyc`: Remove Python file artifacts.
-- `make build`: Builds package for publication.
-- `make publish`: Publishes a new version to PyPI.
+- `just help`: See what commands are available.
+- `just init`: Install dependencies and initialise for development.
+- `just lint`: Lint the project.
+- `just format`: Format project files.
+- `just test`: Test the project.
+- `just test-watch`: Restarts the tests whenever a file changes.
+- `just test-coverage`: Run the tests while generating test coverage data.
+- `just test-compatibility`: Compatibility-focused test suite.
+- `just dev`: Restarts the example whenever a file changes.
+- `just benchmark`: Runs a one-off performance (speed, memory) benchmark.
+- `just clean-pyc`: Remove Python file artifacts.
+- `just build`: Builds package for publication.
+- `just publish`: Publishes a new version to PyPI.
 
 ### Debugging
 
-- Always run the tests. To auto-run with watch, use `npm install -g nodemon`, then `make test-watch`.
+- Always run the tests. To auto-run with watch, use `npm install -g nodemon`, then `just test-watch`.
 - Use a debugger. `uv pip install ipdb`, then `import ipdb; ipdb.set_trace()`.
 - You can use `example.py` as a basic CLI to try out the exporter with arbitrary ContentState JSON: `echo '{"json": "contents"}' | ./example.py -`.
 
@@ -52,7 +52,7 @@ make init
 - Update the version number in `pyproject.toml`, following semver.
 - Update the version number in `draftjs_exporter/__init__.py`, following semver.
 - Make a PR and squash merge it.
-- Back on main with the PR merged, use `make publish` (confirm, and enter your password).
+- Back on main with the PR merged, use `just publish` (confirm, and enter your password).
 - Finally, go to GitHub and create a release and a tag for the new version.
 - Done!
 

@@ -12,7 +12,7 @@ This file provides an overview of the direction this project is heading. It cont
 
 ### Performance regression baselines in CI
 
-Add representative content fixtures and record `make benchmark` + memray stats per PR to fail builds on slowdowns in string, lxml, and html5lib engines.
+Add representative content fixtures and record `just benchmark` + memray stats per PR to fail builds on slowdowns in string, lxml, and html5lib engines.
 
 ### Configuration cookbook and compatibility matrix
 

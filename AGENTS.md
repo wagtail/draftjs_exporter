@@ -6,19 +6,19 @@ Source code lives in `draftjs_exporter/`. Tests are in `tests/`. Contributor and
 
 ## Development commands
 
-- `make help`: See what commands are available.
-- `make init`: Install dependencies and initialise for development.
-- `make lint`: Lint the project.
-- `make format`: Format project files.
-- `make test`: Test the project.
-- `make test-watch`: Restarts the tests whenever a file changes.
-- `make test-coverage`: Run the tests while generating test coverage data.
-- `make test-compatibility`: Compatibility-focused test suite.
-- `make dev`: Restarts the example whenever a file changes.
-- `make benchmark`: Runs a one-off performance (speed, memory) benchmark.
-- `make clean-pyc`: Remove Python file artifacts.
-- `make build`: Builds package for publication.
-- `make publish`: Publishes a new version to PyPI.
+- `just help`: See what commands are available.
+- `just init`: Install dependencies and initialise for development.
+- `just lint`: Lint the project.
+- `just format`: Format project files.
+- `just test`: Test the project.
+- `just test-watch`: Restarts the tests whenever a file changes.
+- `just test-coverage`: Run the tests while generating test coverage data.
+- `just test-compatibility`: Compatibility-focused test suite.
+- `just dev`: Restarts the example whenever a file changes.
+- `just benchmark`: Runs a one-off performance (speed, memory) benchmark.
+- `just clean-pyc`: Remove Python file artifacts.
+- `just build`: Builds package for publication.
+- `just publish`: Publishes a new version to PyPI.
 
 ## Project tools
 
