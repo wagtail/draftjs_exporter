@@ -1,4 +1,3 @@
-from itertools import groupby
 from operator import attrgetter
 from typing import TypedDict
 
@@ -166,18 +165,28 @@ class HTML:
         text = block.get("text", "")
 
         commands = self.build_commands(block)
-        grouped = groupby(commands, attrgetter("index"))
-        listed = list(groupby(commands, attrgetter("index")))
         sliced = []
 
-        i = 0
-        for start_index, comms in grouped:
-            if i < len(listed) - 1:
-                stop_index = listed[i + 1][0]
-                sliced.append((text[start_index:stop_index], list(comms)))
+        start = 0
+        command_count = len(commands)
+
+        # Manual groupby on command index. build_commands sorts by index, so
+        # consecutive commands with the same index form a group. Avoids
+        # itertools.groupby and the extra list allocations it would create.
+        while start < command_count:
+            start_index = commands[start].index
+            end = start + 1
+
+            while end < command_count and commands[end].index == start_index:
+                end += 1
+
+            if end < command_count:
+                stop_index = commands[end].index
+                sliced.append((text[start_index:stop_index], commands[start:end]))
             else:
-                sliced.append(("", list(comms)))
-            i += 1
+                sliced.append(("", commands[start:end]))
+
+            start = end
 
         return sliced
 

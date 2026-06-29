@@ -45,11 +45,12 @@ def make_numbered_li_prefix(delimiter: str) -> Callable[[Props], str]:
             if b.get("type") != type_:
                 index = 1
             else:
+                b_depth = b.get("depth", 0)
                 # We are in the list, but the depth is lower than that of our block: reset.
-                if b.get("depth", 0) < depth:
+                if b_depth < depth:
                     index = 1
                 # Same list, same depth as our block: increment.
-                elif b.get("depth", 0) == depth:
+                elif b_depth == depth:
                     index += 1
 
         return f"{index}{delimiter} "

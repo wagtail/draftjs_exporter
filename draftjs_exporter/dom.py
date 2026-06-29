@@ -98,13 +98,15 @@ class DOM:
             props = {}
 
         # If the first element of children is a list, we use it as the list.
-        if len(elt_children) and isinstance(elt_children[0], (list, tuple)):
+        if elt_children and isinstance(elt_children[0], (list, tuple)):
             children = elt_children[0]
         else:
             children = elt_children
 
+        children_len = len(children)
+
         # The children prop is the first child if there is only one.
-        props["children"] = children[0] if len(children) == 1 else children
+        props["children"] = children[0] if children_len == 1 else children
 
         if callable(type_):
             # Function component, via def or lambda. We presume its signature is correct.

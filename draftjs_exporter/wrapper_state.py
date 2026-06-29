@@ -65,7 +65,7 @@ class WrapperStack:
         self.stack = self.stack[:length]
 
     def head(self) -> Wrapper:
-        if self.length() > 0:
+        if self.stack:
             wrapper = self.stack[-1]
         else:
             wrapper = Wrapper(-1)
@@ -120,7 +120,7 @@ class WrapperState:
             self.stack.stack[-1].last_child = elt
         else:
             # Reset the stack if there is no wrapper.
-            if self.stack.length() > 0:
+            if self.stack.stack:
                 self.stack = WrapperStack()
             parent = elt
 
