@@ -16,7 +16,7 @@
 
 - Raise the lower bound of the optional `lxml` dependency to `>=4.6.5`.
 - Performance improvements when exporting content.
-- Move the repository to wagtail/draftjs_exporter.
+- Move the repository to `wagtail/draftjs_exporter` (same maintainers, new home).
 
 ### Removed
 
