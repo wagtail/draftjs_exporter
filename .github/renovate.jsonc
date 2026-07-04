@@ -1,0 +1,53 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+  "extends": [
+    "config:recommended",
+    ":enablePreCommit",
+    "helpers:pinGitHubActionDigests",
+  ],
+
+  // Run about bi-weekly.
+  "schedule": ["* * 3,22 * *"],
+  "timezone": "Etc/UTC",
+  "prConcurrentLimit": 10,
+
+  "labels": ["dependencies"],
+
+  "minimumReleaseAge": "14 days",
+
+  // Periodically refresh uv.lock to catch transitive dependency updates.
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "schedule": ["before 6am on monday"],
+  },
+
+  "packageRules": [
+    // Auto-merge GitHub Actions updates.
+    {
+      "matchCategories": ["ci"],
+      "automerge": true,
+      "groupName": "CI configuration dependencies",
+    },
+
+    // Auto-merge npm package updates.
+    {
+      "matchManagers": ["npm"],
+      "automerge": true,
+    },
+
+    // Auto-merge all Python dependencies…
+    {
+      "matchManagers": ["pep621"],
+      "automerge": true,
+    },
+
+    // …except for packages whose bounds are intentionally conservative.
+    {
+      "matchManagers": ["pep621"],
+      "matchPackageNames": ["lxml", "beautifulsoup4", "html5lib"],
+      "enabled": false,
+    },
+  ],
+}

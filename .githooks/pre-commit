@@ -28,8 +28,8 @@ PATCH_STAGED=$(git --no-pager diff --name-only --diff-filter=ACM $STAGED)
 # Files which are fully staged.
 FULLY_STAGED=$(comm -23 <(echo "$STAGED") <(echo "$PATCH_STAGED"))
 
-PRETTIER_STAGED=$(grep -E '.(md|css|scss|js|json|json5|yaml|yml|html)$' <<< "$STAGED" || true)
-PRETTIER_FULLY_STAGED=$(grep -E '.(md|css|scss|js|json|json5|yaml|yml|html)$' <<< "$FULLY_STAGED" || true)
+PRETTIER_STAGED=$(grep -E '.(md|css|scss|js|json|jsonc|yaml|yml|html)$' <<< "$STAGED" || true)
+PRETTIER_FULLY_STAGED=$(grep -E '.(md|css|scss|js|json|jsonc|yaml|yml|html)$' <<< "$FULLY_STAGED" || true)
 PY_STAGED=$(grep .py$ <<< "$STAGED" || true)
 PY_FULLY_STAGED=$(grep .py$ <<< "$FULLY_STAGED" || true)
 

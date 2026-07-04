@@ -8,7 +8,7 @@
     "prettier": "3.5.1"
   },
   "scripts": {
-    "lint": "prettier --check '**/?(.)*.{md,css,scss,js,json,json5,yaml,yml,html}'",
-    "format": "prettier --write '**/?(.)*.{md,css,scss,js,json,json5,yaml,yml,html}'"
+    "lint": "prettier --check '**/?(.)*.{md,css,scss,js,json,jsonc,yaml,yml,html}'",
+    "format": "prettier --write '**/?(.)*.{md,css,scss,js,json,jsonc,yaml,yml,html}'"
   }
 }
