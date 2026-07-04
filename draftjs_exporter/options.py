@@ -102,7 +102,7 @@ class Options:
         except KeyError:
             try:
                 return options[fallback_key]
-            except KeyError:
+            except KeyError as err:
                 raise ConfigException(
                     f'"{type_}" is not in the config and has no fallback'
-                )
+                ) from err
