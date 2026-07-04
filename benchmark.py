@@ -1,3 +1,4 @@
+import argparse
 import cProfile
 import logging
 import os
@@ -14,6 +15,15 @@ from draftjs_exporter.dom import DOM
 from draftjs_exporter.html import HTML, ExporterConfig
 from draftjs_exporter.types import ContentState, Element, Props
 from example import br, entity_fallback, image, list_item, ordered_list
+
+parser = argparse.ArgumentParser(description="Run the draftjs_exporter benchmark.")
+parser.add_argument(
+    "--runs",
+    type=int,
+    default=int(os.environ.get("BENCHMARK_RUNS", 1)),
+    help="Number of times to run the benchmark. Defaults to the BENCHMARK_RUNS environment variable, or 1.",
+)
+args = parser.parse_args()
 
 
 def document(props: Props) -> Element:
@@ -72,14 +82,12 @@ exporter = HTML(config)
 # markov_draftjs has slightly different type declarations.
 content_states = cast(list[ContentState], get_content_sample())
 
-BENCHMARK_RUNS = int(os.environ.get("BENCHMARK_RUNS", 1))
-
-print(f"Exporting {len(content_states)} ContentStates {BENCHMARK_RUNS} times")  # noqa: T201
+print(f"Exporting {len(content_states)} ContentStates {args.runs} times")  # noqa: T201
 
 pr = cProfile.Profile()
 pr.enable()
 
-for i in range(0, BENCHMARK_RUNS):
+for i in range(0, args.runs):
     for content_state in content_states:
         exporter.render(content_state)
 

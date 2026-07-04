@@ -52,8 +52,8 @@ dev:
   nodemon -q -e py -w tests -w draftjs_exporter -w example.py -x "clear && python -X dev -W error example.py || true"
 
 # Runs a one-off performance (speed, memory) benchmark.
-benchmark:
-  uv run benchmark.py
+benchmark runs="1":
+  uv run benchmark.py --runs {{runs}}
   uv run python -m memray summary benchmark.bin
   uv run python -m memray stats benchmark.bin
 

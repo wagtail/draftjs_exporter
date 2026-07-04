@@ -25,7 +25,7 @@ jobs:
       - run: uv run ruff format --check
       - run: uv run mypy draftjs_exporter tests
       - run: uv run ty check --output-format=github .
-      - run: uv run just benchmark
+      - run: just benchmark --runs 10
       - run: just build
       - uses: actions/setup-node@v6
         with:
