@@ -1,3 +1,0 @@
-from .etree import Element
-
-def fromstring(markup: str) -> Element: ...

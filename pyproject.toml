@@ -57,7 +57,9 @@ dev = [
   "psutil>=5.9.7",
   # HTML builders.
   "lxml>=4.6.5,<7",
+  "types-lxml>=2026.2.16",
   "beautifulsoup4>=4.4.1,<5",
+  "types-beautifulsoup4>=4.12.0",
   "html5lib>=0.999,<2",
 ]
 
@@ -83,7 +85,6 @@ select = ["E", "F", "I", "T20", "BLE", "C4"]
 ignore = ["E501"]
 
 [tool.mypy]
-mypy_path = "./stubs"
 python_version = "3.10"
 # https://mypy.readthedocs.io/en/latest/config_file.html
 #### Additional opt-in checks of mypy.
