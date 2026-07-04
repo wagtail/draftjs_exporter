@@ -1,24 +1,22 @@
-# Repository Guidelines
+# Agent guidelines
+
+> For the human-readable contributor guide, see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md). This file is a concise quick-reference for the AI assistant.
 
 ## Project structure & module organization
 
 Source code lives in `draftjs_exporter/`. Tests are in `tests/`. Contributor and user docs are in `docs/`. Type-checking stubs live in `stubs/`. The root also contains `example.py` and `benchmark.py` for local runs and performance checks.
 
+See [docs/CONTRIBUTING.md#project-architecture](docs/CONTRIBUTING.md#project-architecture) for the full architecture walkthrough.
+
 ## Development commands
 
-- `just help`: See what commands are available.
-- `just init`: Install dependencies and initialise for development.
-- `just lint`: Lint the project.
-- `just format`: Format project files.
-- `just test`: Test the project.
-- `just test-watch`: Restarts the tests whenever a file changes.
-- `just test-coverage`: Run the tests while generating test coverage data.
-- `just test-compatibility`: Compatibility-focused test suite.
-- `just dev`: Restarts the example whenever a file changes.
-- `just benchmark`: Runs a one-off performance (speed, memory) benchmark.
-- `just clean-pyc`: Remove Python file artifacts.
-- `just build`: Builds package for publication.
-- `just publish`: Publishes a new version to PyPI.
+See [docs/CONTRIBUTING.md#commands](docs/CONTRIBUTING.md#commands) for the full list. Key recipes:
+
+- `just init` – install dependencies
+- `just lint` – lint + type-check
+- `just format` – auto-format
+- `just test` – run tests (strict mode)
+- `just test-coverage` – run with coverage
 
 ## Project tools
 
@@ -32,19 +30,27 @@ Source code lives in `draftjs_exporter/`. Tests are in `tests/`. Contributor and
 
 ## Coding style & naming conventions
 
-- Python uses 4-space indentation and type annotations checked with mypy / ty.
-- Formatting is enforced by `ruff format` for Python and `prettier` for all other files.
-- Test modules follow `test_*.py`, with test functions named `test_*`.
+See [docs/CONTRIBUTING.md#coding-style--conventions](docs/CONTRIBUTING.md#coding-style--conventions) for the full guide. Quick points:
+
+- Python uses 4-space indentation, [PEP 8](https://peps.python.org/pep-0008/) style, enforced with `ruff`.
+- Type annotations required on production code (checked by mypy, ty). Test code is exempt.
+- Formatting: `ruff format` for Python, `prettier` for all other files.
+- Test modules follow `test_*.py`, with test functions named `test_*`, test classes `Test*`.
+- Core classes must use `__slots__`.
 
 ## Testing guidelines
 
+See [docs/CONTRIBUTING.md#testing](docs/CONTRIBUTING.md#testing) for the full guide. Quick points:
+
 - Target of 100% test coverage for all improvements.
-- Write tests both at the unit level but also integration (`test_exports.py`, `test_output.py`)
-- Write implementation and language-agnostic test cases in `test_exports.json`
+- Write tests at the unit level, integration level (`test_output.py`), and snapshot level (`test_exports.json`).
+- Add or update test cases in `test_exports.json` when output behavior changes across engines.
 
 ## Commit & pull request guidelines
 
-- Be concise and to the point. Explain rationales that aren’t obvious.
+See [docs/CONTRIBUTING.md#pull-request-workflow](docs/CONTRIBUTING.md#pull-request-workflow). Quick points:
+
+- Be concise and to the point. Explain rationales that aren't obvious.
 - No Title Case usage ever. Always use Sentence case.
-- Recent commit messages use short, capitalized, imperative summaries (e.g., “Enforce additional mypy check”).
+- Recent commit messages use short, capitalized, imperative summaries (e.g., "Enforce additional mypy check").
 - PRs should include a clear description, relevant test evidence (command + result), links to any related issues.
