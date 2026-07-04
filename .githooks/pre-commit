@@ -51,15 +51,15 @@ fi
 
 if [ -n "$PY_FULLY_STAGED" ];
 then
-  ruff format $PY_FULLY_STAGED
+  uv run ruff format $PY_FULLY_STAGED
   git add $PY_FULLY_STAGED
 fi
 
 if [ -n "$PY_STAGED" ];
 then
-	ruff check $PY_STAGED
-	ruff format --diff $PY_STAGED
-	mypy $PY_STAGED
+	uv run ruff check $PY_STAGED
+	uv run ruff format --diff $PY_STAGED
+	uv run mypy $PY_STAGED
   just build
   just test-coverage
 fi

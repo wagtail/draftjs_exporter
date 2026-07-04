@@ -15,25 +15,25 @@ clean-pyc:
 init: clean-pyc
   uv venv
   uv sync --dev
-  nvm use
+  fnm use
   npm install
 
 # Lint the project.
 lint:
-  ruff check
-  ruff format --check
-  mypy draftjs_exporter tests
-  ty check
+  uv run ruff check
+  uv run ruff format --check
+  uv run mypy draftjs_exporter tests
+  uv run ty check
 
 # Format project files.
 format:
-  ruff check --fix
-  ruff format
+  uv run ruff check --fix
+  uv run ruff format
   npm run format
 
 # Test the project.
 test:
-  PYTHONDEVMODE=1 pytest -W error --capture=no
+  PYTHONDEVMODE=1 uv run pytest -W error --capture=no
 
 # Restarts the tests whenever a file changes.
 test-watch:
@@ -41,7 +41,7 @@ test-watch:
 
 # Run the tests while generating test coverage data.
 test-coverage:
-  PYTHONDEVMODE=1 pytest -W error --cov --cov-report=term --cov-report=html --capture=no
+  PYTHONDEVMODE=1 uv run pytest -W error --cov --cov-report=term --cov-report=html --capture=no
 
 # Compatibility-focused test suite.
 test-compatibility:
@@ -53,9 +53,9 @@ dev:
 
 # Runs a one-off performance (speed, memory) benchmark.
 benchmark:
-  python benchmark.py
-  python -m memray summary benchmark.bin
-  python -m memray stats benchmark.bin
+  uv run benchmark.py
+  uv run python -m memray summary benchmark.bin
+  uv run python -m memray stats benchmark.bin
 
 # Builds package for publication.
 build:
