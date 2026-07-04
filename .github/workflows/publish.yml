@@ -1,0 +1,48 @@
+# See https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+# for a detailed guide
+name: Publish to PyPI
+
+on:
+  release:
+    # https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#release
+    types: [published]
+
+permissions: {}
+
+jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+    permissions: {}
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        # Prevent cache poisoning by disabling cache.
+        with:
+          enable-cache: false
+      - run: uv build
+      # Smoke tests with ready-to-publish package.
+      - run: uv run --isolated --no-project --with dist/*.whl pytest
+      - run: uv run --isolated --no-project --with dist/*.tar.gz pytest
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          path: ./dist
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: none
+      id-token: write # required for trusted publishing
+    environment: pypi
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
+        with:
+          packages-dir: artifact/
+          print-hash: true
