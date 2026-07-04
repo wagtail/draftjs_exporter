@@ -17,6 +17,7 @@ init: clean-pyc
   uv sync --dev
   fnm use
   npm install
+  prek
 
 # Lint the project.
 lint:

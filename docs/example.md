@@ -245,5 +245,3 @@ def blockquote(props):
 ```
 
 Discarded block but the content stays.<div>Render as <span class="missing-entity">div</span></div>Voilà!
-
-

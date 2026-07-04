@@ -72,16 +72,14 @@ The exporter uses a **Strategy pattern** for output generation. All engines impl
 
 ### Installation
 
-> Requirements: [`uv`](https://github.com/astral-sh/uv)
+> Requirements: [`uv`](https://github.com/astral-sh/uv), [just](https://github.com/casey/just), [prek](https://prek.j178.dev/)
 
 Clone the repository, configure the git hooks, then initialize with `just init`.
 
 ```sh
 git clone git@github.com:wagtail/draftjs_exporter.git
 cd draftjs_exporter/
-# Install the git hooks.
-./.githooks/deploy
-# Install the Python environment.
+# Install everything.
 just init
 ```
 
