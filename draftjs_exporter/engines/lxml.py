@@ -1,6 +1,6 @@
 import re
 
-from lxml import etree, html  # type: ignore
+from lxml import etree, html
 
 from draftjs_exporter.engines.base import Attr, DOMEngine
 from draftjs_exporter.types import HTML, Tag
@@ -31,8 +31,8 @@ class DOM_LXML(DOMEngine):
         return html.fromstring(markup)
 
     @staticmethod
-    def append_child(elt: etree.Element, child: etree.Element) -> None:
-        if hasattr(child, "tag"):
+    def append_child(elt: etree.Element, child: etree.Element | str) -> None:
+        if isinstance(child, etree.Element):
             elt.append(child)
         else:
             c = etree.Element("fragment")

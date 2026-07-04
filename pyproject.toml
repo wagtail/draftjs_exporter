@@ -114,10 +114,7 @@ disallow_untyped_decorators = true
 
 # Warns about casting an expression to its inferred type.
 warn_redundant_casts = true
-# Warns about unneeded # type: ignore comments.
-# Disable for compatibility with early ty adoption.
-# warn_unused_ignores = true
-warn_unused_ignores = false
+warn_unused_ignores = true
 # Shows errors for missing return statements on some execution paths.
 warn_no_return = true
 # Shows a warning when returning a value with type Any from a function declared with a non- Any return type.

@@ -107,7 +107,7 @@ def build_markdown_config(options: MarkdownOptions | None = None) -> ExporterCon
     All options fall back to CommonMark-compatible defaults when omitted.
     Set a fallback to None to disable it.
     """
-    opts: MarkdownOptions = options or {}
+    opts = options if options is not None else MarkdownOptions()
 
     bold = opts.get("bold", "**")
     italic = opts.get("italic", "_")
@@ -156,16 +156,24 @@ def build_markdown_config(options: MarkdownOptions | None = None) -> ExporterCon
     }
 
     _apply_fallback(
-        block_map, BLOCK_TYPES.FALLBACK, opts, "block_fallback", block_fallback
+        block_map,
+        BLOCK_TYPES.FALLBACK,
+        "block_fallback" in opts,
+        opts.get("block_fallback"),
+        block_fallback,
     )
     _apply_fallback(
-        style_map, INLINE_STYLES.FALLBACK, opts, "style_fallback", style_fallback
+        style_map,
+        INLINE_STYLES.FALLBACK,
+        "style_fallback" in opts,
+        opts.get("style_fallback"),
+        style_fallback,
     )
     _apply_fallback(
         entity_decorators,
         ENTITY_TYPES.FALLBACK,
-        opts,
-        "entity_fallback",
+        "entity_fallback" in opts,
+        opts.get("entity_fallback"),
         entity_fallback,
     )
 
@@ -180,14 +188,12 @@ def build_markdown_config(options: MarkdownOptions | None = None) -> ExporterCon
 def _apply_fallback(
     config_map: ConfigMap,
     key: str,
-    opts: MarkdownOptions,
-    option_name: str,
+    has_option: bool,
+    value: Component | None,
     default: Component,
 ) -> None:
-    """Add a fallback to config_map unless explicitly set to None."""
-    if option_name in opts:
-        fb = opts[option_name]  # type: ignore[literal-required]
-        if fb is not None:
-            config_map[key] = fb
+    if has_option:
+        if value is not None:
+            config_map[key] = value
     else:
         config_map[key] = default

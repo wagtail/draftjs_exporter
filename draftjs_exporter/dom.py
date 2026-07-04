@@ -5,7 +5,7 @@ from contextvars import ContextVar
 from typing import Any, cast
 
 from draftjs_exporter.engines.base import DOMEngine
-from draftjs_exporter.types import HTML, Element, Props, RenderableType
+from draftjs_exporter.types import HTML, Component, Element, Props, RenderableType
 from draftjs_exporter.utils.module_loading import import_string
 
 # https://gist.github.com/yahyaKacem/8170675
@@ -109,8 +109,7 @@ class DOM:
         props["children"] = children[0] if children_len == 1 else children
 
         if callable(type_):
-            # Function component, via def or lambda. We presume its signature is correct.
-            elt = type_(props)  # type: ignore
+            elt = cast(Component, type_)(props)
         else:
             # Raw tag, as a string.
             attributes = {}

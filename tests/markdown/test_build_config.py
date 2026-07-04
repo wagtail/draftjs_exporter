@@ -1,13 +1,15 @@
 import unittest
+from collections.abc import Callable
+from typing import Any
 
 import pytest
 
 from draftjs_exporter.html import HTML
-from draftjs_exporter.markdown import CONFIG, MarkdownOptions, build_markdown_config
+from draftjs_exporter.markdown import CONFIG, build_markdown_config
 from draftjs_exporter.types import Block, ContentState
 
 
-def _text_block(text: str, block_type: str = "unstyled", **kwargs) -> Block:
+def _text_block(text: str, block_type: str = "unstyled", **kwargs: Any) -> Block:
     return {
         "key": kwargs.get("key", "a"),
         "text": text,
@@ -30,7 +32,7 @@ def _styled_content(text: str, style: str) -> ContentState:
     }
 
 
-def _block_content(text: str, block_type: str, **kwargs) -> ContentState:
+def _block_content(text: str, block_type: str, **kwargs: Any) -> ContentState:
     return {
         "entityMap": {},
         "blocks": [_text_block(text, block_type, **kwargs)],
@@ -66,7 +68,7 @@ def _hr_content() -> ContentState:
     }
 
 
-def _render(options: MarkdownOptions, content_state: ContentState) -> str:
+def _render(options: Any, content_state: ContentState) -> str:
     return HTML(build_markdown_config(options)).render(content_state)
 
 
@@ -111,7 +113,9 @@ STYLE_CASES = [
     STYLE_CASES,
     ids=[f"{k}={v}" for k, v, *_ in STYLE_CASES],
 )
-def test_style_option(option_key, option_value, style, text, expected):
+def test_style_option(
+    option_key: str, option_value: str, style: str, text: str, expected: str
+) -> None:
     assert _render({option_key: option_value}, _styled_content(text, style)) == expected
 
 
@@ -143,7 +147,7 @@ BLOCK_CASES = [
     BLOCK_CASES,
     ids=[f"{k}={v}" for k, v, *_ in BLOCK_CASES],
 )
-def test_block_option(option_key, option_value, content_factory, expected):
+def test_block_option(option_key: str, option_value: str, content_factory: Callable[[], ContentState], expected: str) -> None:
     assert _render({option_key: option_value}, content_factory()) == expected
 
 
