@@ -1,3 +1,9 @@
+"""Abstract DOM-building primitives used by the exporter.
+
+The DOM class exposes a React-like element-creation API over pluggable
+rendering engines such as HTML5lib, lxml, string, and Markdown.
+"""
+
 import re
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -17,18 +23,22 @@ _engine_cache: dict[str, type[DOMEngine]] = {}
 
 
 class DOM:
-    """
-    Component building API, abstracting the DOM implementation.
-    """
+    """Provide a DOM-building API that abstracts the active engine."""
 
     HTML5LIB = "draftjs_exporter.engines.html5lib.DOM_HTML5LIB"
+    """Identifier for the html5lib DOM engine."""
     LXML = "draftjs_exporter.engines.lxml.DOM_LXML"
+    """Identifier for the lxml DOM engine."""
     MARKDOWN = "draftjs_exporter.engines.markdown.DOMMarkdown"
+    """Identifier for the Markdown DOM engine."""
     STRING = "draftjs_exporter.engines.string.DOMString"
+    """Identifier for the string DOM engine."""
     STRING_COMPAT = "draftjs_exporter.engines.string_compat.DOMStringCompat"
+    """Identifier for the string compatibility DOM engine."""
 
     @staticmethod
     def camel_to_dash(camel_cased_str: str) -> str:
+        """Convert a camelCase string to a dashed-case attribute name."""
         sub2 = _first_cap_re.sub(r"\1-\2", camel_cased_str)
         dashed_case_str = _all_cap_re.sub(r"\1-\2", sub2).lower()
         return dashed_case_str.replace("--", "-")
@@ -44,9 +54,7 @@ class DOM:
 
     @classmethod
     def use(cls, engine: str) -> None:
-        """
-        Choose which DOM implementation to use in the current context.
-        """
+        """Select the DOM implementation for the current context."""
         try:
             resolved = _engine_cache[engine]
         except KeyError:
@@ -58,9 +66,7 @@ class DOM:
     @staticmethod
     @contextmanager
     def engine(engine: str) -> Iterator[None]:
-        """
-        Context manager to temporarily set the DOM engine for the current context.
-        """
+        """Temporarily set the DOM engine for the current context."""
         try:
             resolved = _engine_cache[engine]
         except KeyError:
@@ -80,14 +86,18 @@ class DOM:
         props: Props | None = None,
         *elt_children: Element | None,
     ) -> Element:
-        """
-        Signature inspired by React.createElement.
-        createElement(
-          string/Component type,
-          [dict props],
-          [children ...]
-        )
-        https://facebook.github.io/react/docs/top-level-api.html#react.createelement
+        """Create an element or document fragment using the current engine.
+
+        The signature mirrors React.createElement: a type, an optional props
+        dictionary, and zero or more children.
+
+        Parameters:
+            type_: The tag name, component, or ``None`` for a fragment.
+            props: Attributes and metadata to pass to the element.
+            *elt_children: Child nodes to append to the element.
+
+        Returns:
+            The constructed element.
         """
         dom = cls._dom()
         # Create an empty document fragment.
@@ -154,16 +164,20 @@ class DOM:
 
     @classmethod
     def parse_html(cls, markup: HTML) -> Element:
+        """Parse an HTML string into an element using the current engine."""
         return cls._dom().parse_html(markup)
 
     @classmethod
     def append_child(cls, elt: Element, child: Element) -> Any:
+        """Append a child node to an element."""
         return cls._dom().append_child(elt, child)
 
     @classmethod
     def render(cls, elt: Element) -> HTML:
+        """Render an element tree to its final HTML output."""
         return cls._dom().render(elt)
 
     @classmethod
     def render_debug(cls, elt: Element) -> HTML:
+        """Render an element tree to a debug-friendly representation."""
         return cls._dom().render_debug(elt)

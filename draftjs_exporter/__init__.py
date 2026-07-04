@@ -1,3 +1,10 @@
+"""Public API and metadata of draftjs_exporter.
+
+This module gathers metadata, core classes, default configuration maps,
+type aliases, and helpers so callers can import everything from
+``draftjs_exporter`` directly.
+"""
+
 __title__ = "draftjs_exporter"
 __version__ = "5.2.0"
 __author__ = "Springload and Contributors"
@@ -79,9 +86,11 @@ __all__ = [
 ]
 
 Exporter = HTML
+"""Compatibility alias for the HTML exporter."""
 
 HTML_CONFIG: ExporterConfig = {
     "block_map": BLOCK_MAP,
     "style_map": STYLE_MAP,
     "engine": DOM.STRING,
 }
+"""Default exporter configuration using the built-in maps and string engine."""

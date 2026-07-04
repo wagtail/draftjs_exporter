@@ -1,3 +1,10 @@
+"""Convert Draft.js content state into HTML using configurable maps.
+
+The ``HTML`` exporter is the main entry point. It coordinates block,
+inline style, entity, and decorator rendering over a pluggable DOM
+engine.
+"""
+
 from operator import attrgetter
 from typing import TypedDict
 
@@ -23,8 +30,9 @@ from draftjs_exporter.types import (
 from draftjs_exporter.wrapper_state import WrapperState
 
 
-# The whole config object.
 class ExporterConfig(TypedDict, total=False):
+    """Available options when configuring an HTML exporter."""
+
     block_map: ConfigMap
     style_map: ConfigMap
     entity_decorators: ConfigMap
@@ -33,9 +41,10 @@ class ExporterConfig(TypedDict, total=False):
 
 
 class HTML:
-    """
-    Entry point of the exporter. Combines entity, wrapper and style state
-    to generate the right HTML nodes.
+    """Combine entity, wrapper, and style state to render Draft.js content.
+
+    This is the main entry point for converting a Draft.js content state
+    into an HTML string.
     """
 
     __slots__ = (
@@ -47,6 +56,12 @@ class HTML:
     )
 
     def __init__(self, config: ExporterConfig | None = None) -> None:
+        """Initialize the exporter with the given configuration.
+
+        Parameters:
+            config: Exporter options. Missing values use the default block
+                and style maps and the string DOM engine.
+        """
         if config is None:
             config = {}
 
@@ -59,9 +74,7 @@ class HTML:
         self._engine = config.get("engine", DOM.STRING)
 
     def render(self, content_state: ContentState | None = None) -> str:
-        """
-        Starts the export process on a given piece of content state.
-        """
+        """Render the given Draft.js content state as HTML."""
         with DOM.engine(self._engine):
             dom = DOM._dom()
 
@@ -99,6 +112,17 @@ class HTML:
         wrapper_state: WrapperState,
         dom: type[DOMEngine],
     ) -> Element:
+        """Render a single block to an element.
+
+        Parameters:
+            block: The Draft.js block to render.
+            entity_map: Map of entity keys to entity definitions.
+            wrapper_state: Stateful wrapper that handles nesting of list items.
+            dom: Active DOM engine used to create elements.
+
+        Returns:
+            The rendered block element.
+        """
         text = block.get("text", "")
         has_styles = bool(block.get("inlineStyleRanges"))
         has_entities = bool(block.get("entityRanges"))
@@ -158,9 +182,15 @@ class HTML:
         return wrapper_state.element_for(block, content)
 
     def build_command_groups(self, block: Block) -> list[tuple[str, list[Command]]]:
-        """
-        Creates block modification commands, grouped by start index,
-        with the text to apply them on.
+        """Group block modification commands by start index.
+
+        Each group is paired with the slice of text the commands apply to.
+
+        Parameters:
+            block: The Draft.js block whose commands are grouped.
+
+        Returns:
+            Tuples of ``(text slice, commands applied to the slice)``.
         """
         text = block.get("text", "")
 
@@ -191,11 +221,16 @@ class HTML:
         return sliced
 
     def build_commands(self, block: Block) -> list[Command]:
-        """
-        Build all of the manipulation commands for a given block.
-        - One pair to set the text.
-        - Multiple pairs for styles.
-        - Multiple pairs for entities.
+        """Build all manipulation commands for a block.
+
+        The returned commands include a start and stop text marker plus one
+        command for each inline style and entity range.
+
+        Parameters:
+            block: The Draft.js block to build commands from.
+
+        Returns:
+            The ordered list of manipulation commands.
         """
         style_commands = Command.from_style_ranges(block)
         entity_commands = Command.from_entity_ranges(block)

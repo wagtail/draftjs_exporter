@@ -1,24 +1,35 @@
+"""Shared type aliases and TypedDict structures for Draft.js data.
+
+Use these types when annotating custom components, decorators, or
+configuration maps consumed by the exporter.
+"""
+
 import re
 from collections.abc import Callable
 from typing import Any, Literal, TypeAlias, TypedDict
 
-# Element represents an instance of a RenderableType. It’s engine-specific so very hard to type.
 Element: TypeAlias = Any
-# Props are always a dictionary with string keys and arbitrary values.
+"""Engine-specific element produced by a renderable."""
+
 Props: TypeAlias = dict[str, Any]
+"""Dictionary of string attribute keys to arbitrary values."""
 
-# A DOM tag name.
 Tag: TypeAlias = str
-# A component function, taking props as a parameter and returning an Element by calling DOM.create_element.
+"""HTML tag name."""
+
 Component: TypeAlias = Callable[[Props], Element]
-# What can be rendered: None, DOM tag name, Component.
+"""Render a component from props and return an element."""
+
 RenderableType: TypeAlias = Component | Tag | None
-# The output of the exporter.
+"""A tag name, component function, or ``None`` for a fragment."""
+
 HTML = str
+"""Final rendered output of the exporter."""
 
 
-# Config for a single renderable, element and optional wrappers / props.
 class RenderableConfig(TypedDict, total=False):
+    """Configuration describing how to render a single renderable."""
+
     # TODO Use typing.Required when dropping Python 3.10 support.
     # See https://peps.python.org/pep-0655/.
     element: RenderableType
@@ -31,33 +42,40 @@ class RenderableConfig(TypedDict, total=False):
 # def is_renderable_config(val: dict) -> TypeGuard[RenderableConfig]:
 #     return isinstance(val, dict) and "element" in val
 
-# block_map, style_map, entity_decorators.
 ConfigMap: TypeAlias = dict[str, RenderableConfig | RenderableType]
+"""Map string keys to renderable configurations or values."""
 
 
-# composite_decorators.
 class Decorator(TypedDict):
+    """Pattern and component used to decorate matching text."""
+
     strategy: re.Pattern[str]
     component: RenderableType
 
 
 CompositeDecorators: TypeAlias = list[Decorator]
+"""List composite decorators applied while rendering blocks."""
 
 
-# Blocks have a predetermined set of keys and values, but let’s be permissive.
 class InlineStyleRange(TypedDict):
+    """Range of text styled by a single inline style."""
+
     offset: int
     length: int
     style: str
 
 
 class EntityRange(TypedDict):
+    """Range of text associated with a single entity."""
+
     offset: int
     length: int
     key: int
 
 
 class Block(TypedDict, total=False):
+    """Single Draft.js block within a content state."""
+
     key: str
     text: str
     type: str
@@ -67,22 +85,27 @@ class Block(TypedDict, total=False):
     entityRanges: list[EntityRange]
 
 
-# Entity key is int in blocks, str in Entity map.
 EntityKey: TypeAlias = str
+"""Key used to look up an entity in the entity map."""
 
 Mutability: TypeAlias = Literal["MUTABLE", "IMMUTABLE", "SEGMENTED"]
+"""Draft.js entity mutability setting."""
 
 
 class Entity(TypedDict, total=False):
+    """Draft.js entity data referenced by entity ranges."""
+
     type: str
     data: dict[str, Any]
     mutability: Mutability
 
 
 EntityMap: TypeAlias = dict[EntityKey, Entity]
+"""Map entity keys to their definitions."""
 
 
-# The whole content state. blocks and entity_map.
 class ContentState(TypedDict, total=False):
+    """Top-level Draft.js content state passed to the exporter."""
+
     blocks: list[Block]
     entityMap: EntityMap

@@ -1,3 +1,9 @@
+"""Markdown export configuration and preset builders.
+
+Combines block, inline style, entity, and code decorators tuned for
+CommonMark-compatible output.
+"""
+
 from typing import Literal, TypedDict
 
 from draftjs_exporter.constants import BLOCK_TYPES, ENTITY_TYPES, INLINE_STYLES
@@ -34,6 +40,8 @@ from draftjs_exporter.types import Component, ConfigMap
 
 
 class MarkdownOptions(TypedDict, total=False):
+    """Options available when customizing Markdown renderer output."""
+
     bold: Literal["**", "__"]
     italic: Literal["*", "_"]
     strikethrough: Literal["~", "~~"]
@@ -106,6 +114,12 @@ def build_markdown_config(options: MarkdownOptions | None = None) -> ExporterCon
 
     All options fall back to CommonMark-compatible defaults when omitted.
     Set a fallback to None to disable it.
+
+    Parameters:
+        options: Overrides for Markdown characters and fallback components.
+
+    Returns:
+        A full exporter config ready for ``HTML``.
     """
     opts = options if options is not None else MarkdownOptions()
 
@@ -192,6 +206,15 @@ def _apply_fallback(
     value: Component | None,
     default: Component,
 ) -> None:
+    """Attach or remove a fallback component in a config map.
+
+    Parameters:
+        config_map: The map to mutate.
+        key: The fallback key to set.
+        has_option: Whether the caller explicitly provided a fallback option.
+        value: The caller-provided fallback, if any.
+        default: The built-in fallback to use when no option was given.
+    """
     if has_option:
         if value is not None:
             config_map[key] = value

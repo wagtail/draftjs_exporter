@@ -37,6 +37,9 @@ See [docs/CONTRIBUTING.md#coding-style--conventions](docs/CONTRIBUTING.md#coding
 - Formatting: `ruff format` for Python, `prettier` for all other files.
 - Test modules follow `test_*.py`, with test functions named `test_*`, test classes `Test*`.
 - Core classes must use `__slots__`.
+- **Docstrings are required for all public modules, classes, methods, and functions.** Use Google-style sections (`Parameters:`, `Returns:`, `Raises:`, `Yields:`, `Examples:`) and place type information in annotations, not docstrings.
+- Document attributes and type aliases with a docstring directly below the assignment.
+- See [docs/CONTRIBUTING.md#documentation-and-docstrings](docs/CONTRIBUTING.md#documentation-and-docstrings) for the full guide.
 
 ## Testing guidelines
 

@@ -1,6 +1,9 @@
+"""Custom exceptions raised by the exporter."""
+
+
 class ExporterException(Exception):
-    pass
+    """Base exception for all exporter errors."""
 
 
 class ConfigException(ExporterException):
-    pass
+    """Raised when the exporter configuration is invalid or unsupported."""

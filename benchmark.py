@@ -1,3 +1,5 @@
+"""Benchmark the performance of draftjs_exporter."""
+
 import argparse
 import cProfile
 import logging
@@ -27,6 +29,7 @@ args = parser.parse_args()
 
 
 def document(props: Props) -> Element:
+    """Render a document entity as a link."""
     return DOM.create_element(
         "a",
         {"title": props.get("label"), "href": f"/documents/{props.get('id')}"},
@@ -35,10 +38,12 @@ def document(props: Props) -> Element:
 
 
 def link(props: Props) -> Element:
+    """Render a link entity as an anchor element."""
     return DOM.create_element("a", {"href": props["url"]}, props["children"])
 
 
 def block_fallback(props: Props) -> Element:
+    """Render a fallback element for an unknown block type."""
     type_ = props["block"]["type"]
 
     logging.warning(f'Missing config for "{type_}".')
@@ -100,6 +105,7 @@ print("Measuring memory consumption")  # noqa: T201
 
 
 def memory_consumption_run() -> None:
+    """Measure memory consumption while exporting the sample content."""
     with memray.Tracker(
         destination=memray.FileDestination("benchmark.bin", overwrite=True)
     ):

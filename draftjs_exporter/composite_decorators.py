@@ -1,3 +1,5 @@
+"""Apply regex-based composite decorators to text while rendering blocks."""
+
 import re
 from collections.abc import Generator
 from operator import itemgetter
@@ -8,12 +10,24 @@ from draftjs_exporter.engines.base import DOMEngine
 from draftjs_exporter.types import Block, CompositeDecorators, Decorator, Element
 
 br = "\n"
+"""Line-break character handled by the default decorator strategy."""
+
 br_strategy = re.compile(r"\n")
+"""Default decorator strategy matching single line breaks."""
 
 
 def get_decorations(
     decorators: CompositeDecorators, text: str
 ) -> list[tuple[int, int, Any, Decorator]]:
+    """Collect non-overlapping decorator matches for the given text.
+
+    Parameters:
+        decorators: Composite decorator definitions.
+        text: The block text to decorate.
+
+    Returns:
+        A sorted list of decorations as ``(start, end, match, decorator)`` tuples.
+    """
     occupied: dict[int, int] = {}
     decorations = []
 
@@ -36,6 +50,17 @@ def apply_decorators(
     block: Block,
     blocks: list[Block],
 ) -> Generator[str, None, None]:
+    """Yield decorated text segments and decorator elements for a block.
+
+    Parameters:
+        decorators: Composite decorator definitions.
+        text: The block text to decorate.
+        block: The block currently being rendered.
+        blocks: All blocks in the content state.
+
+    Yields:
+        Plain text or decorator element nodes covering the full block text.
+    """
     decorations = get_decorations(decorators, text)
 
     pointer = 0
@@ -61,6 +86,18 @@ def render_decorators(
     blocks: list[Block],
     dom: type[DOMEngine],
 ) -> Element:
+    """Render all decorator output for a block into a single element.
+
+    Parameters:
+        decorators: Composite decorator definitions.
+        text: The block text to decorate.
+        block: The block currently being rendered.
+        blocks: All blocks in the content state.
+        dom: The active DOM engine.
+
+    Returns:
+        A single element containing all decorated text, or the text itself.
+    """
     decorated_children = list(apply_decorators(decorators, text, block, blocks))
 
     if len(decorated_children) == 1:
@@ -77,6 +114,15 @@ def should_render_decorators(
     decorators: CompositeDecorators,
     text: str,
 ) -> bool:
+    """Return whether decorators need to be processed for the given text.
+
+    Parameters:
+        decorators: Composite decorator definitions.
+        text: The block text to check.
+
+    Returns:
+        True when there are decorators and the default newline-only optimization does not apply.
+    """
     nb_decorators = len(decorators)
 
     if nb_decorators == 0:

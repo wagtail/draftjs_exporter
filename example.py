@@ -1,4 +1,6 @@
 #!/usr/bin/env -S uv run
+"""Example usage of draftjs_exporter with custom components and fallbacks."""
+
 import argparse
 import cProfile
 import json
@@ -27,6 +29,7 @@ from draftjs_exporter.markdown.entities import link as markdown_link
 
 
 def blockquote(props: Props) -> Element:
+    """Render a blockquote with an optional cite attribute."""
     block_data = props["block"]["data"]
 
     return DOM.create_element(
@@ -35,6 +38,7 @@ def blockquote(props: Props) -> Element:
 
 
 def list_item(props: Props) -> Element:
+    """Render a list item with a class reflecting its nesting depth."""
     depth = props["block"]["depth"]
 
     return DOM.create_element(
@@ -43,6 +47,7 @@ def list_item(props: Props) -> Element:
 
 
 def ordered_list(props: Props) -> Element:
+    """Render an ordered list with a class reflecting its nesting depth."""
     depth = props["block"]["depth"]
 
     return DOM.create_element(
@@ -51,6 +56,7 @@ def ordered_list(props: Props) -> Element:
 
 
 def image(props: Props) -> Element:
+    """Render an image element from entity data."""
     return DOM.create_element(
         "img",
         {
@@ -63,13 +69,12 @@ def image(props: Props) -> Element:
 
 
 def link(props: Props) -> Element:
+    """Render a link entity as an anchor element."""
     return DOM.create_element("a", {"href": props["url"]}, props["children"])
 
 
 def br(props: Props) -> Element:
-    """
-    Replace line breaks (\n) with br tags.
-    """
+    r"""Replace line breaks (\n) with br tags."""
     # Do not process matches inside code blocks.
     if props["block"]["type"] == BLOCK_TYPES.CODE:
         return props["children"]
@@ -78,9 +83,7 @@ def br(props: Props) -> Element:
 
 
 def hashtag(props: Props) -> Element:
-    """
-    Wrap hashtags in spans with a specific class.
-    """
+    """Wrap hashtags in spans with a specific class."""
     # Do not process matches inside code blocks.
     if props["block"]["type"] == BLOCK_TYPES.CODE:
         return props["children"]
@@ -95,9 +98,7 @@ LINKIFY_RE = re.compile(
 
 
 def linkify(props: Props) -> Element:
-    """
-    Wrap plain URLs with link tags.
-    """
+    """Wrap plain URLs with link tags."""
     match = props["match"]
     protocol = match.group(1)
     url = match.group(2)
@@ -115,9 +116,7 @@ def linkify(props: Props) -> Element:
 
 
 def linkify_markdown(props: Props) -> Element:
-    """
-    Wrap plain URLs with link tags.
-    """
+    """Wrap plain URLs with Markdown link syntax."""
     match = props["match"]
     protocol = match.group(1)
     url = match.group(2)
@@ -138,6 +137,7 @@ def linkify_markdown(props: Props) -> Element:
 
 
 def block_fallback(props: Props) -> Element:
+    """Provide example fallback behavior for unknown block types."""
     type_ = props["block"]["type"]
 
     if type_ == "example-discard":
@@ -157,6 +157,7 @@ def block_fallback(props: Props) -> Element:
 
 
 def entity_fallback(props: Props) -> Element:
+    """Provide example fallback behavior for unknown entity types."""
     type_ = props["entity"]["type"]
     key = props["entity"]["entity_range"]["key"]
     logging.warning(f'Missing config for "{type_}", key "{key}".')
@@ -164,6 +165,7 @@ def entity_fallback(props: Props) -> Element:
 
 
 def style_fallback(props: Props) -> Element:
+    """Provide example fallback behavior for unknown inline styles."""
     type_ = props["inline_style_range"]["style"]
     logging.warning(f'Missing config for "{type_}". Deleting style.')
     return props["children"]
@@ -620,6 +622,7 @@ if __name__ == "__main__":
     p = Stats(pr)
 
     def prettify(markup: str) -> str:
+        """Prettify HTML by stripping html/body/head wrappers."""
         return re.sub(
             r"</?(body|html|head)>",
             "",

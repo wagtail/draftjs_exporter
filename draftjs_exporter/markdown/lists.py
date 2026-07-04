@@ -1,3 +1,5 @@
+"""List item utilities: numbering, prefixes, and spacing between consecutive items."""
+
 from collections.abc import Callable
 
 from draftjs_exporter.dom import DOM
@@ -5,13 +7,28 @@ from draftjs_exporter.types import Block, Element, Props
 
 
 def get_block_index(blocks: list[Block], key: str) -> int:
-    """Retrieves the index at which a given block is, or -1 if not found."""
+    """Find the index of the block with the given key.
+
+    Parameters:
+        blocks: The sequence of blocks to search.
+        key: The block key to locate.
+
+    Returns:
+        The block index, or ``-1`` if the key is not found.
+    """
     keys = [i for i in range(len(blocks)) if blocks[i].get("key") == key]
     return keys[0] if keys else -1
 
 
 def get_li_suffix(props: Props) -> str:
-    """Determines the suffix for list items (newline, or double newline) based on the next block."""
+    r"""Choose a list item suffix based on the following block type.
+
+    Parameters:
+        props: Render properties including the current block and all blocks.
+
+    Returns:
+        ``"\n\n"`` when the next block is a different type, otherwise ``"\n"``.
+    """
     key = props["block"].get("key")
 
     if not key:
@@ -25,7 +42,17 @@ def get_li_suffix(props: Props) -> str:
 
 
 def make_numbered_li_prefix(delimiter: str) -> Callable[[Props], str]:
-    """Returns a prefix function using the given delimiter ('.' or ')')."""
+    """Create a function that computes an ordered list item prefix.
+
+    The returned function counts preceding list items at the same depth
+    within the same list type.
+
+    Parameters:
+        delimiter: The delimiter to place after the item number.
+
+    Returns:
+        A function accepting props and returning the prefix string.
+    """
 
     def get_prefix(props: Props) -> str:
         type_ = props["block"]["type"]
@@ -62,7 +89,15 @@ get_numbered_li_prefix: Callable[[Props], str] = make_numbered_li_prefix(".")
 
 
 def list_item(prefix: str, props: Props) -> Element:
-    """List item formatting - not really inline, not really a block either."""
+    """Render a single Markdown list item with indentation and suffix.
+
+    Parameters:
+        prefix: The list marker prefix, including any trailing space.
+        props: Render properties including the current block and all blocks.
+
+    Returns:
+        A fragment containing the indented prefix, children, and trailing newline.
+    """
     indent = "  " * props["block"]["depth"]
     suffix = get_li_suffix(props)
 

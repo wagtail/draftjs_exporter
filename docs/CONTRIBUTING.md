@@ -142,6 +142,63 @@ We follow [PEP 8](https://peps.python.org/pep-0008/) for Python code style, enfo
 - **Imports**: organised automatically by `ruff` (isort rules in `pyproject.toml`).
 - **Error handling**: use specific exception types; avoid bare `except:` clauses (BLE rules).
 
+Additionally, we follow:
+
+- [Python code best practices from Griffe](https://mkdocstrings.github.io/griffe/guide/users/recommendations/python-code/)
+- [Docstrings best practices from Griffe](https://mkdocstrings.github.io/griffe/guide/users/recommendations/docstrings/)
+
+## Documentation and docstrings
+
+Good documentation helps users and contributors understand the exporter without reading source code. We aim for docs that are accurate, discoverable, and maintainable.
+
+### Design goals
+
+- **Docs as code:** user and contributor docs live in version-controlled Markdown alongside the source.
+- **API docs in docstrings:** the public API is documented in docstrings so it can be extracted by tools like [Griffe](https://mkdocstrings.github.io/griffe/) and [mkdocstrings](https://mkdocstrings.github.io/) in the future.
+- **Consistent style:** all docstrings follow the **Google style** with explicit sections for parameters, return values, raised exceptions, and yielded values.
+- **No type duplication:** type information lives in annotations. Docstrings describe semantics, not types.
+
+### Docstring conventions
+
+Follow these conventions for all production code:
+
+- **Every public module, class, method, and function** must have a docstring.
+- **Module docstrings** go at the top of the file and briefly describe what the module contains and when to use it.
+- **Class docstrings** explain the class’s purpose. List public attributes only when they are not obvious from type annotations.
+- **Method and function docstrings** use this structure:
+
+  ```python
+  def render(self, content_state: ContentState | None = None) -> str:
+      """Render Draft.js ContentState as HTML.
+
+      Parameters:
+          content_state: The raw ContentState to render. Defaults to an empty state.
+
+      Returns:
+          The rendered HTML string.
+
+      Raises:
+          ValueError: If the content state contains unsupported block depths.
+      """
+  ```
+
+- **Use these sections when applicable:** `Parameters:`, `Returns:`, `Yields:`, `Receives:`, `Raises:`, `Warns:`, `Examples:`.
+- **Attributes and type aliases** are documented with a docstring directly below the assignment:
+
+  ```python
+  Element: TypeAlias = Any
+  """An engine-specific DOM element produced by a renderable component."""
+  ```
+
+- **Magic methods** (`__init__`, `__repr__`, etc.) are documented when they are part of the public API.
+- **Exceptions:** document exception classes with a short description of when they are raised.
+
+### Prose documentation
+
+- User-facing docs live in `docs/`; the README is the entry point.
+- Keep language concise and in **Sentence case** (no Title Case).
+- Run `just format` before committing so prettier formats Markdown files consistently.
+
 ## Testing
 
 We aim for 100% test coverage on all changes. Tests are run with `pytest` and configured in `pyproject.toml`.
