@@ -49,5 +49,13 @@
       "matchPackageNames": ["lxml", "beautifulsoup4", "html5lib"],
       "enabled": false,
     },
+
+    // CI Python versions are intentionally pinned (lower-bound, compatibility matrix, experimental).
+    {
+      "matchManagers": ["github-actions"],
+      "matchDepNames": ["python"],
+      "matchFileNames": [".github/workflows/ci.yml"],
+      "enabled": false,
+    },
   ],
 }
