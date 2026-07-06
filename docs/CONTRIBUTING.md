@@ -89,14 +89,14 @@ just init
 
 - `just help`: See what commands are available.
 - `just init`: Install dependencies and initialise for development.
-- `just lint`: Lint the project.
-- `just format`: Format project files.
-- `just test`: Test the project.
-- `just test-watch`: Restarts the tests whenever a file changes.
-- `just test-coverage`: Run the tests while generating test coverage data.
-- `just test-compatibility`: Compatibility-focused test suite.
+- `just lint`: Lint the project. Accepts optional paths to scope to, e.g. `just lint draftjs_exporter/dom.py`.
+- `just format *paths="."`: Format project files.
+- `just test *args`: Test the project or a specific file (like `just test tests/test_dom.py`).
+- `just test-watch *args`: Restarts the tests whenever a file changes.
+- `just test-coverage *args`: Run the tests while generating test coverage data.
+- `just test-compatibility *args`: Compatibility-focused test suite.
 - `just dev`: Restarts the example whenever a file changes.
-- `just benchmark`: Runs a one-off performance (speed, memory) benchmark.
+- `just benchmark runs="1"`: Runs a one-off performance (speed, memory) benchmark. Accepts an optional number of runs, e.g. `just benchmark 5`.
 - `just clean-pyc`: Remove Python file artifacts.
 - `just build`: Builds package for publication.
 - `just publish`: Publishes a new version to PyPI.
@@ -126,7 +126,7 @@ To manually update a dependency, edit the version in `pyproject.toml` or `packag
 - Use a debugger. `uv pip install ipdb`, then `import ipdb; ipdb.set_trace()`.
 - You can use `example.py` as a basic CLI to try out the exporter with arbitrary ContentState JSON: `echo '{"json": "contents"}' | ./example.py -`.
 - Inspect the DOM tree at any stage using `DOM.render_debug()` to see the virtual DOM structure before serialisation.
-- Run individual test files with `uv run pytest tests/test_dom.py`, or filter with `-k`: `uv run pytest tests/test_dom.py -k "test_create_element"`.
+- Run individual test files with `just test tests/test_dom.py`, or filter with `-k`: `just test tests/test_dom.py -k "test_create_element"`.
 - Use `just dev` to restart the example automatically whenever source files change.
 
 ## Coding style & conventions

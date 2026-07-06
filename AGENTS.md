@@ -15,8 +15,8 @@ See [docs/CONTRIBUTING.md#commands](docs/CONTRIBUTING.md#commands) for the full 
 - `just init` – install dependencies
 - `just lint` – lint + type-check
 - `just format` – auto-format
-- `just test` – run tests (strict mode)
-- `just test-coverage` – run with coverage
+- `just test *args` – run tests (strict mode) over project or a specific file (like `just test tests/test_dom.py`)
+- `just test-coverage *args` – run with coverage
 
 ## Project tools
 

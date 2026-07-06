@@ -27,26 +27,26 @@ lint:
   uv run ty check
 
 # Format project files.
-format:
-  uv run ruff check --fix
-  uv run ruff format
-  npm run format
+format *paths=".":
+  uv run ruff check --fix {{paths}}
+  uv run ruff format {{paths}}
+  npm run format -- {{paths}}
 
-# Test the project.
-test:
-  PYTHONDEVMODE=1 uv run pytest -W error --capture=no
+# Test the project or a specific file (like `just test tests/test_dom.py`).
+test *args:
+  PYTHONDEVMODE=1 uv run pytest -W error --capture=no {{args}}
 
 # Restarts the tests whenever a file changes.
-test-watch:
-  PYTHONDEVMODE=1 nodemon -q -e py -w tests -w draftjs_exporter -x "clear && just test || true"
+test-watch *args:
+  PYTHONDEVMODE=1 nodemon -q -e py -w tests -w draftjs_exporter -x "clear && just test {{args}} || true"
 
 # Run the tests while generating test coverage data.
-test-coverage:
-  PYTHONDEVMODE=1 uv run pytest -W error --cov --cov-report=term --cov-report=html --capture=no
+test-coverage *args:
+  PYTHONDEVMODE=1 uv run pytest -W error --cov --cov-report=term --cov-report=html --capture=no {{args}}
 
 # Compatibility-focused test suite.
-test-compatibility:
-  uv run --isolated --python 3.10 --with 'beautifulsoup4==4.7.1, html5lib==1.1, lxml==4.6.5' pytest
+test-compatibility *args:
+  uv run --isolated --python 3.10 --with 'beautifulsoup4==4.7.1, html5lib==1.1, lxml==4.6.5' pytest {{args}}
 
 # Restarts the example whenever a file changes.
 dev:
