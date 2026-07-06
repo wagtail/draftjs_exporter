@@ -248,6 +248,8 @@ By default, the exporter uses a dependency-free engine called `string` to build 
 
 The `string` engine is the fastest, and does not have any dependencies. Its only drawback is that the `parse_html` method does not escape/sanitize HTML like that of other engines.
 
+Engine output often differs in small ways. For example quote escaping in attributes, self-closing tags, and attribute name validation strictness exist between engines by design. If you switch engines on an existing site, expect some minor output differences, and re-check any code or tests that compare rendered HTML exactly.
+
 - For `html5lib`, do `pip install draftjs_exporter[html5lib]`.
 - For `lxml`, do `pip install draftjs_exporter[lxml]`. It also requires `libxml2` and `libxslt` to be available on your system.
 - There are no additional dependencies for `string_compat`.

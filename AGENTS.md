@@ -27,6 +27,7 @@ See [docs/CONTRIBUTING.md#commands](docs/CONTRIBUTING.md#commands) for the full 
 - `uv` for package publication
 - `GitHub Actions` for continuous integration
 - `pytest` for unit tests
+- `hypothesis` for property-based tests
 
 ## Coding style & naming conventions
 
@@ -48,6 +49,7 @@ See [docs/CONTRIBUTING.md#testing](docs/CONTRIBUTING.md#testing) for the full gu
 - Target of 100% test coverage for all improvements.
 - Write tests at the unit level, integration level (`test_output.py`), and snapshot level (`test_exports.json`).
 - Add or update test cases in `test_exports.json` when output behavior changes across engines.
+- `tests/test_properties.py` (strategies in `tests/strategies.py`) checks Hypothesis-generated properties: crash safety and command-grouping invariants. See [docs/CONTRIBUTING.md#property-based-tests](docs/CONTRIBUTING.md#property-based-tests) for the full guide on where / when to use this approach.
 
 ## Commit & pull request guidelines
 

@@ -93,3 +93,4 @@ lib64
 example.html
 .mypy_cache
 __pycache__
+.hypothesis

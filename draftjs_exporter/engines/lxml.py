@@ -33,7 +33,15 @@ class DOM_LXML(DOMEngine):
                 attr[f"{{{NSMAP['xlink']}}}href"] = attr.pop("xlink:href")
                 nsmap = NSMAP
 
-        return etree.Element(type_, attrib=attr, nsmap=nsmap)
+        elt = etree.Element(type_, attrib=attr, nsmap=nsmap)
+        # libxml2's HTML serializer omits the closing tag of some elements
+        # (e.g. <li>, <td>) when they have neither text nor children – its
+        # `.text` is `None`, not just empty. Void elements (<hr>, <img>, …)
+        # are unaffected, so this keeps output consistent with the other
+        # engines without needing to track which tags are void ourselves.
+        elt.text = ""
+
+        return elt
 
     @staticmethod
     def parse_html(markup: HTML) -> etree.Element:
