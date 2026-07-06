@@ -19,7 +19,7 @@ so it thinks `content_states()` is missing arguments. mypy understands this via 
 import unittest
 
 from bs4 import BeautifulSoup
-from hypothesis import given, settings
+from hypothesis import example, given, settings
 
 from draftjs_exporter.constants import ENTITY_TYPES
 from draftjs_exporter.defaults import BLOCK_MAP, STYLE_MAP
@@ -62,6 +62,35 @@ class TestRenderCrashSafety(unittest.TestCase):
 
     @given(content_state=content_states())  # ty: ignore[missing-argument]
     @settings(deadline=None)
+    # Regression for a block jumping straight to a nested depth (here a
+    # list item at depth 1 with no depth-0 item before it) with no
+    # preceding wrapper: WrapperState.update_stack had to synthesize an
+    # intermediary wrapper node with no children, which crashed the
+    # Markdown engine when the wrapper's element is a callable component
+    # (e.g. Markdown's list_item) that reads `props["children"]` directly.
+    @example(
+        content_state={
+            "entityMap": {},
+            "blocks": [
+                {
+                    "key": "aaaaa",
+                    "text": "",
+                    "type": "unstyled",
+                    "depth": 0,
+                    "inlineStyleRanges": [],
+                    "entityRanges": [],
+                },
+                {
+                    "key": "aaaaa",
+                    "text": "",
+                    "type": "unordered-list-item",
+                    "depth": 1,
+                    "inlineStyleRanges": [],
+                    "entityRanges": [],
+                },
+            ],
+        }
+    )
     def test_markdown_engine_never_raises(self, content_state):
         exporter = HTML({**MARKDOWN_CONFIG, "engine": DOM.MARKDOWN})
         exporter.render(content_state)

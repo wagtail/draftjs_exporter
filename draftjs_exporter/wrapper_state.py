@@ -240,7 +240,7 @@ class WrapperState:
                     }
                     props["blocks"] = self.blocks
 
-                    wrapper_parent = DOM.create_element(options.element, props)
+                    wrapper_parent = DOM.create_element(options.element, props, "")
                     self.dom.append_child(self.stack.head().elt, wrapper_parent)
                 else:
                     # Otherwise we can append at the end of the last child.
