@@ -151,3 +151,59 @@ def content_states(draw: st.DrawFn, max_blocks: int = 6) -> dict[str, Any]:
     )
 
     return {"entityMap": entity_map, "blocks": block_list}
+
+
+# Common HTML/JS injection fragments, used to check that block text and
+# entity `data` can never break out of the tag/attribute they're rendered
+# into (see docs/SECURITY.md#tampering). Each fragment contains at least one
+# character (<, >, ", ') that must be escaped for the fragment to stay inert.
+DANGEROUS_FRAGMENTS = [
+    "<script>alert(1)</script>",
+    '"><img src=x onerror=alert(1)>',
+    "'><svg onload=alert(1)>",
+    "</p><script>alert(1)</script><p>",
+    '"',
+    "'",
+    "<",
+    ">",
+    "&",
+]
+
+dangerous_text = st.lists(
+    st.sampled_from(DANGEROUS_FRAGMENTS), min_size=1, max_size=3
+).map("".join)
+"""Text built from concatenated XSS payload fragments rather than arbitrary unicode."""
+
+
+@st.composite
+def dangerous_content_states(draw: st.DrawFn) -> dict[str, Any]:
+    """A single-block ContentState whose block text and entity `url` data
+    are drawn from `DANGEROUS_FRAGMENTS`, to check that rendering escapes
+    them rather than letting them become real markup or attributes.
+    """
+    text = draw(dangerous_text)
+    entity_url = draw(dangerous_text)
+
+    # An entity range referencing the whole (non-empty) block text, so the
+    # `link` entity decorator wraps it in an <a href="{entity_url}">.
+    entity_ranges = [{"offset": 0, "length": len(text), "key": 0}] if text else []
+
+    return {
+        "entityMap": {
+            "0": {
+                "type": ENTITY_TYPE_VALUE,
+                "mutability": "MUTABLE",
+                "data": {"url": entity_url},
+            }
+        },
+        "blocks": [
+            {
+                "key": "aaaaa",
+                "text": text,
+                "type": BLOCK_TYPES.UNSTYLED,
+                "depth": 0,
+                "inlineStyleRanges": [],
+                "entityRanges": entity_ranges,
+            }
+        ],
+    }

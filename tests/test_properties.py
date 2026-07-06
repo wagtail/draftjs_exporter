@@ -18,6 +18,7 @@ so it thinks `content_states()` is missing arguments. mypy understands this via 
 
 import unittest
 
+from bs4 import BeautifulSoup
 from hypothesis import given, settings
 
 from draftjs_exporter.constants import ENTITY_TYPES
@@ -25,7 +26,7 @@ from draftjs_exporter.defaults import BLOCK_MAP, STYLE_MAP
 from draftjs_exporter.dom import DOM
 from draftjs_exporter.html import HTML, ExporterConfig
 from draftjs_exporter.markdown import CONFIG as MARKDOWN_CONFIG
-from tests.strategies import content_states
+from tests.strategies import content_states, dangerous_content_states
 from tests.test_entities import link
 
 CONFIG: ExporterConfig = {
@@ -87,3 +88,52 @@ class TestCommandGroupingInvariants(unittest.TestCase):
             groups = self.exporter.build_command_groups(block)
             reconstructed = "".join(text for text, _commands in groups)
             self.assertEqual(reconstructed, block["text"])
+
+
+class TestRenderEscapingInvariants(unittest.TestCase):
+    """Block text and entity `data` must never be interpreted as markup.
+
+    ContentState is untrusted (see docs/SECURITY.md#tampering): block text
+    and entity `data` may contain literal HTML/JS payload fragments
+    (`<script>`, `"><img onerror=...>`, ...). Rendering must escape that
+    syntax so a real HTML parser reading the output back never sees a new
+    element or attribute that wasn't in the exporter's own markup - i.e. the
+    original text/URL round-trips through the rendered HTML unchanged.
+
+    This complements `TestRenderCrashSafety`: that suite checks rendering
+    doesn't crash, this one checks its *output* stays inert. It does not,
+    and cannot, check URL scheme or CSS safety (e.g. a `javascript:` href) -
+    those remain the integrating application's responsibility, as documented
+    in docs/SECURITY.md#recommendations-for-integrators.
+    """
+
+    @given(content_state=dangerous_content_states())  # ty: ignore[missing-argument]
+    @settings(deadline=None)
+    def test_dangerous_fragments_never_become_markup(self, content_state):
+        block = content_state["blocks"][0]
+        text = block["text"]
+        has_entity = bool(block["entityRanges"])
+        entity_url = content_state["entityMap"]["0"]["data"]["url"]
+
+        for engine in HTML_ENGINES:
+            html = HTML({**CONFIG, "engine": engine}).render(content_state)
+            parsed = BeautifulSoup(html, "html5lib")
+
+            # No payload fragment was parsed back as a real element.
+            self.assertEqual(parsed.find_all("script"), [])
+            self.assertEqual(parsed.find_all("img"), [])
+            self.assertEqual(parsed.find_all("svg"), [])
+
+            if has_entity:
+                links = parsed.find_all("a")
+                self.assertEqual(len(links), 1)
+                # The href attribute value round-trips (modulo the lxml
+                # engine's own space -> %20 URI normalization on render,
+                # which preserves meaning and isn't a breakout): no quote or
+                # tag breakout introduced an extra attribute or element.
+                href = links[0].get("href").replace("%20", " ")
+                self.assertEqual(href, entity_url)
+                self.assertEqual(set(links[0].attrs), {"href"})
+                self.assertEqual(links[0].get_text(), text)
+            else:
+                self.assertEqual(parsed.get_text(), text)
