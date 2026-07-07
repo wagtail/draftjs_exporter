@@ -151,6 +151,107 @@ def content_states(draw: st.DrawFn, max_blocks: int = 6) -> dict[str, Any]:
     return {"entityMap": entity_map, "blocks": block_list}
 
 
+# Markdown-syntax fragments used to exercise every parser branch in the
+# importer (styles, links, images, inline HTML tags, block-level syntax,
+# escapes). Combined randomly they produce adversarial inputs that
+# stress edge cases the hand-written unit tests don't cover: unterminated
+# links, mismatched markers, malformed HTML tags, deeply nested syntax.
+MARKDOWN_FRAGMENTS = [
+    # Style markers (open/close asymmetries, nesting, intraword).
+    "**",
+    "__",
+    "*",
+    "_",
+    "~",
+    "~~",
+    "`",
+    "*a",
+    "_b",
+    "**c",
+    "~d",
+    "`e",
+    # Link / image syntax: well-formed, broken, and exotic schemes.
+    "[",
+    "]",
+    "(",
+    ")",
+    "![",
+    "](http://",
+    "![alt](",
+    "](url)",
+    "http://example.com",
+    "wagtail://core.Page.89",
+    ' "title"',
+    " 'title'",
+    '"',
+    "'",
+    # Inline HTML tags: known style mappings and unknown tags.
+    "<u>",
+    "</u>",
+    "<sup>",
+    "</sup>",
+    "<mark>",
+    "</mark>",
+    "<sub>",
+    "</sub>",
+    "<kbd>",
+    "</kbd>",
+    "<unknown>",
+    "</unknown>",
+    "<",
+    ">",
+    "</",
+    "/>",
+    # Block-level prefixes.
+    "#",
+    "##",
+    "###",
+    "####",
+    "#####",
+    "######",
+    "- ",
+    "* ",
+    "+ ",
+    "1. ",
+    "2. ",
+    "1) ",
+    "2) ",
+    "> ",
+    ">",
+    "---",
+    "***",
+    "___",
+    "```",
+    "```python",
+    "~~~",
+    "~~~python",
+    # Escapes (CommonMark set, sampled).
+    "\\",
+    "\\*",
+    "\\_",
+    "\\#",
+    "\\[",
+    "\\]",
+    "\\(",
+    "\\)",
+    "\\`",
+    "\\~",
+    # Soft line breaks and plain text fillers.
+    " ",
+    "\n",
+    "\n\n",
+    "text",
+    "hello",
+    "world",
+    "abc",
+]
+
+markdown_text = st.lists(
+    st.sampled_from(MARKDOWN_FRAGMENTS), min_size=0, max_size=30
+).map("".join)
+"""Random Markdown built from syntax fragments for importer crash-safety."""
+
+
 # Common HTML/JS injection fragments, used to check that block text and
 # entity `data` can never break out of the tag/attribute they're rendered
 # into (see docs/SECURITY.md#tampering). Each fragment contains at least one

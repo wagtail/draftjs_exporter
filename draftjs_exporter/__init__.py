@@ -23,6 +23,12 @@ from draftjs_exporter.html import ExporterConfig as ExporterConfig
 from draftjs_exporter.markdown import CONFIG as MARKDOWN_CONFIG
 from draftjs_exporter.markdown import MarkdownOptions as MarkdownOptions
 from draftjs_exporter.markdown import build_markdown_config as build_markdown_config
+from draftjs_exporter.markdown.importer import (
+    MarkdownImporterOptions as MarkdownImporterOptions,
+)
+from draftjs_exporter.markdown.importer import (
+    markdown_to_content_state as markdown_to_content_state,
+)
 from draftjs_exporter.types import Block as Block
 from draftjs_exporter.types import Component as Component
 from draftjs_exporter.types import CompositeDecorators as CompositeDecorators
@@ -60,6 +66,9 @@ __all__ = [
     "MARKDOWN_CONFIG",
     "MarkdownOptions",
     "build_markdown_config",
+    # Importer
+    "MarkdownImporterOptions",
+    "markdown_to_content_state",
     # Constants
     "BLOCK_TYPES",
     "ENTITY_TYPES",

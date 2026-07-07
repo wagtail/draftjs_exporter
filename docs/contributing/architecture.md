@@ -25,7 +25,8 @@ draftjs_exporter/
         html5lib.py      # BeautifulSoup / html5lib engine.
         lxml.py          # lxml engine.
         markdown.py      # Non-escaping string engine for Markdown output.
-    markdown/            # Markdown-specific components, config builder, and helpers.
+    markdown/            # Markdown-specific components, config builder, importer, and helpers.
+        importer.py      # Markdown importer – parses Markdown into ContentState.
     utils/
         module_loading.py  # import_string() for dotted-path class resolution.
 ```
@@ -45,6 +46,19 @@ The core flow lives in `HTML.render()` and proceeds as follows:
    - **Composite decorators** – regex-based text transformations (e.g. `\n` → `<br>`).
 5. **Wrapper resolution** – `wrapper_state.element_for()` resolves each block to a DOM element, managing nesting of wrapper elements (e.g. `<ul>`/`<ol>` for list items) based on block depth.
 6. **Final rendering** – All block elements are appended to the document fragment, then `DOM.render()` serialises the virtual DOM tree to the output string (HTML or Markdown).
+
+## Importer pipeline
+
+The reverse direction — Markdown → Draft.js ContentState — lives in `markdown/importer.py` and is exposed as `markdown_to_content_state(markdown, options=None)`. It is a dependency-free parser that does not reuse the export pipeline's `Command`/`EntityState`/`StyleState` abstractions (those consume ranges; the importer must _produce_ ranges from a different source representation).
+
+The flow:
+
+1. **Block splitting** – `_split_blocks()` splits Markdown into raw block strings, handling code fences, paragraph joining, and continuation lines.
+2. **Block parsing** – `_parse_block()` dispatches each raw block to the right handler (heading, blockquote, list, code fence, HR, image, or unstyled fallback) via regex matching.
+3. **Inline parsing** – `_InlineParser` walks block text character-by-character, tracking opening/closing of style markers, inline HTML tags, and link syntax. It produces plain text, `inlineStyleRanges`, `entityRanges`, and entity definitions.
+4. **Style merging** – `_merge_style_ranges()` merges adjacent or overlapping ranges of the same style. This compensates for the exporter's inline style nesting behavior: when styles partially overlap (e.g. bold 0-5, italic 3-8), the exporter must close and reopen the outer marker to produce valid Markdown (`**Bold ****_Italic_**`), producing two BOLD ranges in the imported output that should be a single continuous range. This is an intentional round-trip trade-off, coupling the importer to the exporter's marker-emission quirks.
+
+The importer accepts `MarkdownImporterOptions` with the three inline style markers (`bold`, `italic`, `strikethrough`) and a custom `html_style_tags` mapping. Block-level syntax (list markers, horizontal rule variants, code fence variants) is recognized polymorphically rather than configured – the importer accepts any valid variant the exporter might produce. See [Markdown support](../markdown.md#importer) for the user-facing options reference.
 
 ## Engine system
 

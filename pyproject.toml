@@ -168,7 +168,9 @@ no_implicit_reexport = true
 
 [[tool.mypy.overrides]]
 module = "tests.*"
-# For test cases, we don’t need to annotate functions.
+# For test cases, we don't need to annotate functions.
 disallow_untyped_defs = false
+# Allow calling untyped functions from test methods (metaclass-generated tests, helpers).
+disallow_untyped_calls = false
 # disallow_incomplete_defs = false
 # warn_no_return = false

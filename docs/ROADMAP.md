@@ -30,6 +30,10 @@ Provide a cookbook showing how to prompt LLMs to draft block maps/entity decorat
 
 > Possible changes that require R&D, and high-risk ideas that could bring large benefits but with likely trade-offs.
 
+### Markdown importer
+
+`markdown_to_content_state(markdown, options)` parses Markdown back into Draft.js ContentState, enabling round-trip workflows (ContentState → Markdown → ContentState). The parser is dependency-free and mirrors the exporter's configurable markers. It supports the Markdown subset the exporter produces, plus common CommonMark edge cases (escapes, HR variants, link titles, code fence info strings, multi-line blockquotes, `)` ordered-list delimiters, `~~~` fences). Inline HTML tags (`<u>`, `<sup>`, etc.) emitted by the exporter for non-Markdown styles are parsed back into `inlineStyleRanges`.
+
 ### Rust-backed DOM engine
 
 Prototype a Rust extension or PyO3 module for DOM construction to outperform the current string/lxml/html5lib engines on large documents.
