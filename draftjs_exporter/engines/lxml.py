@@ -1,6 +1,7 @@
 """lxml DOM engine implementation."""
 
 import re
+from typing import no_type_check
 
 from lxml import etree, html
 
@@ -55,8 +56,11 @@ class DOM_LXML(DOMEngine):
         """
         return html.fromstring(markup)
 
+    # Remove soon - see below.
+    @no_type_check
     @staticmethod
-    def append_child(elt: etree.Element, child: etree.Element | str) -> None:
+    # def append_child(elt: etree.Element, child: etree.Element) -> None:
+    def append_child(elt: etree.Element, child: etree.Element) -> None:
         """Append the given child node to the children of elt.
 
         Text children are wrapped in a fragment element before appending.
@@ -65,7 +69,9 @@ class DOM_LXML(DOMEngine):
             elt: The parent element.
             child: The child element or text to append.
         """
-        if isinstance(child, etree.Element):
+        # Compatibility with lxml below 6.0.0 on Python 3.10. Revert once we drop support for Python 3.10.
+        # if isinstance(child, etree.Element):
+        if hasattr(child, "tag"):
             elt.append(child)
         else:
             c = etree.Element("fragment")
