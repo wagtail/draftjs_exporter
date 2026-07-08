@@ -17,6 +17,7 @@ so it thinks `content_states()` is missing arguments. mypy understands this via 
 """
 
 import unittest
+from urllib.parse import unquote
 
 from bs4 import BeautifulSoup
 from hypothesis import example, given, settings
@@ -156,11 +157,10 @@ class TestRenderEscapingInvariants(unittest.TestCase):
             if has_entity:
                 links = parsed.find_all("a")
                 self.assertEqual(len(links), 1)
-                # The href attribute value round-trips (modulo the lxml
-                # engine's own space -> %20 URI normalization on render,
-                # which preserves meaning and isn't a breakout): no quote or
-                # tag breakout introduced an extra attribute or element.
-                href = links[0].get("href").replace("%20", " ")
+                # The href attribute value round-trips: no quote or tag breakout introduced an extra attribute or element.
+                # (modulo the lxml engine's own URI normalization on render, which preserves meaning and isn't a breakout).
+                # Remove lxml-specific workaround once we stop supporting lxml versions below 6.0.0.
+                href = unquote(links[0].get("href"))
                 self.assertEqual(href, entity_url)
                 self.assertEqual(set(links[0].attrs), {"href"})
                 self.assertEqual(links[0].get_text(), text)
