@@ -37,10 +37,18 @@ plugins:
       sections:
         Usage documentation:
           - index.md
-          - troubleshooting.md
+          - getting-started.md
           - markdown.md
-          - api.md
-          - SECURITY.md
+        Guides:
+          - guides/custom-components.md
+          - guides/fallback-components.md
+          - guides/alternative-engines.md
+          - guides/custom-engines.md
+        Reference:
+          - reference/api.md
+          - reference/configuration.md
+          - reference/example.md
+          - reference/research.md
   - mkdocstrings:
       handlers:
         python:
@@ -50,12 +58,23 @@ plugins:
             heading_level: 4
 nav:
   - Home: index.md
+  - Getting started: getting-started.md
   - Markdown support: markdown.md
+  - Guides:
+      - Custom components: guides/custom-components.md
+      - Fallback components: guides/fallback-components.md
+      - Alternative engines: guides/alternative-engines.md
+      - Custom engines: guides/custom-engines.md
+  - Reference:
+      - API: reference/api.md
+      - Configuration: reference/configuration.md
+      - Example output: reference/example.md
+      - Research notes: reference/research.md
   - Troubleshooting: troubleshooting.md
-  - API: api.md
-  - Example output: example.md
-  - Research notes: research.md
-  - Contributing: CONTRIBUTING.md
+  - Contributing:
+      - Contributing: CONTRIBUTING.md
+      - Project architecture: contributing/architecture.md
+      - Test strategy: contributing/test-strategy.md
   - Security policy: SECURITY.md
   - Roadmap: ROADMAP.md
   - Support: SUPPORT.md
