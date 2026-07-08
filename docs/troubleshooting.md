@@ -1,4 +1,4 @@
-# Documentation
+# Troubleshooting
 
 ## Exporter behavior
 
@@ -12,9 +12,7 @@ Here are smaller implementation details that are important to how the exporter b
 - HTML escaping is automatically done by BeautifulSoup / html5lib.
 - The string engine escapes `&`, `<`, `>`, and single/double quotes in attributes, but not outside.
 
-## Troubleshooting
-
-### Install
+## libxml2 installation error
 
 ```sh
 pip install draftjs_exporter
@@ -24,11 +22,13 @@ pip install draftjs_exporter
 #*********************************************************************************
 ```
 
-Solution: see http://stackoverflow.com/a/6504860/1798491
+Solution: see [How to install lxml on Ubuntu](http://stackoverflow.com/a/6504860/1798491)
 
-`apt-get install libxml2-dev libxslt1-dev python-dev`
+```bash
+apt-get install libxml2-dev libxslt1-dev python-dev
+```
 
-### Entity props override
+## Entity props override
 
 Entities receive their `data` as props, except for the key `entity` which is overriden with a dict containing additional data (`type`, `mutability`, etc.). This is a known issue (see [#91](https://github.com/wagtail/draftjs_exporter/issues/91)). There is no workaround if you need to use a data key called `entity` – it won’t be available.
 

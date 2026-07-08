@@ -1,6 +1,6 @@
 # Support
 
-> This project follows a [Code of Conduct](CODE_OF_CONDUCT.md).
+> This project follows a [Code of Conduct](https://wagtail.org/code-of-conduct/).
 > By interacting with this project, you agree to abide by its terms.
 
 Hi! 👋 To help us help you, please read through the following guidelines.
@@ -9,7 +9,7 @@ Hi! 👋 To help us help you, please read through the following guidelines.
 
 Documentation for this project is all on [GitHub](https://github.com/wagtail/draftjs_exporter). Please make sure to have a look at:
 
-- The [README](../README.md)
+- The [README](https://github.com/wagtail/draftjs_exporter/blob/main/README.md)
 - The project’s introductory blog post, [Rethinking rich text pipelines with Draft.js](https://www.draftail.org/blog/2018/03/13/rethinking-rich-text-pipelines-with-draft-js).
 - The [Draft.js docs](https://draftjs.org/)
 - You might also like to read about [How Draft.js represents rich text](https://www.draftail.org/docs/reference/content-storage).

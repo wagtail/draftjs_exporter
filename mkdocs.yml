@@ -1,0 +1,61 @@
+site_name: draftjs_exporter
+repo_url: https://github.com/wagtail/draftjs_exporter
+site_url: https://wagtail.github.io/draftjs_exporter/
+edit_uri: edit/main/docs/
+
+site_description: Library to convert rich text from Draft.js raw ContentState to HTML.
+repo_name: draftjs_exporter
+dev_addr: localhost:8001
+theme:
+  name: material
+  font: false
+  palette:
+    primary: indigo
+  features:
+    - content.code.copy
+  custom_dir: docs/overrides
+markdown_extensions:
+  - admonition
+  - sane_lists
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+plugins:
+  - search
+  - llmstxt:
+      full_output: llms-full.txt
+      sections:
+        Usage documentation:
+          - index.md
+          - troubleshooting.md
+          - markdown.md
+          - api.md
+          - SECURITY.md
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: false
+            heading_level: 4
+nav:
+  - Home: index.md
+  - Markdown support: markdown.md
+  - Troubleshooting: troubleshooting.md
+  - API: api.md
+  - Example output: example.md
+  - Research notes: research.md
+  - Contributing: CONTRIBUTING.md
+  - Security policy: SECURITY.md
+  - Roadmap: ROADMAP.md
+  - Support: SUPPORT.md

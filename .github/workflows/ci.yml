@@ -36,6 +36,10 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: just test-coverage
+      - run: just docs-build
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: site
   test_compatibility:
     needs: test
     runs-on: ubuntu-slim
@@ -88,3 +92,13 @@ jobs:
           python-version: "3.15-dev"
       - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
       - run: uv run --no-group dev --with 'beautifulsoup4>=4.4.1,<5, html5lib==1.1' python -X dev example.py
+  deploy_site:
+    needs: test
+    runs-on: ubuntu-slim
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+        id: deployment

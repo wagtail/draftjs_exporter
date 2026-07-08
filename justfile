@@ -58,6 +58,14 @@ benchmark runs="1":
   uv run python -m memray summary benchmark.bin
   uv run python -m memray stats benchmark.bin
 
+# Build the documentation.
+docs-build:
+  uv run mkdocs build --strict
+
+# Build the documentation and serve it locally.
+docs-serve:
+  uv run mkdocs serve --strict
+
 # Builds package for publication.
 build:
   rm -f dist/*

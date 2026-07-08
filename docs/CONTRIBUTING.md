@@ -2,9 +2,9 @@
 
 Thank you for considering to help this project.
 
-We welcome all support, whether on bug reports, code, design, reviews, tests, documentation, and more. Check out the [project roadmap](../ROADMAP.md) for high-level ideas that align with the project's goals.
+We welcome all support, whether on bug reports, code, design, reviews, tests, documentation, and more. Check out the [project roadmap](ROADMAP.md) for high-level ideas that align with the project's goals.
 
-Please note that this project is released with a [Contributor Code of Conduct](docs/CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+Please note that this project is released with a [Contributor Code of Conduct](https://wagtail.org/code-of-conduct/). By participating in this project you agree to abide by its terms.
 
 ## Project architecture
 
@@ -98,6 +98,8 @@ just init
 - `just dev`: Restarts the example whenever a file changes.
 - `just benchmark runs="1"`: Runs a one-off performance (speed, memory) benchmark. Accepts an optional number of runs, e.g. `just benchmark 5`.
 - `just clean-pyc`: Remove Python file artifacts.
+- `just docs-build`: Build the documentation.
+- `just docs-serve`: Build the documentation and serve it locally.
 - `just build`: Builds package for publication.
 - `just publish`: Publishes a new version to PyPI.
 
