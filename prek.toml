@@ -1,4 +1,4 @@
-# Configuration file for `prek`, a git hook framework written in Rust.
+# Configuration file for `prek`, a git hook framework.
 # See https://prek.j178.dev for more information.
 #:schema https://www.schemastore.org/prek.json
 
@@ -6,23 +6,30 @@ ci = { autofix_prs = false }
 default_language_version = { python = "python3" }
 
 [[repos]]
-repo = "https://github.com/pre-commit/pre-commit-hooks"
-rev = "v6.0.0"
+repo = "builtin"
 hooks = [
-  { id = "check-added-large-files" },
-  { id = "check-case-conflict" },
-  { id = "check-executables-have-shebangs" },
-  { id = "check-illegal-windows-names" },
-  { id = "check-json" },
-  { id = "check-merge-conflict" },
-  { id = "check-shebang-scripts-are-executable" },
-  { id = "check-symlinks" },
-  { id = "check-toml" },
-  { id = "check-yaml", args = [
-    "--unsafe",
-  ] },
-  { id = "end-of-file-fixer" },
-  { id = "trailing-whitespace" },
+  { id = "trailing-whitespace" },                  # Trim trailing whitespace
+  { id = "check-added-large-files" },              # Prevent committing large files
+  { id = "check-case-conflict" },                  # Check for files that would conflict in case-insensitive filesystems
+  { id = "check-illegal-windows-names" },          # Check for filenames invalid on Windows
+  { id = "end-of-file-fixer" },                    # Ensure newline at EOF
+  { id = "file-contents-sorter" },                 # Sort lines in explicitly targeted files
+  { id = "fix-byte-order-marker" },                # Remove UTF-8 byte order marker
+  { id = "check-json" },                           # Validate JSON files
+  { id = "check-json5" },                          # Validate JSON5 files
+  { id = "pretty-format-json" },                   # Pretty format JSON files
+  { id = "check-toml" },                           # Validate TOML files
+  { id = "check-vcs-permalinks" },                 # Check that VCS links are permalinks
+  { id = "check-yaml" },                           # Validate YAML files
+  { id = "check-xml" },                            # Validate XML files
+  { id = "mixed-line-ending" },                    # Normalize or check line endings
+  { id = "check-symlinks" },                       # Check for broken symlinks
+  { id = "destroyed-symlinks" },                   # Detect destroyed symlinks
+  { id = "check-merge-conflict" },                 # Check for merge conflicts
+  { id = "detect-private-key" },                   # Detect private keys
+  { id = "no-commit-to-branch" },                  # Prevent committing to protected branches
+  { id = "check-shebang-scripts-are-executable" }, # Ensures that" (non-binary) files with a shebang are executable
+  { id = "check-executables-have-shebangs" },      # Ensures that" (non-binary) executables have a shebang
 ]
 
 [[repos]]
