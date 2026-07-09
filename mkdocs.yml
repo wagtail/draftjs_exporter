@@ -34,6 +34,7 @@ plugins:
   - search
   - llmstxt:
       full_output: llms-full.txt
+      # Only add docs pages that are relevant to users of the project.
       sections:
         Usage documentation:
           - index.md
@@ -75,6 +76,7 @@ nav:
       - Contributing: CONTRIBUTING.md
       - Project architecture: contributing/architecture.md
       - Test strategy: contributing/test-strategy.md
+      - Documentation style guide: style-guide.md
   - Security policy: SECURITY.md
   - Roadmap: ROADMAP.md
   - Support: SUPPORT.md

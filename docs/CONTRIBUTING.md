@@ -94,6 +94,8 @@ Additionally, we follow:
 
 Good documentation helps users and contributors understand the exporter without reading source code. We aim for docs that are accurate, discoverable, and maintainable.
 
+For prose style, tone, terminology, headings, and linking conventions, follow the [documentation style guide](style-guide.md). The conventions below cover docstrings, which the style guide treats as API documentation.
+
 ### Design goals
 
 - **Docs as code:** user and contributor docs live in version-controlled Markdown alongside the source.
@@ -140,6 +142,7 @@ Follow these conventions for all production code:
 
 - User-facing docs live in `docs/`; the README is the entry point.
 - Keep language concise and in **Sentence case** (no Title Case).
+- Follow the [documentation style guide](style-guide.md) for tone, terminology, headings, and linking conventions.
 - Run `just format` before committing so prettier formats Markdown files consistently.
 
 ## Testing

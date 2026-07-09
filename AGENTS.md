@@ -41,6 +41,7 @@ See [docs/CONTRIBUTING.md#coding-style--conventions](docs/CONTRIBUTING.md#coding
 - **Docstrings are required for all public modules, classes, methods, and functions.** Use Google-style sections (`Parameters:`, `Returns:`, `Raises:`, `Yields:`, `Examples:`) and place type information in annotations, not docstrings.
 - Document attributes and type aliases with a docstring directly below the assignment.
 - See [docs/CONTRIBUTING.md#documentation-and-docstrings](docs/CONTRIBUTING.md#documentation-and-docstrings) for the full guide.
+- For prose documentation (README, MkDocs pages), follow the [documentation style guide](docs/style-guide.md): tone, terminology, headings, linking, and British English spelling.
 
 ## Testing guidelines
 
