@@ -1,0 +1,10 @@
+{
+  "rules": [
+    {
+      "path": "draftjs_exporter/**/*.py",
+      "rule": ".opencodereview/python.md"
+    }
+  ]
+}
+
+wagtail://wagtailcore.page:66896
