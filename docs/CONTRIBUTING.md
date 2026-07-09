@@ -67,7 +67,7 @@ To manually update a dependency, edit the version in `pyproject.toml` or `packag
 - Always run the tests. To auto-run with watch, use `npm install -g nodemon`, then `just test-watch`.
 - Use a debugger. `uv pip install ipdb`, then `import ipdb; ipdb.set_trace()`.
 - You can use `example.py` as a basic CLI to try out the exporter with arbitrary ContentState JSON: `echo '{"json": "contents"}' | ./example.py -`.
-- Inspect the DOM tree at any stage using `DOM.render_debug()` to see the virtual DOM structure before serialisation.
+- Inspect the DOM tree at any stage using `DOM.render_debug()` to see the virtual DOM structure before serialization.
 - Run individual test files with `just test tests/test_dom.py`, or filter with `-k`: `just test tests/test_dom.py -k "test_create_element"`.
 - Use `just dev` to restart the example automatically whenever source files change.
 
@@ -81,7 +81,7 @@ We follow [PEP 8](https://peps.python.org/pep-0008/) for Python code style, enfo
 - **Type annotations**: required on all production code, checked by `mypy` with strict settings and by `ty` (experimental).
 - **Naming**: `snake_case` for functions, methods, and variables; `PascalCase` for classes; `UPPER_CASE` for constants. Test modules follow `test_*.py`, test functions `test_*`, test classes `Test*`.
 - **Performance**: core classes should use `__slots__` to reduce memory overhead.
-- **Imports**: organised automatically by `ruff` (isort rules in `pyproject.toml`).
+- **Imports**: organized automatically by `ruff` (isort rules in `pyproject.toml`).
 - **Error handling**: use specific exception types; avoid bare `except:` clauses (BLE rules).
 - **Comments**: avoid hard-wrapping lines, except at full stops, or other punctuation like commas if must be.
 

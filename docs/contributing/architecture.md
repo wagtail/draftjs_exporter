@@ -37,7 +37,7 @@ Tests mirror this structure under `tests/`, with sub-packages for `engines/`, `m
 The core flow lives in `HTML.render()` and proceeds as follows:
 
 1. **Engine setup** – `DOM.engine()` resolves the engine string to a class (via `import_string`), caches it, and sets it in a thread-safe `ContextVar`.
-2. **Option normalisation** – `Options.map_blocks()`, `Options.map_styles()`, `Options.map_entities()` convert the user-friendly config maps into flat `OptionsMap` dicts of type → normalized `Options` objects.
+2. **Option normalization** – `Options.map_blocks()`, `Options.map_styles()`, `Options.map_entities()` convert the user-friendly config maps into flat `OptionsMap` dicts of type → normalized `Options` objects.
 3. **Block iteration** – `HTML.render()` creates a `WrapperState` instance and an empty document fragment, then iterates over each block.
 4. **Per-block rendering** – For each block, `render_block()` extracts text, inline styles, entity ranges, and composite decorators. It builds a sorted list of `Command` objects from the Draft.js ranges, groups consecutive commands by character offset, and processes each group through:
    - **EntityState** – manages an entity stack; on `start_entity`/`stop_entity` pairs it wraps children in entity components.
@@ -57,7 +57,7 @@ Engines share the same interface and general behavior, but **are not guaranteed 
 - **Strategy** – swappable engines, selected at runtime.
 - **Facade** – `DOM` class hides engine-specific details.
 - **State machine** – `EntityState` tracks entity open/close via a stack.
-- **Command pattern** – operations on text are modelled as `Command` objects, sorted, grouped, and applied in order.
+- **Command pattern** – operations on text are modeled as `Command` objects, sorted, grouped, and applied in order.
 - **Pipeline** – text passes through decorators → inline styles → entity wrapping → wrapper nesting, each stage wrapping the previous.
 - **Null object** – `WrapperStack.head()` returns a default `Wrapper(-1)` when the stack is empty.
 - **Slots for performance** – core classes use `__slots__` to reduce memory overhead.

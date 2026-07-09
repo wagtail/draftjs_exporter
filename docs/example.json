@@ -91,7 +91,7 @@
     },
     {
       "key": "32lnv",
-      "text": "The exporter aims to provide sensible defaults from basic block types and inline styles to HTML, that can easily be customised when required. For more advanced scenarios, an API is provided (mimicking React's createElement) to create custom rendering components of arbitrary complexity.",
+      "text": "The exporter aims to provide sensible defaults from basic block types and inline styles to HTML, that can easily be customized when required. For more advanced scenarios, an API is provided (mimicking React's createElement) to create custom rendering components of arbitrary complexity.",
       "type": "unstyled",
       "depth": 0,
       "inlineStyleRanges": [{ "offset": 209, "length": 13, "style": "CODE" }],

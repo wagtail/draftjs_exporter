@@ -104,17 +104,17 @@ Keep callouts to one or two sentences. Use them when the information directly af
 
 ### Spelling
 
-We use **British English** spelling in prose: `normalisation`, `serialisation`, `organised`, `customised`, `behaviour`. This matches the existing documentation.
+We use **American English** spelling in prose: `normalization`, `serialization`, `organized`, `customized`, `behavior`. This is consistent with the spelling already used in the codebase and its identifiers.
 
 Exceptions:
 
-- **Code and identifiers** follow the spelling of the underlying library or API. For example, the exporter's own code uses American spelling (`normalized`, `serialize`) in places; when a prose sentence refers to a specific symbol, use the symbol's exact spelling.
-- **Established technical terms** keep their conventional spelling regardless of locale: `sanitize`, `serialize` (as part of "serialize/deserialize" pair). When in doubt, match the dominant spelling in the surrounding technical literature.
+- **Proper nouns and product names** keep their own spelling regardless of locale.
+- When a prose sentence refers to a specific code symbol, use the symbol's exact spelling.
 
-### Capitalisation
+### Capitalization
 
 - **Sentence case** for headings and titles, always.
-- Capitalise proper nouns: Draft.js, ContentState, Wagtail, Django, React, BeautifulSoup, lxml, html5lib.
+- Capitalize proper nouns: Draft.js, ContentState, Wagtail, Django, React, BeautifulSoup, lxml, html5lib.
 - "the exporter" is lowercase – it is the project's shorthand for `draftjs_exporter`, not a proper noun.
 - Constants and enum values are written in their source form: `BLOCK_TYPES.HEADER_TWO`, `ENTITY_TYPES.LINK`, `INLINE_STYLES.BOLD`.
 
@@ -144,7 +144,7 @@ Exceptions:
 ### Draft.js terminology
 
 - **Draft.js** – always with the period, capital D.
-- **ContentState** – capitalised, the Draft.js data model. Always one word.
+- **ContentState** – capitalized, the Draft.js data model. Always one word.
 - **block** – lowercase unless starting a sentence. Draft.js blocks are lines of content.
 - **entity** – lowercase. Entities carry data (links, images, embeds).
 - **inline style** – lowercase, two words. Inline styles are character-level formatting (bold, italic, code).
@@ -155,7 +155,7 @@ Exceptions:
 - Use **"can"** for capability: "You can join the `#draftail` channel on Wagtail's Slack."
 - Use **"should"** for recommendations: "All output changes should be covered with unit tests, integration tests, and snapshot tests."
 - Reserve **"must"** for hard requirements, especially around security: "`HTML.render()` must not raise on any structurally valid `ContentState`."
-- Use **"may"** for possibility or optional behaviours: "You may want to go update the Draftail Playground."
+- Use **"may"** for possibility or optional behaviors: "You may want to go update the Draftail Playground."
 
 ## Warnings, notes, and edge cases
 
@@ -163,5 +163,5 @@ We document limitations and edge cases directly in the relevant page, not hidden
 
 - State limitations as facts, not apologies: "There is no workaround if you need to use a data key called `entity` – it won't be available."
 - Call out **experimental** features at the top of their page with a blockquote, so readers see the status before investing in the content.
-- When a behaviour differs between engines, say so explicitly: "Engine output often differs in small ways. For example, quote escaping in attributes, self-closing tags, and attribute name validation strictness exist between engines by design."
+- When a behavior differs between engines, say so explicitly: "Engine output often differs in small ways. For example, quote escaping in attributes, self-closing tags, and attribute name validation strictness exist between engines by design."
 - Security-relevant gotchas go in [SECURITY.md](SECURITY.md) and are cross-linked from the relevant guide pages.

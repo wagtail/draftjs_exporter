@@ -42,7 +42,7 @@
 - Maintaining this over time with changing Draft.js output formats and unmaintained or wildly changing AST formats
 - Regardless of implementation, being on the right spot between: "over the lifetime of the site/CMS, a given piece of content should always render the same HTML" and "a piece of content should always render the _best_ HTML"
 - Keeping the coupling between CMS and editor low so that we can swap editors easily (bigger scope than the one of a single site/project here)
-- Favour logical completeness over raw speed. A regex parser will be faster than building a DOM. But caching makes that mostly irrelevant. The bottlenecks will all likely be in the DB lookups for inline entities anyway.
+- Favor logical completeness over raw speed. A regex parser will be faster than building a DOM. But caching makes that mostly irrelevant. The bottlenecks will all likely be in the DB lookups for inline entities anyway.
 
 ### Other approaches to exporting from Draft.js
 

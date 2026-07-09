@@ -18,7 +18,7 @@
    Features 📝🍸
   </h3>
   <p>
-   The exporter aims to provide sensible defaults from basic block types and inline styles to HTML, that can easily be customised when required. For more advanced scenarios, an API is provided (mimicking React's
+   The exporter aims to provide sensible defaults from basic block types and inline styles to HTML, that can easily be customized when required. For more advanced scenarios, an API is provided (mimicking React's
    <a href="https://facebook.github.io/react/docs/top-level-api.html#react.createelement">
     <code>
      createElement
@@ -103,8 +103,6 @@
          <s>
           te
          </s>
-        </strong>
-        <strong>
          <em>
           xt
          </em>
@@ -205,7 +203,7 @@
 
 ### Features 📝🍸
 
-The exporter aims to provide sensible defaults from basic block types and inline styles to HTML, that can easily be customised when required. For more advanced scenarios, an API is provided (mimicking React's [`createElement`](https://facebook.github.io/react/docs/top-level-api.html#react.createelement)) to create custom rendering components of arbitrary complexity.
+The exporter aims to provide sensible defaults from basic block types and inline styles to HTML, that can easily be customized when required. For more advanced scenarios, an API is provided (mimicking React's [`createElement`](https://facebook.github.io/react/docs/top-level-api.html#react.createelement)) to create custom rendering components of arbitrary complexity.
 
 ---
 
@@ -245,3 +243,5 @@ def blockquote(props):
 ```
 
 Discarded block but the content stays.<div>Render as <span class="missing-entity">div</span></div>Voilà!
+
+
