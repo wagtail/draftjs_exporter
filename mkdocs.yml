@@ -42,6 +42,7 @@ plugins:
         Usage documentation:
           - index.md
           - getting-started.md
+          - content-state.md
           - markdown.md
         Guides:
           - guides/custom-components.md
@@ -63,6 +64,7 @@ plugins:
 nav:
   - Home: index.md
   - Getting started: getting-started.md
+  - Content state: content-state.md
   - Markdown support: markdown.md
   - Guides:
       - Custom components: guides/custom-components.md

@@ -1,6 +1,6 @@
 # Custom engines
 
-The exporter supports using custom engines to generate its output via the `DOM` API. This can be useful to implement custom export formats, e.g. [to Markdown (experimental)](docs/markdown.md).
+The exporter supports using custom engines to generate its output via the `DOM` API. This can be useful to implement custom export formats, e.g. [to Markdown (experimental)](../markdown.md).
 
 Here is an example implementation:
 

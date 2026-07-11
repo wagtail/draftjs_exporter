@@ -1,5 +1,7 @@
 # Research and implementation notes
 
+> This page is historical and explanatory. It preserves the design notes and alternatives considered when the exporter was first built, and is here for contributors who want context on why the project looks the way it does. It is not a tutorial and does not describe current behavior – for that, start with [Getting started](../getting-started.md) and the [API reference](../reference/api.md).
+
 ## R&D notes
 
 ### Useful resources

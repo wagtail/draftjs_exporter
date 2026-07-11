@@ -58,7 +58,7 @@ The exporter does not perform network or filesystem access itself. Parsing raw m
 
 ### Denial of service
 
-ContentState should be treated as untrusted input. Please report any input that evades the project’s [property-based tests](CONTRIBUTING.md#property-based-tests) that assess handling of anomalous content.
+ContentState should be treated as untrusted input. Please report any input that evades the project's [property-based tests](contributing/test-strategy.md#property-based-tests) that assess handling of anomalous content.
 
 Another possible vector is `composite_decorators` strategies, that use developer-supplied regex patterns running against attacker-controlled block text on every render ([`composite_decorators.py`](https://github.com/wagtail/draftjs_exporter/blob/main/draftjs_exporter/composite_decorators.py)). Keep decorator regexes simple and anchored to avoid ReDoS, and enforce your own ContentState size/depth limits upstream if you accept documents from untrusted users.
 

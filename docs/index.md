@@ -25,6 +25,16 @@ It is developed alongside the [Draftail](https://www.draftail.org/) rich text ed
 
 The initial use case was to gain more control over the content managed by rich text editors in a Wagtail/Django site. If you want to read the full story, have a look at our blog post: [Rethinking rich text pipelines with Draft.js](https://www.draftail.org/blog/2018/03/13/rethinking-rich-text-pipelines-with-draft-js).
 
+## Where to go next
+
+- **New to Draft.js?** Read [Content state](content-state.md) to understand the data model the exporter consumes.
+- **Ready to render?** Follow [Getting started](getting-started.md) to install and render your first ContentState.
+- **Configure the output.** See [Configuration](reference/configuration.md) for block, style, and entity maps.
+- **Render as Markdown.** The exporter also produces [Markdown output](markdown.md).
+- **Write custom components.** Use the React-like [custom components](guides/custom-components.md) API, or define [fallback components](guides/fallback-components.md) for missing block and entity types.
+- **Pick an engine.** The default `string` engine is dependency-free. See [Alternative engines](guides/alternative-engines.md) for `html5lib` and `lxml`.
+- **Find an error?** See [Troubleshooting](troubleshooting.md) for known issues and implementation details, and the [API reference](reference/api.md) for the full public API.
+
 ## Contributing
 
 See anything you like in here? Anything missing? We welcome all support, whether on bug reports, feature requests, code, design, reviews, tests, documentation, and more. Please have a look at our [contribution guidelines](CONTRIBUTING.md).

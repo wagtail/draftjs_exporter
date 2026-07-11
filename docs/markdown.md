@@ -11,7 +11,10 @@ Use the built-in `MARKDOWN_CONFIG` to render Markdown with default settings:
 ```python
 from draftjs_exporter import HTML, MARKDOWN_CONFIG
 
+# Build an exporter configured for Markdown output.
 exporter = HTML(MARKDOWN_CONFIG)
+# `render` returns Markdown text instead of HTML, because the config
+# points the engine at the Markdown DOM (DOMMarkdown).
 markdown = exporter.render(content_state)
 ```
 

@@ -2,6 +2,8 @@
 
 The exporter output is extensively configurable to cater for varied rich text requirements.
 
+> This page documents the configuration shape. To see these options used in context, read [Custom components](../guides/custom-components.md) and [Fallback components](../guides/fallback-components.md). For alternative DOM backends, see [Alternative engines](../guides/alternative-engines.md).
+
 ```python
 # draftjs_exporter provides default configurations and predefined constants for reuse.
 from draftjs_exporter.constants import BLOCK_TYPES, ENTITY_TYPES
@@ -24,12 +26,14 @@ config = {
             'wrapper_props': {'class': 'bullet-list'},
         },
         # Use a custom component for more flexibility (reading block data or depth).
+        # See the Custom components guide for how to write one.
         BLOCK_TYPES.BLOCKQUOTE: blockquote,
         BLOCK_TYPES.ORDERED_LIST_ITEM: {
             'element': list_item,
             'wrapper': ordered_list,
         },
         # Provide a fallback component (advanced).
+        # See the Fallback components guide for how to write one.
         BLOCK_TYPES.FALLBACK: block_fallback
     },
     # `style_map` defines the HTML representation of inline elements.
@@ -41,10 +45,12 @@ config = {
         # The `style` prop can be defined as a dict, that will automatically be converted to a string.
         'HIGHLIGHT': {'element': 'strong', 'props': {'style': {'textDecoration': 'underline'}}},
         # Provide a fallback component (advanced).
+        # See the Fallback components guide for how to write one.
         INLINE_STYLES.FALLBACK: style_fallback,
     },
     'entity_decorators': {
         # Map entities to components so they can be rendered with their data.
+        # See the Custom components guide for how to write one.
         ENTITY_TYPES.IMAGE: image,
         ENTITY_TYPES.LINK: link
         # Lambdas work too.
@@ -72,4 +78,4 @@ config = {
 }
 ```
 
-See [examples.py](https://github.com/wagtail/draftjs_exporter/blob/main/example.py) as a fully-fledged demo of the configuration.
+See [examples.py](https://github.com/wagtail/draftjs_exporter/blob/main/example.py) as a fully-fledged demo of the configuration. For the full list of block types, inline styles, and entity types the exporter recognizes, see the [API reference](api.md).
