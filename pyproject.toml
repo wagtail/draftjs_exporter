@@ -28,9 +28,11 @@ classifiers = [
 ]
 
 [project.urls]
+Documentation = "https://wagtail.github.io/draftjs_exporter/"
 Source = "https://github.com/wagtail/draftjs_exporter"
 Tracker = "https://github.com/wagtail/draftjs_exporter/issues"
 Changelog = "https://github.com/wagtail/draftjs_exporter/blob/main/CHANGELOG.md"
+"llms.txt" = "https://wagtail.github.io/draftjs_exporter/llms.txt"
 
 [project.optional-dependencies]
 # Lower version bound for lxml - choose a version with:

@@ -25,6 +25,10 @@ It is developed alongside the [Draftail](https://www.draftail.org/) rich text ed
 
 The initial use case was to gain more control over the content managed by rich text editors in a Wagtail/Django site. If you want to read the full story, have a look at our blog post: [Rethinking rich text pipelines with Draft.js](https://www.draftail.org/blog/2018/03/13/rethinking-rich-text-pipelines-with-draft-js).
 
+## Documentation
+
+The full documentation is available at [on the docs website](https://wagtail.github.io/draftjs_exporter/). For LLM-assisted tooling, there is also a concise [`llms.txt`](https://wagtail.github.io/draftjs_exporter/llms.txt) and a complete [`llms-full.txt`](https://wagtail.github.io/draftjs_exporter/llms-full.txt).
+
 ## Contributing
 
 See anything you like in here? Anything missing? We welcome all support, whether on bug reports, feature requests, code, design, reviews, tests, documentation, and more. Please have a look at our [contribution guidelines](docs/CONTRIBUTING.md).

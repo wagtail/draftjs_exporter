@@ -6,7 +6,7 @@ labels: question
 assignees: ""
 ---
 
-Please make sure you have read available documentation and have searched for other resources available online before submitting your question here.
+Please make sure you have read the [documentation](https://wagtail.github.io/draftjs_exporter/) and have searched for other resources available online before submitting your question here.
 
 Thanks!
 
@@ -19,6 +19,6 @@ Thanks!
   This helps us improve documentation for future readers who might encounter the same problem.
 -->
 
-- [ ] In the https://www.draftail.org/ documentation I searched for: (Write your answers here).
+- [ ] In the https://wagtail.github.io/draftjs_exporter/ documentation I searched for: (Write your answers here).
 - [ ] In the issues / pull requests, I searched for: (Write your answers here).
 - [ ] In Stack Overflow, I searched for: (Write your answers here).

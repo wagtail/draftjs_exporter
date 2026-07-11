@@ -7,9 +7,10 @@ Hi! 👋 To help us help you, please read through the following guidelines.
 
 ## Documentation
 
-Documentation for this project is all on [GitHub](https://github.com/wagtail/draftjs_exporter). Please make sure to have a look at:
+The documentation for this project is published at [wagtail.github.io/draftjs_exporter](https://wagtail.github.io/draftjs_exporter/). Please make sure to have a look at:
 
 - The [README](https://github.com/wagtail/draftjs_exporter/blob/main/README.md)
+- For LLM-assisted tooling, the concise [`llms.txt`](https://wagtail.github.io/draftjs_exporter/llms.txt) and the complete [`llms-full.txt`](https://wagtail.github.io/draftjs_exporter/llms-full.txt).
 - The project’s introductory blog post, [Rethinking rich text pipelines with Draft.js](https://www.draftail.org/blog/2018/03/13/rethinking-rich-text-pipelines-with-draft-js).
 - The [Draft.js docs](https://draftjs.org/)
 - You might also like to read about [How Draft.js represents rich text](https://www.draftail.org/docs/reference/content-storage).
