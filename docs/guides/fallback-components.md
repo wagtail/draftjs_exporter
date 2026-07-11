@@ -16,7 +16,11 @@ config = {
 }
 ```
 
-This fallback component can now control the exporter behavior when normal components are not found. Here is an example:
+This fallback component can now control the exporter behavior when normal components are not found. A fallback receives the same `props` as any [custom component](custom-components.md), and can return one of three things:
+
+- The block's `children` to keep the content but discard the wrapping element.
+- `None` to remove the block entirely.
+- Any DOM element to provide an alternative rendering.
 
 ```python
 def block_fallback(props):
@@ -24,15 +28,12 @@ def block_fallback(props):
 
     if type_ == 'example-discard':
         logging.warning(f'Missing config for "{type_}". Discarding block, keeping content.')
-        # Directly return the block's children to keep its content.
         return props['children']
     elif type_ == 'example-delete':
         logging.error(f'Missing config for "{type_}". Deleting block.')
-        # Return None to not render anything, removing the whole block.
         return None
     else:
         logging.warning(f'Missing config for "{type_}". Using div instead.')
-        # Provide a fallback.
         return DOM.create_element('div', {}, props['children'])
 ```
 

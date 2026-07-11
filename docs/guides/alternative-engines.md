@@ -14,17 +14,14 @@ Engine output often differs in small ways. For example quote escaping in attribu
 - For `lxml`, do `pip install draftjs_exporter[lxml]`. It also requires `libxml2` and `libxslt` to be available on your system.
 - There are no additional dependencies for `string_compat`.
 
-Then, use the `engine` attribute of the exporter config:
+Then, use the `engine` attribute of the exporter config. The `DOM` class exposes the available engines as constants:
 
 ```python
 config = {
-    # Specify which DOM backing engine to use.
     'engine': DOM.HTML5LIB,
-    # Or for lxml:
-    'engine': DOM.LXML,
-    # Or to use the "maximum output stability" string_compat engine:
-    'engine': DOM.STRING_COMPAT,
 }
 ```
+
+Replace `DOM.HTML5LIB` with `DOM.LXML` for the lxml engine, or `DOM.STRING_COMPAT` for the maximum-output-stability variant of the default `string` engine.
 
 To use the `lxml` or `html5lib` engines with arbitrary versions of those dependencies, simply install `draftjs_exporter` without the extras, and separately install the desired versions of the dependencies.

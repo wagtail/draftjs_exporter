@@ -6,15 +6,12 @@ The exporter can render Draft.js content as Markdown in addition to HTML.
 
 ## Quick start
 
-Use the built-in `MARKDOWN_CONFIG` to render Markdown with default settings:
+Use the built-in `MARKDOWN_CONFIG` to render Markdown with default settings. The config points the exporter at the Markdown DOM engine (`DOMMarkdown`), so `render` returns Markdown text instead of HTML:
 
 ```python
 from draftjs_exporter import HTML, MARKDOWN_CONFIG
 
-# Build an exporter configured for Markdown output.
 exporter = HTML(MARKDOWN_CONFIG)
-# `render` returns Markdown text instead of HTML, because the config
-# points the engine at the Markdown DOM (DOMMarkdown).
 markdown = exporter.render(content_state)
 ```
 
@@ -57,15 +54,18 @@ The three fallback options control what happens when the exporter encounters a b
 from draftjs_exporter import HTML, build_markdown_config
 from draftjs_exporter.markdown.helpers import block
 
-# Custom block fallback that prefixes unknown blocks
+
 def my_block_fallback(props):
     return block(["<!-- unknown --> ", props["children"]])
 
+
 config = build_markdown_config({
     "block_fallback": my_block_fallback,
-    "style_fallback": None,  # disable: unknown styles will error
+    "style_fallback": None,
 })
 ```
+
+In this example, unknown blocks are prefixed with an HTML comment, while unknown styles raise an error instead of falling back to plain text.
 
 ## Default formatting
 
@@ -101,11 +101,10 @@ The following table shows every Draft.js content type the Markdown exporter hand
 
 ## Low-level API
 
-For cases where `build_markdown_config` is not flexible enough, you can build a config dict manually from the individual component functions. This is the same approach used by the default `CONFIG` and `build_markdown_config` internally.
+For cases where `build_markdown_config` is not flexible enough, you can build a config dict manually from the individual component functions. This is the same approach used by the default `CONFIG` and `build_markdown_config` internally. The constants and default maps are available from the top-level package; the Markdown-specific component functions live in submodules:
 
 ```python
-from draftjs_exporter.constants import BLOCK_TYPES, ENTITY_TYPES, INLINE_STYLES
-from draftjs_exporter.defaults import BLOCK_MAP as HTML_BLOCK_MAP, STYLE_MAP as HTML_STYLE_MAP
+from draftjs_exporter import BLOCK_MAP as HTML_BLOCK_MAP, BLOCK_TYPES, ENTITY_TYPES, INLINE_STYLES, STYLE_MAP as HTML_STYLE_MAP
 from draftjs_exporter.markdown.blocks import list_wrapper, make_ul, ol, prefixed_block
 from draftjs_exporter.markdown.code import code_element, code_wrapper
 from draftjs_exporter.markdown.entities import image, link, make_horizontal_rule

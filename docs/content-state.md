@@ -6,7 +6,7 @@
 
 Draft.js uses a fixed schema with predefined rich text types. There are strong constraints on content structure: what is block-level formatting, what is inline, what can carry data, and how. For storage and transport, Draft.js editors output a [raw ContentState](https://www.draftail.org/docs/next/draft-js/api-reference/data-conversion#converttoraw) representation that is serializable as JSON.
 
-Here is a simple rich text example, in the shape you would pass it to the exporter:
+Here is a simple rich text example, in the shape you would pass it to the exporter. Each part of this structure is explained in the sections below.
 
 ```python
 from draftjs_exporter import HTML

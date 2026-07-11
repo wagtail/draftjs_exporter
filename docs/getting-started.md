@@ -10,36 +10,29 @@ pip install draftjs_exporter
 
 We support the following Python versions: 3.10, 3.11, 3.12, 3.13, 3.14, 3.15. For legacy Python versions, find compatible releases in the [CHANGELOG](https://github.com/wagtail/draftjs_exporter/blob/main/CHANGELOG.md).
 
-In your code, create an exporter and use the `render` method to create HTML:
+In your code, create an exporter and use the `render` method to produce HTML. Pass an empty config dict to use the default block, style, and entity maps — see [Configuration](reference/configuration.md) to customize them.
 
 ```python
-from draftjs_exporter.dom import DOM
-from draftjs_exporter.html import HTML
+from draftjs_exporter import HTML
 
-# Configuration options are detailed in the Configuration reference.
-# An empty dict uses the default block, style, and entity maps.
-config = {}
+exporter = HTML({})
 
-# Initialize the exporter with your configuration.
-exporter = HTML(config)
-
-# Render a Draft.js ContentState.
-# Learn how Draft.js models this data in the "Content state" page.
 html = exporter.render({
     'entityMap': {},
     'blocks': [{
-        # Every block has a unique key, its text, and a type.
         'key': '6m5fh',
         'text': 'Hello, world!',
-        'type': 'unstyled',  # "unstyled" is the default block type.
-        'depth': 0,          # depth is used for nested blocks like list items.
-        'inlineStyleRanges': [],  # character-level formatting (bold, italic, ...).
-        'entityRanges': []       # links, images, and other entities.
+        'type': 'unstyled',
+        'depth': 0,
+        'inlineStyleRanges': [],
+        'entityRanges': []
     }]
 })
 
 print(html)
 ```
+
+For details on the ContentState structure of blocks / inline styles / entities, read [our content state overview](content-state.md).
 
 You can also run an example by downloading this repository and then using `python example.py`, or by using our [online Draft.js demo](http://playground.draftail.org/).
 
@@ -47,16 +40,12 @@ You can also run an example by downloading this repository and then using `pytho
 
 ## Type annotations
 
-The exporter's codebase uses static type annotations, checked with mypy and ty. Reusable types are made available:
+The exporter's codebase uses static type annotations, checked with mypy and ty. Reusable types are made available so you can annotate your own components:
 
 ```python
 from draftjs_exporter import DOM, Element, Props
 
-
-# Components are functions that take `props` as parameter and return DOM elements.
-# See the Custom components guide for the full API.
 def image(props: Props) -> Element:
-    # This component creates an image element, with the relevant attributes.
     return DOM.create_element('img', {
         'src': props.get('src'),
         'width': props.get('width'),
@@ -64,6 +53,8 @@ def image(props: Props) -> Element:
         'alt': props.get('alt'),
     })
 ```
+
+See [Custom components](guides/custom-components.md) for the full component API.
 
 ## Next steps
 
