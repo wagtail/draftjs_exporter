@@ -17,6 +17,7 @@
 - Raise the lower bound of the optional `lxml` dependency to `>=4.6.5`.
 - Performance improvements when exporting content.
 - Move the repository to `wagtail/draftjs_exporter` (same maintainers, new home).
+- Reduce redundant tags in nested and partially nested inline style output, producing semantically equivalent but cleaner HTML ([#136](https://github.com/wagtail/draftjs_exporter/issues/136)).
 
 ### Removed
 

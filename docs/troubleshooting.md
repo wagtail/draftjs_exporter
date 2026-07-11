@@ -9,6 +9,7 @@ Here are smaller implementation details that are important to how the exporter b
 - HTML attributes are added in alphabetical order for the `lxml` and `html5` engines, and in the order they are provided as for the default `string` engine.
 - `unstyled` blocks without text render as an empty element.
 - Inline ranges aiming the same offset and length are always rendered in the same order (alphabetical order of the style type - `BOLD`, `CODE`, `ITALIC`).
+- Overlapping or partially nested inline styles are rendered with the minimum number of tags. For example, a bold range covering `[0-11]` and an italic range covering `[5-11]` produce `<strong>Bold <em>Italic</em></strong>` rather than `<strong>Bold </strong><strong><em>Italic</em></strong>`. This is semantically equivalent but produces different HTML than older versions; code comparing exact output strings may need updating.
 - `style` prop is rendered as-is if it is a string, or can also be a dict in which case its properties are converted into a string using `camel_to_dash`.
 - Invalid attributes are left for the BeautifulSoup / html5lib parser to handle.
 - HTML escaping is automatically done by BeautifulSoup / html5lib.

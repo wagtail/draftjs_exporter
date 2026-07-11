@@ -137,3 +137,150 @@ class TestStyleState(unittest.TestCase):
         style_state.apply(Command("start_inline_style", 0, "ITALIC"))
         style_state.render_styles("Test text", blocks[0], blocks)
         style_state.apply(Command("stop_inline_style", 9, "ITALIC"))
+
+    def test_start_segment_no_styles_returns_content(self):
+        block: Block = {
+            "key": "5s7g9",
+            "text": "test",
+            "type": "unstyled",
+            "depth": 0,
+            "inlineStyleRanges": [],
+            "entityRanges": [],
+        }
+        content = DOM.create_element()
+        innermost = self.style_state.start_segment(block, [block], content)
+        self.assertIs(innermost, content)
+        self.assertEqual(self.style_state.element_stack, [])
+
+    def test_start_segment_open_one_style(self):
+        block: Block = {
+            "key": "5s7g9",
+            "text": "test",
+            "type": "unstyled",
+            "depth": 0,
+            "inlineStyleRanges": [],
+            "entityRanges": [],
+        }
+        content = DOM.create_element()
+        self.style_state.apply(Command("start_inline_style", 0, "BOLD"))
+        innermost = self.style_state.start_segment(block, [block], content)
+        self.assertEqual(len(self.style_state.element_stack), 1)
+        self.assertEqual(self.style_state.element_stack[0][0], "BOLD")
+        self.assertIs(innermost, self.style_state.element_stack[0][1])
+        # The strong element is a child of content
+        self.assertEqual(len(content.children), 1)
+
+    def test_start_segment_prefix_match(self):
+        """When the prefix of active styles matches the existing stack,
+        keep the outer tags open and create only new inner tags."""
+        block: Block = {
+            "key": "5s7g9",
+            "text": "Bold Italic",
+            "type": "unstyled",
+            "depth": 0,
+            "inlineStyleRanges": [],
+            "entityRanges": [],
+        }
+        content = DOM.create_element()
+
+        # First segment: [BOLD]
+        self.style_state.apply(Command("start_inline_style", 0, "BOLD"))
+        innermost = self.style_state.start_segment(block, [block], content)
+        DOM.append_child(innermost, "Bold ")
+        self.assertEqual(len(self.style_state.element_stack), 1)
+
+        # Second segment: [BOLD, ITALIC] — BOLD is already open, only ITALIC opens
+        self.style_state.apply(Command("start_inline_style", 5, "ITALIC"))
+        innermost = self.style_state.start_segment(block, [block], content)
+        self.assertEqual(len(self.style_state.element_stack), 2)
+        self.assertEqual(self.style_state.element_stack[1][0], "ITALIC")
+        DOM.append_child(innermost, "Italic")
+
+        # Third segment: [] — both close
+        self.style_state.apply(Command("stop_inline_style", 11, "BOLD"))
+        self.style_state.apply(Command("stop_inline_style", 11, "ITALIC"))
+        innermost = self.style_state.start_segment(block, [block], content)
+        self.assertIs(innermost, content)
+        self.assertEqual(self.style_state.element_stack, [])
+
+        # Verify the rendered tree
+        self.assertEqual(
+            DOM.render_debug(content),
+            "<fragment><strong>Bold <em>Italic</em></strong></fragment>",
+        )
+
+    def test_start_segment_close_and_reopen(self):
+        """Adjacent styles close and reopen since there is no shared prefix."""
+        block: Block = {
+            "key": "5s7g9",
+            "text": "BoldItalic",
+            "type": "unstyled",
+            "depth": 0,
+            "inlineStyleRanges": [],
+            "entityRanges": [],
+        }
+        content = DOM.create_element()
+
+        # Segment 1: [ITALIC]
+        self.style_state.apply(Command("start_inline_style", 0, "ITALIC"))
+        innermost = self.style_state.start_segment(block, [block], content)
+        DOM.append_child(innermost, "Bold")
+
+        # Segment 2: [BOLD] — no prefix match, ITALIC closes, BOLD opens
+        self.style_state.apply(Command("stop_inline_style", 4, "ITALIC"))
+        self.style_state.apply(Command("start_inline_style", 4, "BOLD"))
+        innermost = self.style_state.start_segment(block, [block], content)
+        DOM.append_child(innermost, "Italic")
+
+        # Segment 3: []
+        self.style_state.apply(Command("stop_inline_style", 10, "BOLD"))
+        self.style_state.start_segment(block, [block], content)
+
+        self.assertEqual(
+            DOM.render_debug(content),
+            "<fragment><em>Bold</em><strong>Italic</strong></fragment>",
+        )
+
+    def test_flush_clears_stack(self):
+        block: Block = {
+            "key": "5s7g9",
+            "text": "test",
+            "type": "unstyled",
+            "depth": 0,
+            "inlineStyleRanges": [],
+            "entityRanges": [],
+        }
+        content = DOM.create_element()
+        self.style_state.apply(Command("start_inline_style", 0, "BOLD"))
+        self.style_state.start_segment(block, [block], content)
+        self.assertEqual(len(self.style_state.element_stack), 1)
+        self.style_state.flush()
+        self.assertEqual(self.style_state.element_stack, [])
+
+    def test_uses_components_false_for_string_tags(self):
+        block: Block = {
+            "key": "5s7g9",
+            "text": "test",
+            "type": "unstyled",
+            "depth": 0,
+            "inlineStyleRanges": [
+                {"offset": 0, "length": 4, "style": "ITALIC"},
+                {"offset": 0, "length": 4, "style": "BOLD"},
+            ],
+            "entityRanges": [],
+        }
+        self.assertFalse(self.style_state.uses_components(block))
+
+    def test_uses_components_true_when_any_is_callable(self):
+        block: Block = {
+            "key": "5s7g9",
+            "text": "test",
+            "type": "unstyled",
+            "depth": 0,
+            "inlineStyleRanges": [
+                {"offset": 0, "length": 4, "style": "ITALIC"},
+                {"offset": 0, "length": 4, "style": "IMPORTANT"},
+            ],
+            "entityRanges": [],
+        }
+        self.assertTrue(self.style_state.uses_components(block))

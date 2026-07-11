@@ -133,6 +133,10 @@ class HTML:
             entity_state = EntityState(self.entity_options, entity_map)
             style_state = StyleState(self.style_options) if has_styles else None
 
+            use_continuation = not (
+                style_state is None or style_state.uses_components(block)
+            )
+
             for text, commands in self.build_command_groups(block):
                 for command in commands:
                     entity_state.apply(command)
@@ -151,22 +155,37 @@ class HTML:
                 else:
                     decorated_node = text
 
-                if style_state:
-                    styled_node = style_state.render_styles(
-                        decorated_node, block, wrapper_state.blocks
-                    )
-                else:
-                    styled_node = decorated_node
-                entity_node = entity_state.render_entities(
-                    styled_node, block, wrapper_state.blocks, dom
+                entity_active = (
+                    bool(entity_state.has_entity())
+                    or entity_state.completed_entity is not None
                 )
 
-                if entity_node is not None:
-                    dom.append_child(content, entity_node)
+                if style_state is not None and use_continuation and not entity_active:
+                    innermost = style_state.start_segment(
+                        block, wrapper_state.blocks, content
+                    )
+                    if decorated_node not in (None, ""):
+                        dom.append_child(innermost, decorated_node)
+                else:
+                    if style_state is not None and use_continuation:
+                        style_state.flush()
 
-                    # Check whether there actually are two different nodes, confirming we are not inserting an upcoming entity.
-                    if styled_node != entity_node and entity_state.has_no_entity():
-                        dom.append_child(content, styled_node)
+                    if style_state:
+                        styled_node = style_state.render_styles(
+                            decorated_node, block, wrapper_state.blocks
+                        )
+                    else:
+                        styled_node = decorated_node
+                    entity_node = entity_state.render_entities(
+                        styled_node, block, wrapper_state.blocks, dom
+                    )
+
+                    if entity_node is not None:
+                        dom.append_child(content, entity_node)
+
+                        # Check whether there actually are two different nodes, confirming we are not inserting an upcoming entity.
+                        if styled_node != entity_node and entity_state.has_no_entity():
+                            dom.append_child(content, styled_node)
         # Fast track for blocks which do not contain styles nor entities, which is very common.
         elif has_decorators:
             content = render_decorators(

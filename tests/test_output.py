@@ -166,6 +166,76 @@ class TestOutput(unittest.TestCase):
             '<h1><strong>He</strong>ader</h1><p><strong style="text-decoration: underline;">some</strong> <a href="http://example.com">paragraph</a> text</p>',
         )
 
+    def test_render_with_partially_nested_inline_styles(self):
+        """Partially nested styles produce minimal tag output (issue #136).
+
+        BOLD [0-11], ITALIC [5-11]:
+        - ``<strong>Bold <em>Italic</em></strong>`` (contiguous outer tag)
+        instead of ``<strong>Bold </strong><strong><em>Italic</em></strong>``.
+        """
+        self.assertEqual(
+            self.exporter.render(
+                {
+                    "entityMap": {},
+                    "blocks": [
+                        {
+                            "key": "9nc73",
+                            "text": "Bold Italic",
+                            "type": "unstyled",
+                            "depth": 0,
+                            "inlineStyleRanges": [
+                                {"offset": 0, "length": 11, "style": "BOLD"},
+                                {"offset": 5, "length": 6, "style": "ITALIC"},
+                            ],
+                            "entityRanges": [],
+                        }
+                    ],
+                }
+            ),
+            "<p><strong>Bold <em>Italic</em></strong></p>",
+        )
+
+    def test_render_with_three_level_nested_inline_styles(self):
+        """Three-level nested inline styles from issue #136.
+
+        BOLD [0-21], ITALIC [5-21], UNDERLINE [12-21] should produce a single
+        ``<strong>`` containing a single ``<em>`` containing a single ``<u>``,
+        ``<strong>Bold <em>Italic <u>Underline</u></em></strong>``.
+        """
+        exporter = HTML(
+            {
+                **config,
+                "style_map": {
+                    INLINE_STYLES.ITALIC: "em",
+                    INLINE_STYLES.BOLD: "strong",
+                    INLINE_STYLES.UNDERLINE: "u",
+                },
+            }
+        )
+        self.assertEqual(
+            exporter.render(
+                {
+                    "entityMap": {},
+                    "blocks": [
+                        {
+                            "key": "",
+                            "text": "Bold Italic Underline",
+                            "type": "unstyled",
+                            "depth": 0,
+                            "inlineStyleRanges": [
+                                {"offset": 0, "length": 21, "style": "BOLD"},
+                                {"offset": 5, "length": 16, "style": "ITALIC"},
+                                {"offset": 12, "length": 9, "style": "UNDERLINE"},
+                            ],
+                            "entityRanges": [],
+                            "data": {},
+                        }
+                    ],
+                }
+            ),
+            "<p><strong>Bold <em>Italic <u>Underline</u></em></strong></p>",
+        )
+
     def test_render_with_entities(self):
         self.assertEqual(
             self.exporter.render(

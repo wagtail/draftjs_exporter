@@ -41,7 +41,7 @@ The core flow lives in `HTML.render()` and proceeds as follows:
 3. **Block iteration** – `HTML.render()` creates a `WrapperState` instance and an empty document fragment, then iterates over each block.
 4. **Per-block rendering** – For each block, `render_block()` extracts text, inline styles, entity ranges, and composite decorators. It builds a sorted list of `Command` objects from the Draft.js ranges, groups consecutive commands by character offset, and processes each group through:
    - **EntityState** – manages an entity stack; on `start_entity`/`stop_entity` pairs it wraps children in entity components.
-   - **StyleState** – tracks active inline styles; `render_styles()` wraps text in nested inline elements from innermost to outermost.
+   - **StyleState** – tracks active inline styles; `start_segment()` keeps style elements open across text segments where styles continue (reducing redundant tags), while `render_styles()` wraps text in nested inline elements from innermost to outermost as a fallback for entity-active segments and callable component styles.
    - **Composite decorators** – regex-based text transformations (e.g. `\n` → `<br>`).
 5. **Wrapper resolution** – `wrapper_state.element_for()` resolves each block to a DOM element, managing nesting of wrapper elements (e.g. `<ul>`/`<ol>` for list items) based on block depth.
 6. **Final rendering** – All block elements are appended to the document fragment, then `DOM.render()` serialises the virtual DOM tree to the output string (HTML or Markdown).
