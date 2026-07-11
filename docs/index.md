@@ -34,6 +34,7 @@ The initial use case was to gain more control over the content managed by rich t
 - **Write custom components.** Use the React-like [custom components](guides/custom-components.md) API, or define [fallback components](guides/fallback-components.md) for missing block and entity types.
 - **Pick an engine.** The default `string` engine is dependency-free. See [Alternative engines](guides/alternative-engines.md) for `html5lib` and `lxml`.
 - **Find an error?** See [Troubleshooting](troubleshooting.md) for known issues and implementation details, and the [API reference](reference/api.md) for the full public API.
+- **Upgrading?** See the [Migration guide](migration-guide.md) for breaking changes and upgrade steps by version.
 
 ## Contributing
 

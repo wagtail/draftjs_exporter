@@ -27,6 +27,8 @@
 
 - Fix concurrency bug where the DOM engine was shared globally across all `HTML` instances. Each exporter now uses its own engine via a context variable ([#122](https://github.com/wagtail/draftjs_exporter/issues/122)).
 
+For breaking changes and upgrade steps, see the [migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/).
+
 ## [v5.2.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v5.2.0)
 
 ### Added
@@ -52,11 +54,7 @@
 
 - Remove support for Python 3.6.
 
-### How to upgrade
-
-#### Python 3.6 support
-
-Python 3.6 is no longer supported, as it has reached its [end of life](https://www.python.org/dev/peps/pep-0494/). For projects needing Python 3.6, please keep using [v4.1.2](https://github.com/wagtail/draftjs_exporter/tree/v4.1.2) of the exporter.
+For breaking changes and upgrade steps, see the [migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/).
 
 ## [v4.1.2](https://github.com/wagtail/draftjs_exporter/releases/tag/v4.1.2)
 
@@ -80,7 +78,7 @@ Python 3.6 is no longer supported, as it has reached its [end of life](https://w
 
 ## [v4.0.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v4.0.0)
 
-This release contains breaking changes. **Be sure to check out the "how to upgrade" section below.**
+This release contains breaking changes. **Be sure to check out the [migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/).**
 
 ### Removed
 
@@ -88,59 +86,6 @@ This release contains breaking changes. **Be sure to check out the "how to upgra
 - Remove HTML attributes alphabetical sorting of default string engine ([#129](https://github.com/wagtail/draftjs_exporter/pull/129))
 - Disable single and double quotes escaping outside of attributes for string engine ([#129](https://github.com/wagtail/draftjs_exporter/pull/129))
 - Stop sorting inline styles alphabetically ([#129](https://github.com/wagtail/draftjs_exporter/pull/129))
-
-### How to upgrade
-
-#### Python 3.5 support
-
-Do not upgrade to this version if you are using the exporter in Python 3.5. Please keep using [v3.0.1](https://github.com/wagtail/draftjs_exporter/tree/v3.0.1) of the exporter.
-
-#### HTML attributes sorting
-
-The default `string` engine no longer sorts attributes alphabetically by name in its output HTML. This makes it possible to control the order as needed, wherever attributes can be specified:
-
-```python
-def image(props):
-    return DOM.create_element('img', {
-        'src': props.get('src'),
-        'width': props.get('width'),
-        'height': props.get('height'),
-        'alt': props.get('alt'),
-    })
-```
-
-If you relied on this behavior, you can either reorder your `props` / `wrapper_props` / `create_element` calls as needed, or subclass the built-in `string` engine and override its `render_attrs` method to add back the `attrs.sort`:
-
-```python
-    @staticmethod
-    def render_attrs(attr: Attr) -> str:
-        attrs = [f' {k}="{escape(v)}"' for k, v in attr.items()]
-        attrs.sort()
-        return "".join(attrs)
-```
-
-### HTML quotes escaping
-
-The default `string` engine no longer escapes single and double quotes in HTML content (it still escapes quotes inside attributes). If you relied on this behavior, subclass the built-in `string` engine and override its `render_children` method to add back `quote=True`:
-
-```python
-    @staticmethod
-    def render_children(children: Sequence[Union[HTML, Elt]]) -> HTML:
-        return "".join(
-            [
-                DOMString.render(c)
-                if isinstance(c, Elt)
-                else escape(c, quote=True)
-                for c in children
-            ]
-        )
-```
-
-### Inline styles sorting
-
-The exporter supports passing the `style` attribute as a dictionary with JS attributes for style properties, and will automatically convert it to a string. The properties are no longer sorted alphabetically – it’s now possible to reorder the dictionary’s keys to change the order.
-
-If you relied on this behavior, either reorder the keys as needed, or pass the `style` as a string (with CSS properties syntax).
 
 ## [v3.0.1](https://github.com/wagtail/draftjs_exporter/releases/tag/v3.0.1)
 
@@ -154,7 +99,7 @@ If you relied on this behavior, either reorder the keys as needed, or pass the `
 
 ## [v3.0.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v3.0.0)
 
-This release contains breaking changes. **Be sure to check out the "how to upgrade" section below.**
+This release contains breaking changes. **Be sure to check out the [migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/).**
 
 ### Changed
 
@@ -168,17 +113,7 @@ This release contains breaking changes. **Be sure to check out the "how to upgra
 - Add [PEP-561](https://www.python.org/dev/peps/pep-0561/) metadata so the exporter’s type annotations can be read by type checkers ([#101](https://github.com/wagtail/draftjs_exporter/issues/101), [#123](https://github.com/wagtail/draftjs_exporter/pull/123)).
 - Give entity rendering components access to the current `block`, `blocks` list, `mutability`, and key as `entity_range.key` ([#91](https://github.com/wagtail/draftjs_exporter/issues/91), [#124](https://github.com/wagtail/draftjs_exporter/pull/124)).
 
-### How to upgrade
-
-#### Python 2.7 and 3.4 support
-
-Do not upgrade to this version if you are using the exporter in Python 2.7 or 3.4. Please keep using [v2.1.7](https://github.com/wagtail/draftjs_exporter/tree/v2.1.7) of the exporter.
-
-#### PEP-484 type annotations
-
-If you are using the exporter in a codebase using type annotations and a type checker, there is a chance the annotations added in this release will create conflicts with your project’s annotations – if there are discrepancies between the expected input/output of the exporter, or in the configuration. In this case you may need to update your project’s type annotations or stubs to match the expected types of the exporter’s public API.
-
-If you believe there is a problem with how the public API is typed, please [open a new issue](https://github.com/wagtail/draftjs_exporter/issues/new/choose).
+For breaking changes and upgrade steps, see the [migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/).
 
 ## [v2.1.7](https://github.com/wagtail/draftjs_exporter/releases/tag/v2.1.7)
 
@@ -242,7 +177,7 @@ If you believe there is a problem with how the public API is typed, please [open
 
 ## [v2.0.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v2.0.0)
 
-This release contains breaking changes that will require updating the exporter's configurations. **Be sure to check out the "how to upgrade" section below.**
+This release contains breaking changes that will require updating the exporter's configurations. **Be sure to check out the [migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/).**
 
 ### Changed
 
@@ -264,131 +199,6 @@ This release contains breaking changes that will require updating the exporter's
 
 - Stop loading html5lib engine on every use, even if unused ([#80](https://github.com/wagtail/draftjs_exporter/issues/80)).
 
-### How to upgrade
-
-#### New default engine
-
-The specificities of the new engine are described in the [documentation](https://github.com/wagtail/draftjs_exporter#alternative-backing-engines). To start using the new default,
-
-1. Remove the `engine` property from the exporter configuration, or do `'engine': DOM.STRING,`.
-2. You can also remove the `html5lib` and `beautifulsoup4` dependencies from your project if they aren't used anywhere else.
-
-To keep using the previous default, html5lib:
-
-1. Set the `engine` property to `'engine': DOM.HTML5LIB,`.
-2. Make sure you install the exporter with `pip install draftjs_exporter[html5lib]`.
-
-#### Decorator component definitions
-
-Decorator components now require the function syntax (see the relevant [documentation](https://github.com/wagtail/draftjs_exporter#custom-components)).
-
-```python
-# Before:
-class OrderedList:
-    def render(self, props):
-        depth = props['block']['depth']
-
-        return DOM.create_element('ol', {
-            'class': f'list--depth-{depth}'
-        }, props['children'])
-# After:
-def ordered_list(props):
-    depth = props['block']['depth']
-
-    return DOM.create_element('ol', {
-        'class': f'list--depth-{depth}'
-    }, props['children'])
-```
-
-If you were relying on the configuration capabilities of the class API, switch to composing components instead:
-
-```python
-# Before:
-class Link:
-    def __init__(self, use_new_window=False):
-        self.use_new_window = use_new_window
-
-    def render(self, props):
-        link_props = {
-            'href': props['url'],
-        }
-
-        if self.use_new_window:
-            link_props['target'] = '_blank'
-            link_props['rel'] = 'noreferrer noopener'
-
-        return DOM.create_element('a', link_props, props['children'])
-
-# In the config:
-    ENTITY_TYPES.LINK: Link(use_new_window=True)
-
-# After:
-def link(props):
-    return DOM.create_element('a', props, props['children'])
-
-def same_window_link(props):
-    return DOM.create_element(link, {
-        'href': props['url'],
-    }, props['children'])
-})
-
-def new_window_link(props):
-    return DOM.create_element(link, {
-        'href': props['url'],
-        'target': '_blank',
-        'rel': 'noreferrer noopener',
-    }, props['children'])
-})
-```
-
-The composite decorators API now looks closer to that of other decorators, and to Draft.js:
-
-```python
-# Before:
-class BR:
-    SEARCH_RE = re.compile(r'\n')
-
-    def render(self, props):
-        if props['block']['type'] == BLOCK_TYPES.CODE:
-            return props['children']
-
-        return DOM.create_element('br')
-
-
-'composite_decorators': [
-    BR,
-]
-# After:
-
-def br(props):
-    if props['block']['type'] == BLOCK_TYPES.CODE:
-        return props['children']
-
-    return DOM.create_element('br')
-
-# In the config:
-'composite_decorators': [
-    {
-        'strategy': re.compile(r'\n'),
-        'component': br,
-    },
-],
-```
-
-#### Engine configuration
-
-```diff
-# The `engine` field in the exporter config now has to be a dotted path string pointing to a valid engine.
-- 'engine': 'html5lib',
-+ 'engine': 'draftjs_exporter.engines.html5lib.DOM_HTML5LIB',
-# Or, using the shorthand.
-+ 'engine': DOM.HTML5LIB,
-
-# It's not possible either to directly provide an engine implementation - use a dotted path instead.
-- DOM.use(DOMTestImpl)
-+ DOM.use('tests.test_dom.DOMTestImpl')
-```
-
 ## [v1.1.1](https://github.com/wagtail/draftjs_exporter/releases/tag/v1.1.1)
 
 ### Fixed
@@ -405,18 +215,7 @@ def br(props):
 
 - Pre-compile regexes in html5lib engine for performance improvements (#76).
 
-### How to upgrade
-
-There is no need to make any changes to keep using the previous engines (html5lib, lxml). To switch to the new string engine, opt-in via the config:
-
-```diff
-exporter = HTML({
-+    # Specify which DOM backing engine to use.
-+    'engine': 'string',
-})
-```
-
-The new engine is faster than both `html5lib` and `lxml`, and outputs a functionally identical HTML (see a list of all known engine differences at [`test_engine_differences.py`](https://github.com/wagtail/draftjs_exporter/blob/main/tests/engines/test_engines_differences.py)). Its only drawback is that when using the `DOM.parse_html()` no safeguards are provided against malformed or unescaped HTML, whereas lxml or html5lib sanitise the input.
+For breaking changes and upgrade steps, see the [migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/).
 
 ## [v1.0.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v1.0.0)
 
@@ -455,23 +254,7 @@ The project has reached a high-enough level of stability to be used in productio
 - Stop rendering decorators when there is no text to decorate.
 - Remove extra HTML serialisation steps.
 
-### How to upgrade
-
-```diff
-# Change composite decorators block type access
-- props['block_type']
-+ props['block']['type']
-# Stop using DOM.get_children directly.
-- DOM.get_children()
-# Stop using DOM.pretty_print directly.
-- DOM.pretty_print()
-# Move `ConfigException` to `draftjs_exporter.error`.
-- from draftjs_exporter.options import ConfigException
-+ from draftjs_exporter.error import ConfigException
-# Remove automatic conversion from `className` prop to `class` attribute.
-- BLOCK_TYPES.BLOCKQUOTE: ['blockquote', {'className': 'c-pullquote'}]
-+ BLOCK_TYPES.BLOCKQUOTE: ['blockquote', {'class': 'c-pullquote'}]
-```
+For breaking changes and upgrade steps, see the [migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/).
 
 ## [v0.8.1](https://github.com/wagtail/draftjs_exporter/releases/tag/v0.8.1)
 
@@ -531,59 +314,7 @@ KEYBOARD = 'kbd'
 
 - Fix block ordering with block components and wrapper. Fix #55.
 
-### How to upgrade
-
-```diff
-# Change element-only block declarations:
-- BLOCK_TYPES.HEADER_TWO: {'element': 'h2'},
-+ BLOCK_TYPES.HEADER_TWO: 'h2',
-# Change array-style block declarations:
-- BLOCK_TYPES.BLOCKQUOTE: ['blockquote', {'class': 'c-pullquote'}]
-+ BLOCK_TYPES.BLOCKQUOTE: {'element': 'blockquote', 'props': {'class': 'c-pullquote'}}
-# Change block wrapper declarations:
-- 'wrapper': ['ul', {'class': 'bullet-list'}],
-+ 'wrapper': 'ul',
-+ 'wrapper_props': {'class': 'bullet-list'},
-# Change location and name of exceptions:
-- from draftjs_exporter.wrapper_state import BlockException
-+ from draftjs_exporter.options import ConfigException
-# Change element-only style declarations:
-- 'KBD': {'element': 'kbd'},
-+ 'KBD': 'kbd',
-# Change object-style style declarations:
-- 'HIGHLIGHT': {'element': 'strong', 'textDecoration': 'underline'},
-+ 'HIGHLIGHT': {'element': 'strong', 'props': {'style': {'textDecoration': 'underline'}}},
-# Create custom STRIKETHROUGH styles:
-+ 'STRIKETHROUGH': {'element': 'span', 'props': {'style': {'textDecoration': 'line-through'}}},
-# Create custom UNDERLINE styles:
-+ 'UNDERLINE': {'element': 'span', 'props': {'style': {'textDecoration': 'underline'}}},
-# New camel_to_dash location:
-- from draftjs_exporter.style_state import camel_to_dash
-- camel_to_dash()
-+ from draftjs_exporter.dom import DOM
-+ DOM.camel_to_dash()
-# New default rendering for code-block:
-- BLOCK_TYPES.CODE: 'pre',
-+ BLOCK_TYPES.CODE: lambda props: DOM.create_element('pre', {}, DOM.create_element('code', {}, props['children'])),
-# Use the new pre block to produce the previous result, or override the default for code-block.
-+ BLOCK_TYPES.PRE: 'pre',
-# Entities now receive the content of `data` directly, instead of the whole entity:
-  def render(self, props):
--     data = props.get('data', {})
-      link_props = {
--         'href': data['url'],
-+         'href': props['url'],
-      }
-# Remove wrapping around text items.
-- DOM.create_text_node(text)
-+ text
-# Remove fragment calls.
-- DOM.create_document_fragment()
-+ DOM.create_element()
-# Remove text getters and setters. This is not supported anymore.
-- DOM.get_text_content(elt)
-- DOM.set_text_content(elt, text)
-```
+For breaking changes and upgrade steps, see the [migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/).
 
 ## [v0.7.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v0.7.0)
 
@@ -749,3 +480,5 @@ First usable release!
 ### Removed
 
 ### How to upgrade
+
+For breaking changes and upgrade steps, see the [migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/).

@@ -44,6 +44,7 @@ plugins:
           - getting-started.md
           - content-state.md
           - markdown.md
+          - migration-guide.md
         Guides:
           - guides/custom-components.md
           - guides/fallback-components.md
@@ -53,7 +54,6 @@ plugins:
           - reference/api.md
           - reference/configuration.md
           - reference/example.md
-          - reference/research.md
   - mkdocstrings:
       handlers:
         python:
@@ -66,6 +66,7 @@ nav:
   - Getting started: getting-started.md
   - Content state: content-state.md
   - Markdown support: markdown.md
+  - Migration guide: migration-guide.md
   - Guides:
       - Custom components: guides/custom-components.md
       - Fallback components: guides/fallback-components.md
@@ -75,12 +76,12 @@ nav:
       - API: reference/api.md
       - Configuration: reference/configuration.md
       - Example output: reference/example.md
-      - Research notes: reference/research.md
   - Troubleshooting: troubleshooting.md
   - Contributing:
       - Contributing: CONTRIBUTING.md
       - Project architecture: contributing/architecture.md
       - Test strategy: contributing/test-strategy.md
+      - Research notes: contributing/research.md
       - Documentation style guide: style-guide.md
   - Security policy: SECURITY.md
   - Roadmap: ROADMAP.md
