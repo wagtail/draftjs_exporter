@@ -94,3 +94,4 @@ example.html
 .mypy_cache
 __pycache__
 .hypothesis
+site

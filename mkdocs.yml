@@ -9,11 +9,14 @@ dev_addr: localhost:8001
 theme:
   name: material
   font: false
+  logo: theme/favicon.png
+  favicon: theme/favicon.png
   palette:
-    primary: indigo
+    scheme: default
+    primary: white
   features:
     - content.code.copy
-  custom_dir: docs/overrides
+  custom_dir: docs/theme
 markdown_extensions:
   - admonition
   - sane_lists
