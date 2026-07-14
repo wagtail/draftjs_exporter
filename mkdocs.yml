@@ -61,6 +61,9 @@ plugins:
             show_source: true
             show_root_heading: false
             heading_level: 4
+  - mkdocs-simple-hooks:
+      hooks:
+        on_post_build: "docs.hooks:on_post_build"
 nav:
   - Home: index.md
   - Getting started: getting-started.md
