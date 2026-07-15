@@ -11,13 +11,15 @@
 - Add experimental Markdown export via `DOM.MARKDOWN`, with `MARKDOWN_CONFIG` and `build_markdown_config()`.
 - Re-export the public API from the `draftjs_exporter` package root (`Exporter`, `HTML_CONFIG`, types, constants).
 - Improve static type annotations with `TypedDict` definitions for configuration and ContentState.
+- Add [new documentation website](https://wagtail.github.io/ draftjs_exporter/) with docs for getting started, Markdown export, custom components, and more.
+- Add threat model and security guidance in [`SECURITY.md`](https://wagtail.github.io/draftjs_exporter/SECURITY/).
 
 ### Changed
 
 - Raise the lower bound of the optional `lxml` dependency to `>=4.6.5`.
 - Performance improvements when exporting content.
 - Move the repository to `wagtail/draftjs_exporter` (same maintainers, new home).
-- Reduce redundant tags in nested and partially nested inline style output, producing semantically equivalent but cleaner HTML ([#136](https://github.com/wagtail/draftjs_exporter/issues/136)).
+- Reduce redundant tags in nested and partially nested inline style output, producing semantically equivalent but cleaner HTML ([#136](https://github.com/wagtail/draftjs_exporter/issues/136)). See [troubleshooting](https://wagtail.github.io/draftjs_exporter/troubleshooting/) for details.
 
 ### Removed
 
@@ -26,6 +28,7 @@
 ### Fixed
 
 - Fix concurrency bug where the DOM engine was shared globally across all `HTML` instances. Each exporter now uses its own engine via a context variable ([#122](https://github.com/wagtail/draftjs_exporter/issues/122)).
+- Fix crash when rendering blocks that start at a nested depth without a preceding depth-0 block, when the wrapper element is a callable component (e.g. Markdown list items).
 
 For breaking changes and upgrade steps, see the [migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/).
 
