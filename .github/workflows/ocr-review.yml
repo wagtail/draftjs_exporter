@@ -94,7 +94,7 @@ jobs:
     steps:
       - name: Resolve PR context
         id: pr-context
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
             if (context.eventName === 'pull_request_target') {
@@ -113,14 +113,14 @@ jobs:
 
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          fetch-depth: 0
+          persist-credentials: false
           # Source rules from the base branch (main), never from the PR branch.
           ref: ${{ steps.pr-context.outputs.base_ref }}
-          sparse-checkout: |
-            .opencodereview/
           path: trusted-rules
 
       - name: Run OpenCodeReview
-        uses: alibaba/open-code-review@main
+        uses: alibaba/open-code-review@a4a281c1f5925bfd53c7076afc8feb48cb4d171a # v1.7.13
         with:
           llm_url: ${{ secrets.OCR_LLM_URL }}
           llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
