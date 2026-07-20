@@ -59,6 +59,8 @@ on:
   # action only reads the diff and does not execute any code from the PR.
   pull_request_target:
     types: [opened, synchronize, reopened]
+    branches-ignore:
+      - renovate/**
   issue_comment:
     types: [created]
 
