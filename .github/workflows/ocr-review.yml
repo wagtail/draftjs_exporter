@@ -53,10 +53,7 @@ concurrency:
     }}
   cancel-in-progress: true
 
-on:
-  # Use pull_request_target instead of pull_request so that secrets are
-  # available even for PRs from forks. This is safe because the reusable
-  # action only reads the diff and does not execute any code from the PR.
+on: # zizmor: ignore[dangerous-triggers] -- never runs untrusted code, only reads it.
   pull_request_target:
     types: [opened, synchronize, reopened]
     branches-ignore:
@@ -99,16 +96,13 @@ jobs:
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
-            if (context.eventName === 'pull_request_target') {
-              core.setOutput('base_ref', context.payload.pull_request.base.ref);
-            } else if (context.eventName === 'issue_comment') {
+            if (context.eventName === 'issue_comment') {
               const prNumber = context.issue.number;
               const { data: pullRequest } = await github.rest.pulls.get({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_number: prNumber
               });
-              core.setOutput('base_ref', pullRequest.base.ref);
               core.setOutput('head_sha', pullRequest.head.sha);
               core.setOutput('title', pullRequest.title);
             }
@@ -117,13 +111,12 @@ jobs:
         shell: bash
         run: |
           # Download review rules from the base branch, never from the PR branch.
-          BASE_REF="${{ steps.pr-context.outputs.base_ref }}"
           REPO="${{ github.repository }}"
           RULES_DIR="${{ runner.temp }}/trusted-rules/.opencodereview"
           mkdir -p "$RULES_DIR"
           for file in rule.json python.md README.md; do
             curl -sSfL -o "$RULES_DIR/$file" \
-              "https://raw.githubusercontent.com/${REPO}/${BASE_REF}/.opencodereview/${file}"
+              "https://raw.githubusercontent.com/${REPO}/main/.opencodereview/${file}"
           done
 
       - name: Run OpenCodeReview
@@ -137,7 +130,7 @@ jobs:
           rule: ${{ runner.temp }}/trusted-rules/.opencodereview/rule.json
           # For issue_comment triggers, pass the resolved refs; for
           # pull_request_target the action resolves them from the event.
-          base_ref: ${{ steps.pr-context.outputs.base_ref }}
+          base_ref: main
           head_sha: ${{ steps.pr-context.outputs.head_sha }}
           # Particularly useful when PR titles follow semantic conventions (e.g., feat(auth): add OAuth2 support).
           background: ${{ steps.pr-context.outputs.title || github.event.pull_request.title }}
