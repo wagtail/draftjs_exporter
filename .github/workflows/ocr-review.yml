@@ -92,24 +92,32 @@ jobs:
         )
       )
     steps:
-      - name: Get PR context
+      - name: Resolve PR context
         id: pr-context
-        if: github.event_name == 'issue_comment'
         uses: actions/github-script@v7
         with:
           script: |
-            // For issue_comment events, resolve PR base/head so the action
-            // can review the right diff (issue_comment has no top-level
-            // pull_request payload fields).
-            const prNumber = context.issue.number;
-            const { data: pullRequest } = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber
-            });
-            core.setOutput('base_ref', pullRequest.base.ref);
-            core.setOutput('head_sha', pullRequest.head.sha);
-            core.setOutput('title', pullRequest.title);
+            if (context.eventName === 'pull_request_target') {
+              core.setOutput('base_ref', context.payload.pull_request.base.ref);
+            } else if (context.eventName === 'issue_comment') {
+              const prNumber = context.issue.number;
+              const { data: pullRequest } = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber
+              });
+              core.setOutput('base_ref', pullRequest.base.ref);
+              core.setOutput('head_sha', pullRequest.head.sha);
+              core.setOutput('title', pullRequest.title);
+            }
+
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          # Source rules from the base branch (main), never from the PR branch.
+          ref: ${{ steps.pr-context.outputs.base_ref }}
+          sparse-checkout: |
+            .opencodereview/
+          path: trusted-rules
 
       - name: Run OpenCodeReview
         uses: alibaba/open-code-review@main
@@ -118,6 +126,8 @@ jobs:
           llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
           llm_model: ${{ vars.OCR_LLM_MODEL }}
           llm_use_anthropic: ${{ vars.OCR_LLM_USE_ANTHROPIC }}
+          # Point at the trusted rules file checked out from the base branch.
+          rule: trusted-rules/.opencodereview/rule.json
           # For issue_comment triggers, pass the resolved refs; for
           # pull_request_target the action resolves them from the event.
           base_ref: ${{ steps.pr-context.outputs.base_ref }}
