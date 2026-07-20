@@ -116,8 +116,10 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           # Source rules from the base branch (main), never from the PR branch.
+          # Check out outside GITHUB_WORKSPACE so the action's own checkout
+          # (which git-cleans the workspace) does not wipe this directory.
           ref: ${{ steps.pr-context.outputs.base_ref }}
-          path: trusted-rules
+          path: ${{ runner.temp }}/trusted-rules
 
       - name: Run OpenCodeReview
         uses: alibaba/open-code-review@a4a281c1f5925bfd53c7076afc8feb48cb4d171a # v1.7.13
@@ -127,7 +129,7 @@ jobs:
           llm_model: ${{ vars.OCR_LLM_MODEL }}
           llm_use_anthropic: ${{ vars.OCR_LLM_USE_ANTHROPIC }}
           # Point at the trusted rules file checked out from the base branch.
-          rule: trusted-rules/.opencodereview/rule.json
+          rule: ${{ runner.temp }}/trusted-rules/.opencodereview/rule.json
           # For issue_comment triggers, pass the resolved refs; for
           # pull_request_target the action resolves them from the event.
           base_ref: ${{ steps.pr-context.outputs.base_ref }}
