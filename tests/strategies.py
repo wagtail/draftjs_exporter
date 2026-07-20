@@ -60,7 +60,7 @@ def style_ranges(text: str) -> st.SearchStrategy[list[dict[str, Any]]]:
     style = st.builds(lambda s: {"style": s}, st.sampled_from(STYLE_VALUES))
     # ty doesn't yet model the ParamSpec signature rewrite that @st.composite
     # applies (dropping the leading `draw` parameter for callers) - false positive.
-    return st.lists(ranges(text, style), max_size=4)  # ty: ignore[missing-argument]
+    return st.lists(ranges(text, style), max_size=4)
 
 
 @st.composite
@@ -126,7 +126,7 @@ def blocks(draw: st.DrawFn, entity_keys: list[int]) -> dict[str, Any]:
         "type": draw(st.sampled_from(BLOCK_TYPE_VALUES)),
         "depth": draw(st.integers(min_value=0, max_value=4)),
         "inlineStyleRanges": draw(style_ranges(text)),
-        "entityRanges": draw(entity_ranges(text, entity_keys)),  # ty: ignore[missing-argument]
+        "entityRanges": draw(entity_ranges(text, entity_keys)),
     }
 
 
@@ -146,9 +146,7 @@ def content_states(draw: st.DrawFn, max_blocks: int = 6) -> dict[str, Any]:
         for key in entity_keys
     }
 
-    block_list = draw(
-        st.lists(blocks(entity_keys), min_size=0, max_size=max_blocks)  # ty: ignore[missing-argument]
-    )
+    block_list = draw(st.lists(blocks(entity_keys), min_size=0, max_size=max_blocks))
 
     return {"entityMap": entity_map, "blocks": block_list}
 

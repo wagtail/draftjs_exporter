@@ -29,7 +29,7 @@ def get_decorations(
         A sorted list of decorations as ``(start, end, match, decorator)`` tuples.
     """
     occupied: dict[int, int] = {}
-    decorations = []
+    decorations: list[tuple[int, int, Any, Decorator]] = []
 
     for decorator in decorators:
         for match in decorator["strategy"].finditer(text):

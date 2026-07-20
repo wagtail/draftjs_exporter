@@ -48,12 +48,12 @@ html5lib = ["beautifulsoup4>=4.4.1,<5", "html5lib>=0.999,<2"]
 [dependency-groups]
 dev = [
   "hypothesis>=6.100.0",
-  "mypy==1.8.0",
+  "mypy==1.20.2",
   "pytest>=7.4.3",
   "pytest-cov>=4.1.0",
   "pytest-memray>=1.7.0",
   "ruff>=0.1.9",
-  "ty>=0.0.24",
+  "ty>=0.0.25",
   # Benchmark dependencies.
   "markov_draftjs>=2.0.0",
   "memray>=1.15.0",
@@ -150,7 +150,8 @@ disallow_untyped_decorators = true
 
 
 # Warns about casting an expression to its inferred type.
-warn_redundant_casts = true
+# ty requires more casts than mypy currently.
+warn_redundant_casts = false
 warn_unused_ignores = true
 # Shows errors for missing return statements on some execution paths.
 warn_no_return = true

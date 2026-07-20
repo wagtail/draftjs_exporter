@@ -51,7 +51,7 @@ class TestRenderCrashSafety(unittest.TestCase):
     overlapping style/entity ranges.
     """
 
-    @given(content_state=content_states())  # ty: ignore[missing-argument]
+    @given(content_state=content_states())
     @settings(deadline=None)
     def test_html_engines_never_raise(self, content_state):
         # Not using self.subTest: it's incompatible with @given (each of the
@@ -61,7 +61,7 @@ class TestRenderCrashSafety(unittest.TestCase):
         for engine in HTML_ENGINES:
             HTML({**CONFIG, "engine": engine}).render(content_state)
 
-    @given(content_state=content_states())  # ty: ignore[missing-argument]
+    @given(content_state=content_states())
     @settings(deadline=None)
     # Regression for a block jumping straight to a nested depth (here a
     # list item at depth 1 with no depth-0 item before it) with no
@@ -111,7 +111,7 @@ class TestCommandGroupingInvariants(unittest.TestCase):
     def setUp(self):
         self.exporter = HTML(CONFIG)
 
-    @given(content_state=content_states())  # ty: ignore[missing-argument]
+    @given(content_state=content_states())
     @settings(deadline=None)
     def test_command_groups_preserve_all_text(self, content_state):
         for block in content_state["blocks"]:
@@ -137,7 +137,7 @@ class TestRenderEscapingInvariants(unittest.TestCase):
     in docs/SECURITY.md#recommendations-for-integrators.
     """
 
-    @given(content_state=dangerous_content_states())  # ty: ignore[missing-argument]
+    @given(content_state=dangerous_content_states())
     @settings(deadline=None)
     def test_dangerous_fragments_never_become_markup(self, content_state):
         block = content_state["blocks"][0]

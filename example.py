@@ -178,8 +178,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "infile",
         nargs="?",
-        type=argparse.FileType("r"),
-        default=open("docs/example.json", "r", encoding="utf-8"),
+        type=str,
+        default="docs/example.json",
         help="Draft.js JSON file to convert, or - for STDIN",
     )
     args = parser.parse_args()
@@ -249,7 +249,8 @@ if __name__ == "__main__":
     exporter = Exporter(config)
 
     # Use file/STDIN input if provided, otherwise run the built-in demo.
-    content_state: ContentState = json.load(args.infile)
+    with open(args.infile, "r", encoding="utf-8") as f:
+        content_state: ContentState = json.load(f)
 
     # --- HTML export ---
 
