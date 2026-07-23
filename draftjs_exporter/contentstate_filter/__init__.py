@@ -6,7 +6,7 @@ from typing import Any, Literal, TypeAlias, TypedDict
 
 from draftjs_exporter.constants import BLOCK_TYPES
 from draftjs_exporter.error import ConfigException
-from draftjs_exporter.types import Block, ContentState, Entity
+from draftjs_exporter.types import Block, ContentState, Entity, InlineStyleRange
 
 FilterCallback: TypeAlias = Callable[[Any], Any]
 """Custom rule action: receives the matched object, returns a replacement or None."""
@@ -193,7 +193,7 @@ class ContentStateFilter:
         ranges = block.get("inlineStyleRanges", [])
         if not ranges or not rules:
             return
-        kept = []
+        kept: list[InlineStyleRange] = []
         for style_range in ranges:
             actions = rules.get(style_range["style"], [])
             if not actions:
@@ -201,7 +201,13 @@ class ContentStateFilter:
                 continue
             result = self._run_actions(style_range["style"], actions, "inline_style")
             if result is not None:
-                kept.append({**style_range, "style": result})
+                kept.append(
+                    {
+                        "offset": style_range["offset"],
+                        "length": style_range["length"],
+                        "style": result,
+                    }
+                )
         block["inlineStyleRanges"] = kept
 
     def _apply_entity_rules(

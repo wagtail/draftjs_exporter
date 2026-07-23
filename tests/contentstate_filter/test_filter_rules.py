@@ -4,16 +4,17 @@ import unittest
 
 from draftjs_exporter.contentstate_filter import ContentStateFilter
 from draftjs_exporter.error import ConfigException
+from draftjs_exporter.types import ContentState
 
 
 class TestRuleValidation(unittest.TestCase):
     def test_invalid_rule_type(self):
         with self.assertRaises(ConfigException):
-            ContentStateFilter([{"type": "nope", "match": "x", "action": "keep"}])  # type: ignore[typeddict-item]
+            ContentStateFilter([{"type": "nope", "match": "x", "action": "keep"}])  # type: ignore[typeddict-item]  # ty: ignore[invalid-argument-type]
 
     def test_invalid_action(self):
         with self.assertRaises(ConfigException):
-            ContentStateFilter([{"type": "block", "match": "x", "action": "nope"}])  # type: ignore[typeddict-item]
+            ContentStateFilter([{"type": "block", "match": "x", "action": "nope"}])  # type: ignore[typeddict-item]  # ty: ignore[invalid-argument-type]
 
     def test_demote_requires_header_block(self):
         with self.assertRaises(ConfigException):
@@ -34,12 +35,12 @@ class TestRuleValidation(unittest.TestCase):
             )
 
     def test_no_rules_is_identity(self):
-        cs = {"blocks": [], "entityMap": {}}
+        cs: ContentState = {"blocks": [], "entityMap": {}}
         self.assertEqual(ContentStateFilter().apply(cs), cs)
         self.assertEqual(ContentStateFilter(None).apply(cs), cs)
 
     def test_callable_returning_garbage_rejected(self):
-        cs = {
+        cs: ContentState = {
             "blocks": [
                 {
                     "key": "a",
