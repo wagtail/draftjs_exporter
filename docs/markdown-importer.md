@@ -45,21 +45,21 @@ The result is a regular ContentState, ready to store or render with the exporter
 
 The importer supports the CommonMark core — the constructs most real-world Markdown uses:
 
-| Construct                              | ContentState output                                             |
-| -------------------------------------- | --------------------------------------------------------------- |
-| Paragraph                              | `unstyled` block                                                |
-| ATX headings (`#` through `######`)    | `header-one` through `header-six`                               |
-| `>` blockquote                         | `blockquote` block                                              |
-| Fenced code (` ``` ` or `~~~`)         | `code-block` block                                              |
-| `---` / `***` / `___` thematic break   | `atomic` block with `HORIZONTAL_RULE` entity                    |
-| `* ` / `- ` / `+ ` lists               | `unordered-list-item` blocks with depth                         |
-| `1. ` / `1) ` lists                    | `ordered-list-item` blocks with depth                           |
-| `**bold**` / `__bold__`                | `BOLD` inline style range                                       |
-| `*italic*` / `_italic_`                | `ITALIC` inline style range                                     |
-| `` `code` ``                           | `CODE` inline style range                                       |
-| `[text](url)`                          | `LINK` entity (data from [resolver chain](#entity-resolution))  |
-| `![alt](url)`                          | `IMAGE` entity (data from resolver chain)                       |
-| Hard line break (two spaces + newline) | `\n` in block text                                              |
+| Construct                              | ContentState output                                            |
+| -------------------------------------- | -------------------------------------------------------------- |
+| Paragraph                              | `unstyled` block                                               |
+| ATX headings (`#` through `######`)    | `header-one` through `header-six`                              |
+| `>` blockquote                         | `blockquote` block                                             |
+| Fenced code (` ``` ` or `~~~`)         | `code-block` block                                             |
+| `---` / `***` / `___` thematic break   | `atomic` block with `HORIZONTAL_RULE` entity                   |
+| `* ` / `- ` / `+ ` lists               | `unordered-list-item` blocks with depth                        |
+| `1. ` / `1) ` lists                    | `ordered-list-item` blocks with depth                          |
+| `**bold**` / `__bold__`                | `BOLD` inline style range                                      |
+| `*italic*` / `_italic_`                | `ITALIC` inline style range                                    |
+| `` `code` ``                           | `CODE` inline style range                                      |
+| `[text](url)`                          | `LINK` entity (data from [resolver chain](#entity-resolution)) |
+| `![alt](url)`                          | `IMAGE` entity (data from resolver chain)                      |
+| Hard line break (two spaces + newline) | `\n` in block text                                             |
 
 Not supported: reference-style links, Setext headings, indented code blocks, tables, autolinks, list item continuation lines, and arbitrary HTML. Every input still parses — unsupported constructs become plain text.
 
@@ -67,22 +67,22 @@ Not supported: reference-style links, Setext headings, indented code blocks, tab
 
 `parser_config` controls which constructs the parser recognizes, and how entities are created:
 
-| Option               | Default    | Effect                                              |
-| -------------------- | ---------- | --------------------------------------------------- |
-| `headings`           | `True`     | Parse ATX headings                                  |
-| `blockquote`         | `True`     | Parse `>` blockquotes                               |
-| `code_fenced`        | `True`     | Parse fenced code blocks                            |
-| `thematic_break`     | `True`     | Parse thematic breaks                               |
-| `unordered_list`     | `True`     | Parse unordered lists                               |
-| `ordered_list`       | `True`     | Parse ordered lists                                 |
-| `emphasis`           | `True`     | Parse bold and italic                               |
-| `code_inline`        | `True`     | Parse backtick code spans                           |
-| `links`              | `True`     | Parse `[text](url)` links                           |
-| `images`             | `True`     | Parse `![alt](url)` images                          |
-| `line_breaks`        | `True`     | Strip two-space hard break markers                  |
-| `link_resolvers`     | `[]`       | Resolver chain for link URLs                        |
-| `image_resolvers`    | `[]`       | Resolver chain for image URLs                       |
-| `inline_html_styles` | `{}`       | Whitelist of HTML tags mapped to inline styles      |
+| Option               | Default | Effect                                         |
+| -------------------- | ------- | ---------------------------------------------- |
+| `headings`           | `True`  | Parse ATX headings                             |
+| `blockquote`         | `True`  | Parse `>` blockquotes                          |
+| `code_fenced`        | `True`  | Parse fenced code blocks                       |
+| `thematic_break`     | `True`  | Parse thematic breaks                          |
+| `unordered_list`     | `True`  | Parse unordered lists                          |
+| `ordered_list`       | `True`  | Parse ordered lists                            |
+| `emphasis`           | `True`  | Parse bold and italic                          |
+| `code_inline`        | `True`  | Parse backtick code spans                      |
+| `links`              | `True`  | Parse `[text](url)` links                      |
+| `images`             | `True`  | Parse `![alt](url)` images                     |
+| `line_breaks`        | `True`  | Strip two-space hard break markers             |
+| `link_resolvers`     | `[]`    | Resolver chain for link URLs                   |
+| `image_resolvers`    | `[]`    | Resolver chain for image URLs                  |
+| `inline_html_styles` | `{}`    | Whitelist of HTML tags mapped to inline styles |
 
 Disabled constructs pass through as plain text. For example, with `"headings": False`, the source `# Title` imports as a paragraph containing the literal text `# Title`.
 
@@ -187,12 +187,12 @@ Tag content is parsed recursively, so `<sup>**bold**</sup>` produces both `SUPER
 
 `filter_rules` apply content policy to the parsed ContentState — removing or transforming blocks, inline styles, and entities. Each rule has a `type` (what to match), a `match` (the type to match), and an `action`:
 
-| Action     | Effect                                                                     |
-| ---------- | -------------------------------------------------------------------------- |
-| `"remove"` | Delete matching objects                                                    |
-| `"keep"`   | No-op                                                                      |
-| `"demote"` | Headings only: `header-one` becomes `header-two`, and so on                |
-| callable   | Receives the matched object, returns a replacement or `None` to remove it  |
+| Action     | Effect                                                                    |
+| ---------- | ------------------------------------------------------------------------- |
+| `"remove"` | Delete matching objects                                                   |
+| `"keep"`   | No-op                                                                     |
+| `"demote"` | Headings only: `header-one` becomes `header-two`, and so on               |
+| callable   | Receives the matched object, returns a replacement or `None` to remove it |
 
 For example, to demote all level-1 headings on import:
 
