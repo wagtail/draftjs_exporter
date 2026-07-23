@@ -1,14 +1,15 @@
 """Tests for inline Markdown parsing."""
 
 import unittest
+from typing import Any
 
 from draftjs_exporter.markdown_parser.builder import ContentStateBuilder
 from draftjs_exporter.markdown_parser.inline import InlineParser
 
 
-def make_parser(**overrides):
+def make_parser(**overrides: Any) -> InlineParser:
     """Build an InlineParser with all constructs enabled."""
-    config = {
+    config: dict[str, Any] = {
         "emphasis": True,
         "code_inline": True,
         "links": True,
@@ -157,3 +158,89 @@ class TestEmphasis(unittest.TestCase):
         text, styles, _ = make_parser(emphasis=False).parse("**a**")
         self.assertEqual(text, "**a**")
         self.assertEqual(styles, [])
+
+
+def parse_with_builder(**overrides: Any) -> tuple[InlineParser, ContentStateBuilder]:
+    """Build a parser with a fresh builder, returning both."""
+    builder = ContentStateBuilder()
+    parser = make_parser(builder=builder, **overrides)
+    return parser, builder
+
+
+class TestLinks(unittest.TestCase):
+    def test_simple_link(self):
+        parser, builder = parse_with_builder()
+        text, styles, entities = parser.parse("[example](https://example.com)")
+        self.assertEqual(text, "example")
+        self.assertEqual(styles, [])
+        self.assertEqual(entities, [{"offset": 0, "length": 7, "key": 0}])
+        self.assertEqual(
+            builder.entity_map["0"],
+            {
+                "type": "LINK",
+                "mutability": "MUTABLE",
+                "data": {"url": "https://example.com"},
+            },
+        )
+
+    def test_link_with_styled_label(self):
+        parser, builder = parse_with_builder()
+        text, styles, entities = parser.parse("[**bold**](/url)")
+        self.assertEqual(text, "bold")
+        self.assertEqual(styles, [{"offset": 0, "length": 4, "style": "BOLD"}])
+        self.assertEqual(entities, [{"offset": 0, "length": 4, "key": 0}])
+
+    def test_link_offsets_in_text(self):
+        parser, builder = parse_with_builder()
+        text, _, entities = parser.parse("see [docs](/d) now")
+        self.assertEqual(text, "see docs now")
+        self.assertEqual(entities, [{"offset": 4, "length": 4, "key": 0}])
+
+    def test_links_disabled(self):
+        parser, builder = parse_with_builder(links=False)
+        text, _, entities = parser.parse("[a](/b)")
+        self.assertEqual(text, "[a](/b)")
+        self.assertEqual(entities, [])
+
+    def test_custom_link_resolver(self):
+        def wagtail(url, label):
+            if url.startswith("wagtail://"):
+                return {"type": "DOCUMENT", "data": {"id": 1}}
+            return None
+
+        parser, builder = parse_with_builder(link_resolvers=[wagtail])
+        text, _, entities = parser.parse("[file](wagtail://document?id=1)")
+        self.assertEqual(builder.entity_map["0"]["type"], "DOCUMENT")
+
+    def test_resolver_deferring_falls_back_to_default(self):
+        parser, builder = parse_with_builder(link_resolvers=[lambda url, label: None])
+        parser.parse("[a](/b)")
+        self.assertEqual(builder.entity_map["0"]["type"], "LINK")
+
+
+class TestImages(unittest.TestCase):
+    def test_inline_image(self):
+        parser, builder = parse_with_builder()
+        text, _, entities = parser.parse("a ![alt](/img.jpg) b")
+        self.assertEqual(text, "a alt b")
+        self.assertEqual(entities, [{"offset": 2, "length": 3, "key": 0}])
+        self.assertEqual(
+            builder.entity_map["0"],
+            {
+                "type": "IMAGE",
+                "mutability": "IMMUTABLE",
+                "data": {"src": "/img.jpg", "alt": "alt"},
+            },
+        )
+
+    def test_images_disabled(self):
+        parser, _ = parse_with_builder(images=False)
+        text, _, entities = parser.parse("![a](/b)")
+        self.assertEqual(text, "![a](/b)")
+        self.assertEqual(entities, [])
+
+    def test_resolve_image_entity(self):
+        parser, builder = parse_with_builder()
+        key = parser.resolve_image_entity("/x.jpg", "alt text")
+        self.assertEqual(key, 0)
+        self.assertEqual(builder.entity_map["0"]["type"], "IMAGE")

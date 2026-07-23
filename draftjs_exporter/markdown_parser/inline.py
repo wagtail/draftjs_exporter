@@ -1,6 +1,7 @@
 """Inline Markdown parsing: emphasis, code spans, links, images, inline HTML."""
 
 import re
+from collections.abc import Callable
 from typing import TypeAlias
 
 from draftjs_exporter.constants import INLINE_STYLES
@@ -22,7 +23,7 @@ Span: TypeAlias = tuple[int, int, str, "str | int"]
 integer entity key).
 """
 
-ESCAPABLE = frozenset("\\`*{}_[]<>()#+-.!|\"")
+ESCAPABLE = frozenset('\\`*{}_[]<>()#+-.!|"')
 """Punctuation characters that can be backslash-escaped per CommonMark."""
 
 TAG_RE = re.compile(r"<([a-zA-Z][a-zA-Z0-9]*)>")
@@ -100,9 +101,13 @@ class InlineParser:
         entities: list[EntityRange] = []
         for offset, length, kind, payload in spans:
             if kind == "style":
-                styles.append({"offset": offset, "length": length, "style": str(payload)})
+                styles.append(
+                    {"offset": offset, "length": length, "style": str(payload)}
+                )
             else:
-                entities.append({"offset": offset, "length": length, "key": int(payload)})
+                entities.append(
+                    {"offset": offset, "length": length, "key": int(payload)}
+                )
         styles.sort(key=lambda r: r["offset"])
         entities.sort(key=lambda r: r["offset"])
         return plain, styles, entities
@@ -117,14 +122,16 @@ class InlineParser:
         Returns:
             The integer key of the newly registered entity.
         """
-        return self._resolve_entity(url, alt, self.image_resolvers, default_image_resolver)
+        return self._resolve_entity(
+            url, alt, self.image_resolvers, default_image_resolver
+        )
 
     def _resolve_entity(
         self,
         url: str,
         label: str,
         resolvers: list[EntityResolver],
-        default: EntityResolver,
+        default: Callable[[str, str], EntityResolution],
     ) -> int:
         """Resolve a URL into an entity and register it on the builder."""
         try:
@@ -176,10 +183,16 @@ class InlineParser:
                     continue
 
             # Images: ![alt](url)
-            if self.images and ch == "!" and i + 1 < n and text[i + 1] == "[":
+            if ch == "!" and i + 1 < n and text[i + 1] == "[":
                 result = self._link_target(text, i + 1)
                 if result is not None:
                     alt, url, end = result
+                    if not self.images:
+                        # Disabled: keep the whole construct literal rather
+                        # than letting the bracket parse as a link.
+                        out.extend(text[i:end])
+                        i = end
+                        continue
                     start = len(out)
                     out.extend(alt)
                     key = self._resolve_entity(
