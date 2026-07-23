@@ -1,6 +1,6 @@
 ---
 name: draftjs-exporter
-description: Use when working with the Draft.js exporter library. Manipulating and rendering Draft.js ContentState to HTML or Markdown, parsing Markdown back into ContentState, writing custom block/entity/style components, configuring block/style/entity maps, picking or building DOM, or extending the exporter with fallbacks and composite decorators. Trigger on imports from `draftjs_exporter`, `DOM.create_element`, `block_map` / `style_map` / `entity_decorators` / `composite_decorators`, `build_markdown_config`, `markdown_to_content_state`, or Draft.js `ContentState` / `entityMap` JSON.
+description: Use when working with the Draft.js exporter library. Manipulating and rendering Draft.js ContentState to HTML or Markdown, parsing Markdown back into ContentState, writing custom block/entity/style components, configuring block/style/entity maps, picking or building DOM, or extending the exporter with fallbacks and composite decorators. Trigger on imports from `draftjs_exporter`, `DOM.create_element`, `block_map` / `style_map` / `entity_decorators` / `composite_decorators`, `build_markdown_config`, `MarkdownImporter` / `ContentStateFilter` / `scheme_resolver`, or Draft.js `ContentState` / `entityMap` JSON.
 license: MIT
 metadata:
   version: "6.0.0"
@@ -31,7 +31,9 @@ You can access a Markdown-native version of every documentation page by adding `
 | Switch DOM engine                             | `"engine": DOM.HTML5LIB` (or `DOM.LXML`, `DOM.STRING_COMPAT`)             | [alternative engines](https://wagtail.github.io/draftjs_exporter/alternative-engines/)                  |
 | Render Markdown instead of HTML               | `HTML(MARKDOWN_CONFIG).render(content_state)`                             | [Markdown](https://wagtail.github.io/draftjs_exporter/markdown/)                                        |
 | Customize Markdown characters                 | `build_markdown_config({"bold": "__", "italic": "*", ...})`               | [Markdown chars](https://wagtail.github.io/draftjs_exporter/markdown/#configuring-output-characters)    |
-| Parse Markdown back into ContentState         | `markdown_to_content_state(markdown, options=None)`                       | [Markdown importer](https://wagtail.github.io/draftjs_exporter/markdown/#importer)                      |
+| Import Markdown as ContentState               | `MarkdownImporter({}).import_markdown(md)`                                | [Markdown importer](https://wagtail.github.io/draftjs_exporter/markdown-importer/)                      |
+| Resolve internal URLs on import (wagtail://)  | `scheme_resolver("wagtail", {"page": "LINK"}, coerce={"id": int})`       | [Entity resolution](https://wagtail.github.io/draftjs_exporter/markdown-importer/#entity-resolution)    |
+| Filter imported content (demote headings)     | `ContentStateFilter([{"type": "block", "match": ..., "action": "demote"}])` | [Filtering](https://wagtail.github.io/draftjs_exporter/markdown-importer/#filtering)                    |
 | Debug output                                  | `DOM.render_debug(elt)`, `echo '{...}' \| python example.py -`            | [API](https://wagtail.github.io/draftjs_exporter/api/)                                                  |
 | Migrate between major versions                | `DOM.STRING_COMPAT` for old `string` output; per-version notes            | [migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/)                          |
 | Full public API (constants, types, defaults)  | `draftjs_exporter.constants`, `types`, `defaults`                         | [API reference](https://wagtail.github.io/draftjs_exporter/api/)                                        |
@@ -182,20 +184,29 @@ All defaults produce valid [CommonMark](https://commonmark.org/). Limitations: n
 
 ### Importer
 
-The Markdown importer (`markdown_to_content_state`) parses Markdown back into Draft.js `ContentState`, enabling round-trip workflows (`ContentState → Markdown → ContentState`). It is dependency-free and recognizes the same Markdown subset the exporter produces.
+The Markdown importer (`MarkdownImporter`) parses Markdown back into Draft.js `ContentState`, enabling round-trip workflows (`ContentState → Markdown → ContentState`). It is dependency-free and covers the CommonMark core. Parsing runs first, then optional filtering applies content policy.
 
 ```python
-from draftjs_exporter import build_markdown_config, HTML, markdown_to_content_state
+from draftjs_exporter import BLOCK_TYPES, MarkdownImporter, scheme_resolver
 
-options = {"bold": "__", "italic": "*"}
-config = build_markdown_config(options)
-exporter = HTML(config)
-markdown = exporter.render(content_state)
-# Round-trip by passing the same options to the importer.
-round_tripped = markdown_to_content_state(markdown, options)
+importer = MarkdownImporter({
+    "parser_config": {
+        # Disable constructs, or resolve internal URL schemes to typed entities.
+        "image_resolvers": [
+            scheme_resolver("wagtail", {"image": "IMAGE"}, coerce={"id": int}, label_key="alt"),
+        ],
+        # Whitelist inline HTML tags as styles (no Markdown equivalent).
+        "inline_html_styles": {"sup": "SUPERSCRIPT", "sub": "SUBSCRIPT"},
+    },
+    "filter_rules": [
+        # Declarative content policy: remove, keep, demote, or a callable.
+        {"type": "block", "match": BLOCK_TYPES.HEADER_ONE, "action": "demote"},
+    ],
+})
+content_state = importer.import_markdown(markdown)
 ```
 
-Only inline style markers (`bold`, `italic`, `strikethrough`) and `html_style_tags` are configurable. Block-level syntax (list markers, horizontal rules, code fences, ordered-list delimiters) is recognized polymorphically. See [Markdown importer](https://wagtail.github.io/draftjs_exporter/markdown/#importer).
+See [Markdown importer](https://wagtail.github.io/draftjs_exporter/markdown-importer/).
 
 ## Common gotchas
 
@@ -216,7 +227,11 @@ All imported from `draftjs_exporter` directly:
 - **`DOM`** — facade over the active engine. `create_element`, `render`, `render_debug`, `parse_html`, `append_child`, `camel_to_dash`. Engine constants: `DOM.STRING`, `DOM.HTML5LIB`, `DOM.LXML`, `DOM.STRING_COMPAT`, `DOM.MARKDOWN`.
 - **Default maps & configs**: `BLOCK_MAP`, `STYLE_MAP`, `HTML_CONFIG`, `MARKDOWN_CONFIG`.
 - **Constants**: `BLOCK_TYPES`, `INLINE_STYLES`, `ENTITY_TYPES` (each with a `FALLBACK` member).
-- **Markdown helpers**: `build_markdown_config(options)`, `markdown_to_content_state(markdown, options=None)`, plus option type aliases `MarkdownOptions` and `MarkdownImporterOptions`.
+- **Markdown helper**: `build_markdown_config(options)`, plus the option type alias `MarkdownOptions`.
+- **Importer**: `MarkdownImporter(config).import_markdown(markdown)` — converts Markdown to ContentState. Config keys: `parser` (dotted path), `parser_config` (feature toggles, `link_resolvers`/`image_resolvers`, `inline_html_styles`), `filter_rules`.
+- **Parser**: `MarkdownParser(config).parse(markdown)`, `ParserConfig`, `scheme_resolver(scheme, type_map, coerce, label_key, mutability)`, `EntityResolver`, `EntityResolution`.
+- **Filter**: `ContentStateFilter(rules).apply(content_state)`, `FilterRule` (`type`/`match`/`action`; actions `remove`/`keep`/`demote`/callable).
+- **Errors**: `MarkdownParseError` (with `.line` and `.message`).
 - **Type aliases**: `Props`, `Element`, `Component`, `ContentState`, `Block`, `Entity`, `EntityMap`, `EntityRange`, `InlineStyleRange`, `RenderableConfig`, `ExporterConfig`, plus internals (`CompositeDecorators`, `ConfigMap`, `Decorator`, `EntityKey`, `Mutability`, `RenderableType`, `Tag`).
 - **`DOMEngine`** — abstract base for custom engines. Import from `draftjs_exporter.engines.base` (not re-exported at top level).
 
