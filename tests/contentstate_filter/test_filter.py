@@ -3,14 +3,21 @@
 import unittest
 
 from draftjs_exporter.contentstate_filter import ContentStateFilter
+from draftjs_exporter.types import Block, ContentState, EntityRange, InlineStyleRange
 
 
-def cs_with_blocks(*blocks):
+def cs_with_blocks(*blocks: Block) -> ContentState:
     """Build a ContentState from blocks with an empty entity map."""
     return {"blocks": list(blocks), "entityMap": {}}
 
 
-def make_block(type_, text="x", depth=0, styles=None, entities=None):
+def make_block(
+    type_: str,
+    text: str = "x",
+    depth: int = 0,
+    styles: list[InlineStyleRange] | None = None,
+    entities: list[EntityRange] | None = None,
+) -> Block:
     """Build a single Draft.js block."""
     return {
         "key": "aaaaa",
@@ -111,8 +118,8 @@ class TestInlineStyleRules(unittest.TestCase):
 
 
 class TestEntityRules(unittest.TestCase):
-    def setUp(self):
-        self.cs = {
+    def setUp(self) -> None:
+        self.cs: ContentState = {
             "blocks": [
                 make_block(
                     "unstyled",
