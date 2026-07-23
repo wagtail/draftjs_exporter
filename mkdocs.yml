@@ -69,6 +69,7 @@ nav:
   - Getting started: getting-started.md
   - Content state: content-state.md
   - Markdown support: markdown.md
+  - Markdown importer: markdown-importer.md
   - Migration guide: migration-guide.md
   - Guides:
       - Custom components: guides/custom-components.md
