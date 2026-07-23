@@ -175,3 +175,58 @@ class TestFencedCode(unittest.TestCase):
     def test_closing_fence_must_match_marker(self):
         cs = parse("```\na\n~~~\nb\n```")
         self.assertEqual(cs["blocks"][0]["text"], "a\n~~~\nb")
+
+
+class TestLists(unittest.TestCase):
+    def test_unordered_flat(self):
+        cs = parse("- a\n- b")
+        self.assertEqual(
+            block_types(cs), ["unordered-list-item", "unordered-list-item"]
+        )
+        self.assertEqual([b["depth"] for b in cs["blocks"]], [0, 0])
+
+    def test_ordered_flat(self):
+        cs = parse("1. a\n2. b")
+        self.assertEqual(block_types(cs), ["ordered-list-item"] * 2)
+
+    def test_ordered_with_paren_delimiter(self):
+        cs = parse("1) a")
+        self.assertEqual(block_types(cs), ["ordered-list-item"])
+
+    def test_all_bullet_markers(self):
+        for marker in "*+-":
+            cs = parse(f"{marker} item")
+            self.assertEqual(block_types(cs), ["unordered-list-item"])
+
+    def test_nested_unordered(self):
+        cs = parse("- a\n  - b\n    - c")
+        self.assertEqual([b["depth"] for b in cs["blocks"]], [0, 1, 2])
+
+    def test_nested_then_back_to_top(self):
+        cs = parse("- a\n  - b\n- c")
+        self.assertEqual([b["depth"] for b in cs["blocks"]], [0, 1, 0])
+
+    def test_mixed_kinds_by_indent(self):
+        cs = parse("- a\n  1. b")
+        self.assertEqual(
+            block_types(cs), ["unordered-list-item", "ordered-list-item"]
+        )
+        self.assertEqual(cs["blocks"][1]["depth"], 1)
+
+    def test_list_content_is_inline_parsed(self):
+        cs = parse("- **bold**")
+        self.assertEqual(cs["blocks"][0]["text"], "bold")
+
+    def test_blank_line_ends_list(self):
+        cs = parse("- a\n\nparagraph")
+        self.assertEqual(block_types(cs), ["unordered-list-item", "unstyled"])
+
+    def test_paragraph_after_list_without_blank_line(self):
+        cs = parse("- a\nparagraph")
+        self.assertEqual(block_types(cs), ["unordered-list-item", "unstyled"])
+
+    def test_list_between_paragraphs(self):
+        cs = parse("intro\n\n- item\n\noutro")
+        self.assertEqual(
+            block_types(cs), ["unstyled", "unordered-list-item", "unstyled"]
+        )
