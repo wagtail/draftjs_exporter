@@ -213,3 +213,73 @@ def dangerous_content_states(draw: st.DrawFn) -> dict[str, Any]:
             }
         ],
     }
+
+
+# Text that survives a Markdown export → import round-trip unchanged:
+# no Markdown-special characters, no leading/trailing whitespace quirks.
+safe_block_text = (
+    st.text(
+        alphabet=st.characters(
+            whitelist_categories=["Ll", "Lu", "Nd"], whitelist_characters=" "
+        ),
+        min_size=1,
+        max_size=20,
+    )
+    .map(str.strip)
+    .filter(bool)
+)
+
+ROUNDTRIP_BLOCK_TYPES = [
+    BLOCK_TYPES.UNSTYLED,
+    BLOCK_TYPES.HEADER_ONE,
+    BLOCK_TYPES.BLOCKQUOTE,
+    BLOCK_TYPES.UNORDERED_LIST_ITEM,
+    BLOCK_TYPES.ORDERED_LIST_ITEM,
+]
+
+# CODE is excluded: the Markdown exporter cannot represent code spans
+# overlapping other styles (the other style's markers end up inside the
+# span's literal content), so such ranges cannot round-trip.
+ROUNDTRIP_STYLES = [INLINE_STYLES.BOLD, INLINE_STYLES.ITALIC]
+
+
+@st.composite
+def roundtrip_blocks(draw: st.DrawFn) -> dict[str, Any]:
+    """A block whose type, text, and styles survive a Markdown round-trip.
+
+    Style ranges use unique styles per block: real Draft.js editors
+    merge same-style ranges, so duplicates and same-style overlaps
+    never occur in practice (and export as literal marker runs).
+    """
+    text = draw(safe_block_text)
+    styles = draw(st.lists(st.sampled_from(ROUNDTRIP_STYLES), unique=True, max_size=2))
+    style_ranges = []
+    for style in styles:
+        # Zero-length ranges are not realistic Draft.js content, and
+        # export as empty marker runs that cannot be re-imported.
+        offset = draw(st.integers(min_value=0, max_value=len(text) - 1))
+        length = draw(st.integers(min_value=1, max_value=len(text) - offset))
+        style_ranges.append({"offset": offset, "length": length, "style": style})
+    return {
+        "key": draw(
+            st.text(
+                alphabet=st.characters(min_codepoint=97, max_codepoint=122),
+                min_size=5,
+                max_size=5,
+            )
+        ),
+        "text": text,
+        "type": draw(st.sampled_from(ROUNDTRIP_BLOCK_TYPES)),
+        "depth": 0,
+        "inlineStyleRanges": style_ranges,
+        "entityRanges": [],
+    }
+
+
+@st.composite
+def roundtrip_content_states(draw: st.DrawFn) -> dict[str, Any]:
+    """Content states limited to constructs both engines support."""
+    return {
+        "entityMap": {},
+        "blocks": draw(st.lists(roundtrip_blocks(), min_size=0, max_size=4)),
+    }
