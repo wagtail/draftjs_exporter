@@ -214,7 +214,7 @@ class TestEdgeCases(unittest.TestCase):
     def test_entity_callback_without_type_rejected(self):
         from draftjs_exporter.error import ConfigException
 
-        cs = {
+        cs: ContentState = {
             "blocks": [
                 make_block(
                     "unstyled",
