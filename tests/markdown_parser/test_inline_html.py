@@ -9,7 +9,9 @@ SUP_SUB = {"sup": "SUPERSCRIPT", "sub": "SUBSCRIPT"}
 
 class TestInlineHtml(unittest.TestCase):
     def test_whitelisted_tag_produces_style(self):
-        text, styles, _ = make_parser(inline_html_styles=SUP_SUB).parse("a <sup>2</sup> b")
+        text, styles, _ = make_parser(inline_html_styles=SUP_SUB).parse(
+            "a <sup>2</sup> b"
+        )
         self.assertEqual(text, "a 2 b")
         self.assertEqual(styles, [{"offset": 2, "length": 1, "style": "SUPERSCRIPT"}])
 
