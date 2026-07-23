@@ -1,6 +1,9 @@
 ---
 name: draftjs-exporter
 description: Use when working with the Draft.js exporter library. Manipulating and rendering Draft.js ContentState to HTML or Markdown, parsing Markdown back into ContentState, writing custom block/entity/style components, configuring block/style/entity maps, picking or building DOM, or extending the exporter with fallbacks and composite decorators. Trigger on imports from `draftjs_exporter`, `DOM.create_element`, `block_map` / `style_map` / `entity_decorators` / `composite_decorators`, `build_markdown_config`, `markdown_to_content_state`, or Draft.js `ContentState` / `entityMap` JSON.
+license: MIT
+metadata:
+  version: "6.0.0"
 ---
 
 # Draft.js exporter
@@ -218,21 +221,6 @@ All imported from `draftjs_exporter` directly:
 - **`DOMEngine`** — abstract base for custom engines. Import from `draftjs_exporter.engines.base` (not re-exported at top level).
 
 For every `BLOCK_TYPES.*`, `INLINE_STYLES.*`, `ENTITY_TYPES.*` value, see [the API reference](https://wagtail.github.io/draftjs_exporter/api/) or [`constants.py`](https://github.com/wagtail/draftjs_exporter/blob/main/draftjs_exporter/constants.py).
-
-## Reference docs
-
-- [Getting started](https://wagtail.github.io/draftjs_exporter/getting-started/)
-- [Content state](https://wagtail.github.io/draftjs_exporter/content-state/)
-- [Configuration](https://wagtail.github.io/draftjs_exporter/configuration/)
-- [Custom components](https://wagtail.github.io/draftjs_exporter/custom-components/)
-- [Fallbacks](https://wagtail.github.io/draftjs_exporter/fallback-components/)
-- [Alternative engines](https://wagtail.github.io/draftjs_exporter/alternative-engines/)
-- [Custom engines](https://wagtail.github.io/draftjs_exporter/custom-engines/)
-- [Markdown](https://wagtail.github.io/draftjs_exporter/markdown/)
-- [Troubleshooting](https://wagtail.github.io/draftjs_exporter/troubleshooting/)
-- [Migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/)
-- [API reference](https://wagtail.github.io/draftjs_exporter/api/)
-- [Architecture](https://wagtail.github.io/draftjs_exporter/architecture/)
 
 ## Resources
 
