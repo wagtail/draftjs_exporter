@@ -188,3 +188,45 @@ class TestDepthNormalization(unittest.TestCase):
         )
         result = ContentStateFilter([]).apply(cs)
         self.assertEqual(result["blocks"][1]["depth"], 0)
+
+
+class TestEdgeCases(unittest.TestCase):
+    def test_chain_stops_after_remove(self):
+        block = make_block("unstyled")
+        cs = cs_with_blocks(block)
+        result = ContentStateFilter(
+            [
+                {"type": "block", "match": "unstyled", "action": "remove"},
+                {"type": "block", "match": "unstyled", "action": "keep"},
+            ]
+        ).apply(cs)
+        self.assertEqual(result["blocks"], [])
+
+    def test_block_callback_without_type_rejected(self):
+        from draftjs_exporter.error import ConfigException
+
+        cs = cs_with_blocks(make_block("unstyled"))
+        with self.assertRaises(ConfigException):
+            ContentStateFilter(
+                [{"type": "block", "match": "unstyled", "action": lambda b: {}}]
+            ).apply(cs)
+
+    def test_entity_callback_without_type_rejected(self):
+        from draftjs_exporter.error import ConfigException
+
+        cs = {
+            "blocks": [
+                make_block(
+                    "unstyled",
+                    text="a",
+                    entities=[{"offset": 0, "length": 1, "key": 0}],
+                )
+            ],
+            "entityMap": {
+                "0": {"type": "LINK", "mutability": "MUTABLE", "data": {}}
+            },
+        }
+        with self.assertRaises(ConfigException):
+            ContentStateFilter(
+                [{"type": "entity", "match": "LINK", "action": lambda e: {}}]
+            ).apply(cs)

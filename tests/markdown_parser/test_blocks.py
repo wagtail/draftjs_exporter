@@ -255,3 +255,27 @@ class TestStandaloneImages(unittest.TestCase):
         cs = parse("![alt](/x.jpg)", images=False)
         self.assertEqual(block_types(cs), ["unstyled"])
         self.assertEqual(cs["blocks"][0]["text"], "![alt](/x.jpg)")
+
+
+class TestQuoteAndErrorEdges(unittest.TestCase):
+    def test_quote_starting_with_empty_line(self):
+        cs = parse(">\n> b")
+        self.assertEqual(block_types(cs), ["blockquote"])
+        self.assertEqual(cs["blocks"][0]["text"], "b")
+
+    def test_quote_with_only_empty_content(self):
+        cs = parse(">")
+        self.assertEqual(cs["blocks"], [])
+
+    def test_parse_error_with_line_propagates_unchanged(self):
+        from draftjs_exporter.error import MarkdownParseError
+        from draftjs_exporter.markdown_parser import MarkdownParser
+
+        def bad(url, label):
+            raise MarkdownParseError("custom failure", line=99)
+
+        parser = MarkdownParser({"link_resolvers": [bad]})
+        with self.assertRaises(MarkdownParseError) as ctx:
+            parser.parse("[a](/b)")
+        self.assertEqual(ctx.exception.line, 99)
+        self.assertEqual(ctx.exception.message, "custom failure")

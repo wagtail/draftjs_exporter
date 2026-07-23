@@ -244,3 +244,33 @@ class TestImages(unittest.TestCase):
         key = parser.resolve_image_entity("/x.jpg", "alt text")
         self.assertEqual(key, 0)
         self.assertEqual(builder.entity_map["0"]["type"], "IMAGE")
+
+
+class TestMalformedConstructs(unittest.TestCase):
+    def test_unclosed_link_bracket_is_literal(self):
+        parser, _ = parse_with_builder()
+        text, _, entities = parser.parse("[a")
+        self.assertEqual(text, "[a")
+        self.assertEqual(entities, [])
+
+    def test_unclosed_link_paren_is_literal(self):
+        parser, _ = parse_with_builder()
+        text, _, entities = parser.parse("[a](/b")
+        self.assertEqual(text, "[a](/b")
+        self.assertEqual(entities, [])
+
+    def test_unclosed_image_is_literal(self):
+        parser, _ = parse_with_builder()
+        text, _, entities = parser.parse("![a")
+        self.assertEqual(text, "![a")
+        self.assertEqual(entities, [])
+
+    def test_resolver_raising_parse_error_propagates(self):
+        from draftjs_exporter.error import MarkdownParseError
+
+        def bad(url, label):
+            raise MarkdownParseError("direct failure")
+
+        parser, _ = parse_with_builder(link_resolvers=[bad])
+        with self.assertRaises(MarkdownParseError):
+            parser.parse("[a](/b)")
