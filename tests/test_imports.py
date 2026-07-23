@@ -88,7 +88,7 @@ def normalize(content_state: ContentState) -> dict[str, Any]:
 
 def build_fixture_importer(fixture: dict[str, Any]) -> MarkdownImporter:
     """Build an importer for a direct-import fixture, expanding shorthands."""
-    config: dict[str, Any] = dict(fixture.get("config", {}))
+    config = dict(fixture.get("config", {}))
     if config.pop("wagtail_resolvers", False):
         config["parser_config"] = {
             **config.get("parser_config", {}),
@@ -109,7 +109,7 @@ def build_fixture_importer(fixture: dict[str, Any]) -> MarkdownImporter:
                 )
             ],
         }
-    return MarkdownImporter(config)
+    return MarkdownImporter(ImporterConfig(**config))
 
 
 class TestRoundTrip(unittest.TestCase):
