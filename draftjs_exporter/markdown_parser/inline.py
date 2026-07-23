@@ -351,5 +351,39 @@ class InlineParser:
     def _parse_inline_html(
         self, text: str, i: int, out: list[str], spans: list[Span]
     ) -> int | None:
-        """Parse a whitelisted inline HTML tag. Implemented in Task 7."""
-        return None
+        """Parse a whitelisted inline HTML tag at index i.
+
+        Only exact ``<tag>`` openers (no attributes) with a matching
+        ``</tag>`` closer are recognized. Anything else is literal text,
+        so unwhitelisted or malformed HTML carries no markup semantics.
+
+        Parameters:
+            text: The full source text.
+            i: Index of the ``<`` character.
+            out: Output characters accumulated so far.
+            spans: Spans accumulated so far.
+
+        Returns:
+            The index after the closing tag, or None when the tag does
+            not parse as a whitelisted construct.
+        """
+        match = TAG_RE.match(text, i)
+        if match is None:
+            return None
+        tag = match.group(1)
+        style = self.inline_html_styles.get(tag)
+        if style is None:
+            return None
+        closing = f"</{tag}>"
+        end = text.find(closing, match.end())
+        if end == -1:
+            return None
+        inner_plain, inner_spans = self._parse(text[match.end() : end])
+        start = len(out)
+        out.extend(inner_plain)
+        spans.extend(
+            (s + start, length, kind, payload)
+            for s, length, kind, payload in inner_spans
+        )
+        spans.append((start, len(inner_plain), "style", style))
+        return end + len(closing)
