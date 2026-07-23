@@ -32,3 +32,16 @@ class TestResolverErrors(unittest.TestCase):
         )
         with self.assertRaises(MarkdownParseError):
             parser.parse("[a](/b)")
+
+
+class TestLineNumbers(unittest.TestCase):
+    def test_resolver_error_gets_line_number(self):
+        from draftjs_exporter.markdown_parser import MarkdownParser
+
+        def bad(url, label):
+            raise RuntimeError("boom")
+
+        parser = MarkdownParser({"link_resolvers": [bad]})
+        with self.assertRaises(MarkdownParseError) as ctx:
+            parser.parse("first\n\nsecond [a](/b)")
+        self.assertEqual(ctx.exception.line, 3)
