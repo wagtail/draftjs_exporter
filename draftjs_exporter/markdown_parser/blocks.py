@@ -285,5 +285,40 @@ class BlockParser:
         return i
 
     def _parse_list(self, lines: list[str], i: int) -> int:
-        """Parse a list. Implemented in Task 10."""
-        raise NotImplementedError
+        """Parse consecutive list items with indent-based depth tracking.
+
+        Depth derives from a stack of indent widths: deeper indents
+        push, shallower indents pop. Continuation lines (indented
+        content without a marker) are not supported — they end the
+        list and become paragraphs.
+
+        Parameters:
+            lines: All source lines.
+            i: Index of the first list item line.
+
+        Returns:
+            The index of the first line after the list.
+        """
+        stack: list[int] = []
+        while i < len(lines):
+            line = lines[i]
+            if not line.strip():
+                break
+            unordered = ULIST_RE.match(line) if self.unordered_list else None
+            ordered = OLIST_RE.match(line) if self.ordered_list else None
+            match = unordered or ordered
+            if match is None:
+                break
+            indent = len(match.group(1).replace("\t", "    "))
+            while stack and indent < stack[-1]:
+                stack.pop()
+            if not stack or indent > stack[-1]:
+                stack.append(indent)
+            type_ = (
+                BLOCK_TYPES.UNORDERED_LIST_ITEM
+                if unordered
+                else BLOCK_TYPES.ORDERED_LIST_ITEM
+            )
+            self._add_text_block(type_, match.group(2), i, depth=len(stack) - 1)
+            i += 1
+        return i
