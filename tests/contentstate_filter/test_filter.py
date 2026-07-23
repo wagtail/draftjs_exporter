@@ -222,9 +222,7 @@ class TestEdgeCases(unittest.TestCase):
                     entities=[{"offset": 0, "length": 1, "key": 0}],
                 )
             ],
-            "entityMap": {
-                "0": {"type": "LINK", "mutability": "MUTABLE", "data": {}}
-            },
+            "entityMap": {"0": {"type": "LINK", "mutability": "MUTABLE", "data": {}}},
         }
         with self.assertRaises(ConfigException):
             ContentStateFilter(
