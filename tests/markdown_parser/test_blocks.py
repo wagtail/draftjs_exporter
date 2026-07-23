@@ -208,9 +208,7 @@ class TestLists(unittest.TestCase):
 
     def test_mixed_kinds_by_indent(self):
         cs = parse("- a\n  1. b")
-        self.assertEqual(
-            block_types(cs), ["unordered-list-item", "ordered-list-item"]
-        )
+        self.assertEqual(block_types(cs), ["unordered-list-item", "ordered-list-item"])
         self.assertEqual(cs["blocks"][1]["depth"], 1)
 
     def test_list_content_is_inline_parsed(self):
