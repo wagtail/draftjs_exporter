@@ -21,7 +21,7 @@ class TestMarkdownParser(unittest.TestCase):
 
     def test_non_string_input_raises_type_error(self):
         with self.assertRaises(TypeError):
-            MarkdownParser().parse(None)  # type: ignore[arg-type]
+            MarkdownParser().parse(None)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
 
     def test_config_toggle_passed_through(self):
         cs = MarkdownParser({"headings": False}).parse("# Title")
