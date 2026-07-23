@@ -114,3 +114,64 @@ class TestThematicBreaks(unittest.TestCase):
 
     def test_spaced_markers(self):
         self.assertEqual(block_types(parse("- - -")), ["atomic"])
+
+
+class TestBlockquotes(unittest.TestCase):
+    def test_single_line_quote(self):
+        cs = parse("> quoted")
+        self.assertEqual(block_types(cs), ["blockquote"])
+        self.assertEqual(cs["blocks"][0]["text"], "quoted")
+
+    def test_multiline_quote_joins(self):
+        cs = parse("> a\n> b")
+        self.assertEqual(len(cs["blocks"]), 1)
+        self.assertEqual(cs["blocks"][0]["text"], "a\nb")
+
+    def test_empty_quote_line_splits_blocks(self):
+        cs = parse("> a\n>\n> b")
+        self.assertEqual(block_types(cs), ["blockquote", "blockquote"])
+
+    def test_quote_content_is_inline_parsed(self):
+        cs = parse("> **bold**")
+        self.assertEqual(cs["blocks"][0]["text"], "bold")
+        self.assertEqual(
+            cs["blocks"][0]["inlineStyleRanges"],
+            [{"offset": 0, "length": 4, "style": "BOLD"}],
+        )
+
+    def test_quote_without_space(self):
+        cs = parse(">quoted")
+        self.assertEqual(cs["blocks"][0]["text"], "quoted")
+
+
+class TestFencedCode(unittest.TestCase):
+    def test_backtick_fence(self):
+        cs = parse("```\ncode line\n```")
+        self.assertEqual(block_types(cs), ["code-block"])
+        self.assertEqual(cs["blocks"][0]["text"], "code line")
+
+    def test_tilde_fence(self):
+        cs = parse("~~~\ncode\n~~~")
+        self.assertEqual(block_types(cs), ["code-block"])
+
+    def test_info_string_ignored(self):
+        cs = parse("```python\nx = 1\n```")
+        self.assertEqual(cs["blocks"][0]["text"], "x = 1")
+
+    def test_multiline_code(self):
+        cs = parse("```\na\nb\n```")
+        self.assertEqual(cs["blocks"][0]["text"], "a\nb")
+
+    def test_unclosed_fence_parses_to_eof(self):
+        cs = parse("```\ncode")
+        self.assertEqual(block_types(cs), ["code-block"])
+        self.assertEqual(cs["blocks"][0]["text"], "code")
+
+    def test_code_content_not_inline_parsed(self):
+        cs = parse("```\n**not bold**\n```")
+        self.assertEqual(cs["blocks"][0]["text"], "**not bold**")
+        self.assertEqual(cs["blocks"][0]["inlineStyleRanges"], [])
+
+    def test_closing_fence_must_match_marker(self):
+        cs = parse("```\na\n~~~\nb\n```")
+        self.assertEqual(cs["blocks"][0]["text"], "a\n~~~\nb")
