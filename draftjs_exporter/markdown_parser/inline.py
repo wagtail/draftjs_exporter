@@ -264,8 +264,76 @@ class InlineParser:
     def _parse_emphasis(
         self, text: str, i: int, out: list[str], spans: list[Span]
     ) -> int | None:
-        """Parse an emphasis delimiter run. Implemented in Task 5."""
-        return None
+        """Parse an emphasis delimiter run at index i.
+
+        Delimiter runs match by exact length: a run of 2 only closes a
+        run of 2. Runs longer than 3 are treated as literal text.
+
+        Parameters:
+            text: The full source text.
+            i: Index of the first delimiter character.
+            out: Output characters accumulated so far.
+            spans: Spans accumulated so far.
+
+        Returns:
+            The index after the closing delimiter, or None when the run
+            does not form emphasis (it is then emitted literally).
+        """
+        ch = text[i]
+        n = len(text)
+        run = 1
+        while i + run < n and text[i + run] == ch:
+            run += 1
+        if run > 3:
+            # Runs longer than 3 are not emphasis: emit them literally.
+            out.extend(ch * run)
+            return i + run
+        marker = ch * run
+        end = self._find_closing(text, i + run, marker)
+        if end == -1:
+            return None
+        inner_plain, inner_spans = self._parse(text[i + run : end])
+        start = len(out)
+        out.extend(inner_plain)
+        spans.extend(
+            (s + start, length, kind, payload)
+            for s, length, kind, payload in inner_spans
+        )
+        styles_by_run = {
+            1: [INLINE_STYLES.ITALIC],
+            2: [INLINE_STYLES.BOLD],
+            3: [INLINE_STYLES.BOLD, INLINE_STYLES.ITALIC],
+        }
+        for style in styles_by_run[run]:
+            spans.append((start, len(inner_plain), "style", style))
+        return end + run
+
+    @staticmethod
+    def _find_closing(text: str, start: int, marker: str) -> int:
+        """Find the closing delimiter, skipping longer runs for singles.
+
+        Parameters:
+            text: The full source text.
+            start: Index to start searching from.
+            marker: The exact delimiter run to find.
+
+        Returns:
+            The index of the closing delimiter, or -1 when absent.
+        """
+        i = start
+        while True:
+            end = text.find(marker, i)
+            if end == -1:
+                return -1
+            if len(marker) == 1:
+                ch = marker
+                part_of_longer_run = (end > 0 and text[end - 1] == ch) or (
+                    end + 1 < len(text) and text[end + 1] == ch
+                )
+                if part_of_longer_run:
+                    i = end + 1
+                    continue
+            return end
 
     def _parse_inline_html(
         self, text: str, i: int, out: list[str], spans: list[Span]
