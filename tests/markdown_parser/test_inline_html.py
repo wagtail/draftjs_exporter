@@ -1,0 +1,44 @@
+"""Tests for the inline HTML style whitelist."""
+
+import unittest
+
+from tests.markdown_parser.test_inline import make_parser
+
+SUP_SUB = {"sup": "SUPERSCRIPT", "sub": "SUBSCRIPT"}
+
+
+class TestInlineHtml(unittest.TestCase):
+    def test_whitelisted_tag_produces_style(self):
+        text, styles, _ = make_parser(inline_html_styles=SUP_SUB).parse("a <sup>2</sup> b")
+        self.assertEqual(text, "a 2 b")
+        self.assertEqual(styles, [{"offset": 2, "length": 1, "style": "SUPERSCRIPT"}])
+
+    def test_recursive_content(self):
+        text, styles, _ = make_parser(inline_html_styles=SUP_SUB).parse(
+            "<sup>**bold**</sup>"
+        )
+        self.assertEqual(text, "bold")
+        self.assertIn({"offset": 0, "length": 4, "style": "SUPERSCRIPT"}, styles)
+        self.assertIn({"offset": 0, "length": 4, "style": "BOLD"}, styles)
+
+    def test_tag_with_attributes_is_literal(self):
+        text, styles, _ = make_parser(inline_html_styles=SUP_SUB).parse(
+            '<sup class="x">2</sup>'
+        )
+        self.assertEqual(text, '<sup class="x">2</sup>')
+        self.assertEqual(styles, [])
+
+    def test_non_whitelisted_tag_is_literal(self):
+        text, styles, _ = make_parser(inline_html_styles=SUP_SUB).parse("<b>bold</b>")
+        self.assertEqual(text, "<b>bold</b>")
+        self.assertEqual(styles, [])
+
+    def test_unclosed_tag_is_literal(self):
+        text, styles, _ = make_parser(inline_html_styles=SUP_SUB).parse("<sup>2")
+        self.assertEqual(text, "<sup>2")
+        self.assertEqual(styles, [])
+
+    def test_empty_whitelist_means_literal(self):
+        text, styles, _ = make_parser().parse("<sup>2</sup>")
+        self.assertEqual(text, "<sup>2</sup>")
+        self.assertEqual(styles, [])
