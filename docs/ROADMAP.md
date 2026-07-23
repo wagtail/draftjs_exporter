@@ -42,6 +42,14 @@ Explore a streaming API that yields HTML incrementally (sync/async) to reduce me
 
 After dropping 3.10/3.11, adopt 3.12+ features (faster f-strings, `typing.Self`/`TypeAliasType`, better `match` exhaustiveness) to simplify Options/State internals and improve runtime speed.
 
+### More advanced tests
+
+See:
+
+- [Cosmic Ray](https://cosmic-ray.readthedocs.io/en/latest/)
+- [MutMut](https://mutmut.readthedocs.io/en/latest/)
+- [Hypothesis - State machines](https://hypothesis.readthedocs.io/en/latest/stateful.html)
+
 ## Backlog
 
 > Likely useful but lower-priority or “filler” tasks.
