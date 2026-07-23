@@ -3,7 +3,7 @@ import os
 import unittest
 from typing import Any
 
-from draftjs_exporter.markdown_importer import MarkdownImporter
+from draftjs_exporter.markdown_importer import ImporterConfig, MarkdownImporter
 from draftjs_exporter.markdown_parser import scheme_resolver
 from draftjs_exporter.types import ContentState
 
