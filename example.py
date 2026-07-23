@@ -23,9 +23,11 @@ from draftjs_exporter import (
     Element,
     Exporter,
     ExporterConfig,
+    MarkdownImporter,
     Props,
 )
 from draftjs_exporter.markdown.entities import link as markdown_link
+from draftjs_exporter.markdown_parser import scheme_resolver
 
 
 def blockquote(props: Props) -> Element:
@@ -357,6 +359,37 @@ if __name__ == "__main__":
 
     print("=== Markdown escaping ===")  # noqa: T201
     print(escaping_output)  # noqa: T201
+
+    # --- Markdown import ---
+    # Import the Markdown back into a ContentState, with entity resolvers
+    # for internal URLs and a filter demoting level-1 headings.
+
+    importer = MarkdownImporter(
+        {
+            "parser_config": {
+                "image_resolvers": [
+                    scheme_resolver(
+                        "wagtail",
+                        {"image": "IMAGE"},
+                        coerce={"id": int},
+                        label_key="alt",
+                        mutability="IMMUTABLE",
+                    )
+                ],
+            },
+            "filter_rules": [
+                {
+                    "type": "block",
+                    "match": BLOCK_TYPES.HEADER_ONE,
+                    "action": "demote",
+                },
+            ],
+        }
+    )
+    imported = importer.import_markdown(markdown_output)
+
+    print("=== Markdown import ===")  # noqa: T201
+    print(json.dumps(imported, indent=2))  # noqa: T201
 
     styles = """
     /* Tacit CSS framework https://yegor256.github.io/tacit/ */
