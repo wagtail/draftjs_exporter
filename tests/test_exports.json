@@ -151,6 +151,35 @@
           "entityRanges": []
         }
       ]
+    },
+    "import": {
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "Bold Italic",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [
+            {
+              "offset": 0,
+              "length": 5,
+              "style": "BOLD"
+            },
+            {
+              "offset": 5,
+              "length": 6,
+              "style": "ITALIC"
+            },
+            {
+              "offset": 5,
+              "length": 6,
+              "style": "BOLD"
+            }
+          ],
+          "entityRanges": []
+        }
+      ],
+      "entityMap": {}
     }
   },
   {
@@ -329,6 +358,85 @@
           "entityRanges": []
         }
       ]
+    },
+    "import": {
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "0123~4~56789abcdef",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [
+            {
+              "offset": 0,
+              "length": 1,
+              "style": "BOLD"
+            },
+            {
+              "offset": 1,
+              "length": 1,
+              "style": "CODE"
+            },
+            {
+              "offset": 2,
+              "length": 1,
+              "style": "ITALIC"
+            },
+            {
+              "offset": 3,
+              "length": 1,
+              "style": "UNDERLINE"
+            },
+            {
+              "offset": 7,
+              "length": 1,
+              "style": "SUPERSCRIPT"
+            },
+            {
+              "offset": 8,
+              "length": 1,
+              "style": "SUBSCRIPT"
+            },
+            {
+              "offset": 9,
+              "length": 1,
+              "style": "MARK"
+            },
+            {
+              "offset": 10,
+              "length": 1,
+              "style": "QUOTATION"
+            },
+            {
+              "offset": 11,
+              "length": 1,
+              "style": "SMALL"
+            },
+            {
+              "offset": 12,
+              "length": 1,
+              "style": "SAMPLE"
+            },
+            {
+              "offset": 13,
+              "length": 1,
+              "style": "INSERT"
+            },
+            {
+              "offset": 14,
+              "length": 1,
+              "style": "DELETE"
+            },
+            {
+              "offset": 15,
+              "length": 1,
+              "style": "KEYBOARD"
+            }
+          ],
+          "entityRanges": []
+        }
+      ],
+      "entityMap": {}
     }
   },
   {
@@ -374,6 +482,39 @@
           ]
         }
       ]
+    },
+    "import": {
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "a",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [
+            {
+              "offset": 0,
+              "length": 1,
+              "style": "ITALIC"
+            }
+          ],
+          "entityRanges": [
+            {
+              "offset": 0,
+              "length": 1,
+              "key": 0
+            }
+          ]
+        }
+      ],
+      "entityMap": {
+        "0": {
+          "type": "LINK",
+          "mutability": "MUTABLE",
+          "data": {
+            "url": "/"
+          }
+        }
+      }
     }
   },
   {
@@ -424,6 +565,39 @@
           ]
         }
       ]
+    },
+    "import": {
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "a",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [
+            {
+              "offset": 0,
+              "length": 1,
+              "style": "ITALIC"
+            }
+          ],
+          "entityRanges": [
+            {
+              "offset": 0,
+              "length": 1,
+              "key": 0
+            }
+          ]
+        }
+      ],
+      "entityMap": {
+        "0": {
+          "type": "LINK",
+          "mutability": "MUTABLE",
+          "data": {
+            "url": "/"
+          }
+        }
+      }
     }
   },
   {
@@ -717,6 +891,106 @@
           ]
         }
       ]
+    },
+    "import": {
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "DraftJS AST Exporter",
+          "type": "header-two",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00001",
+          "text": "In your draft-js, exporting your content:",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [
+            {
+              "offset": 18,
+              "length": 9,
+              "style": "BOLD"
+            },
+            {
+              "offset": 33,
+              "length": 7,
+              "style": "ITALIC"
+            }
+          ],
+          "entityRanges": []
+        },
+        {
+          "key": "00002",
+          "text": "From draft-js internals",
+          "type": "ordered-list-item",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00003",
+          "text": "To an abstract syntax tree",
+          "type": "ordered-list-item",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00004",
+          "text": "Extensibility.",
+          "type": "ordered-list-item",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00005",
+          "text": " ",
+          "type": "atomic",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": [
+            {
+              "offset": 0,
+              "length": 1,
+              "key": 0
+            }
+          ]
+        },
+        {
+          "key": "00006",
+          "text": ":)Find the project on Github.",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": [
+            {
+              "offset": 22,
+              "length": 6,
+              "key": 1
+            }
+          ]
+        }
+      ],
+      "entityMap": {
+        "1": {
+          "type": "LINK",
+          "mutability": "MUTABLE",
+          "data": {
+            "url": "https://github.com/icelab/draft-js-ast-exporter"
+          }
+        },
+        "0": {
+          "type": "IMAGE",
+          "mutability": "IMMUTABLE",
+          "data": {
+            "src": "http://placekitten.com/500/300",
+            "alt": ""
+          }
+        }
+      }
     }
   },
   {
@@ -777,6 +1051,33 @@
           "entityRanges": []
         }
       ]
+    },
+    "import": {
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "search http://www.google.com#world for the #world",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": [
+            {
+              "offset": 7,
+              "length": 27,
+              "key": 0
+            }
+          ]
+        }
+      ],
+      "entityMap": {
+        "0": {
+          "type": "LINK",
+          "mutability": "MUTABLE",
+          "data": {
+            "url": "http://www.google.com#world"
+          }
+        }
+      }
     }
   },
   {
@@ -1241,6 +1542,412 @@
           "data": {}
         }
       ]
+    },
+    "import": {
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "draftjs_exporter is an HTML exporter for Draft.js content",
+          "type": "header-two",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": [
+            {
+              "offset": 41,
+              "length": 8,
+              "key": 0
+            }
+          ]
+        },
+        {
+          "key": "00001",
+          "text": "Try it out by \"running\" this file!",
+          "type": "blockquote",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00002",
+          "text": "Features 📝🍸",
+          "type": "header-three",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00003",
+          "text": "The exporter aims to provide sensible defaults from basic block types and inline styles to HTML, that can easily be customised when required. For more advanced scenarios, an API is provided (mimicking React's createElement) to create custom rendering components of arbitrary complexity.",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [
+            {
+              "offset": 209,
+              "length": 13,
+              "style": "CODE"
+            }
+          ],
+          "entityRanges": [
+            {
+              "offset": 209,
+              "length": 13,
+              "key": 1
+            }
+          ]
+        },
+        {
+          "key": "00004",
+          "text": " ",
+          "type": "atomic",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": [
+            {
+              "offset": 0,
+              "length": 1,
+              "key": 2
+            }
+          ]
+        },
+        {
+          "key": "00005",
+          "text": "Here are some features worth highlighting:",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00006",
+          "text": "Convert line breaks to <br>",
+          "type": "unordered-list-item",
+          "depth": 0,
+          "inlineStyleRanges": [
+            {
+              "offset": 23,
+              "length": 4,
+              "style": "CODE"
+            }
+          ],
+          "entityRanges": []
+        },
+        {
+          "key": "00007",
+          "text": "elements.",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00008",
+          "text": "Automatic conversion of entity data to HTML attributes (int & boolean to string, style object to style string).",
+          "type": "unordered-list-item",
+          "depth": 0,
+          "inlineStyleRanges": [
+            {
+              "offset": 81,
+              "length": 12,
+              "style": "CODE"
+            },
+            {
+              "offset": 97,
+              "length": 12,
+              "style": "CODE"
+            }
+          ],
+          "entityRanges": [
+            {
+              "offset": 81,
+              "length": 28,
+              "key": 3
+            }
+          ]
+        },
+        {
+          "key": "00009",
+          "text": "Wrapped blocks (<li> elements go inside <ul> or <ol>).",
+          "type": "unordered-list-item",
+          "depth": 0,
+          "inlineStyleRanges": [
+            {
+              "offset": 16,
+              "length": 5,
+              "style": "CODE"
+            },
+            {
+              "offset": 40,
+              "length": 4,
+              "style": "CODE"
+            },
+            {
+              "offset": 48,
+              "length": 4,
+              "style": "CODE"
+            }
+          ],
+          "entityRanges": []
+        },
+        {
+          "key": "00010",
+          "text": "With arbitrary nesting.",
+          "type": "unordered-list-item",
+          "depth": 1,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00011",
+          "text": "Common text styles: Bold, Italic, Underline, Monospace, ~Strikethrough.~ cmd + b",
+          "type": "unordered-list-item",
+          "depth": 2,
+          "inlineStyleRanges": [
+            {
+              "offset": 20,
+              "length": 4,
+              "style": "BOLD"
+            },
+            {
+              "offset": 26,
+              "length": 6,
+              "style": "ITALIC"
+            },
+            {
+              "offset": 34,
+              "length": 9,
+              "style": "UNDERLINE"
+            },
+            {
+              "offset": 45,
+              "length": 9,
+              "style": "CODE"
+            },
+            {
+              "offset": 73,
+              "length": 7,
+              "style": "KEYBOARD"
+            }
+          ],
+          "entityRanges": []
+        },
+        {
+          "key": "00012",
+          "text": "~Overlapping ~~te~xt styles. <strong style=\"text-decoration: underline;\">Custom styles</strong> too!",
+          "type": "unordered-list-item",
+          "depth": 2,
+          "inlineStyleRanges": [
+            {
+              "offset": 14,
+              "length": 4,
+              "style": "BOLD"
+            },
+            {
+              "offset": 18,
+              "length": 2,
+              "style": "ITALIC"
+            },
+            {
+              "offset": 18,
+              "length": 2,
+              "style": "BOLD"
+            },
+            {
+              "offset": 20,
+              "length": 9,
+              "style": "ITALIC"
+            }
+          ],
+          "entityRanges": []
+        },
+        {
+          "key": "00013",
+          "text": "#hashtag support via #CompositeDecorators.",
+          "type": "unordered-list-item",
+          "depth": 3,
+          "inlineStyleRanges": [],
+          "entityRanges": [
+            {
+              "offset": 21,
+              "length": 20,
+              "key": 4
+            }
+          ]
+        },
+        {
+          "key": "00014",
+          "text": "Linkify URLs too! http://example.com/",
+          "type": "unordered-list-item",
+          "depth": 4,
+          "inlineStyleRanges": [],
+          "entityRanges": [
+            {
+              "offset": 18,
+              "length": 19,
+              "key": 5
+            }
+          ]
+        },
+        {
+          "key": "00015",
+          "text": "Depth can go back and forth, it works fiiine (1)",
+          "type": "unordered-list-item",
+          "depth": 2,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00016",
+          "text": "Depth can go back and forth, it works fiiine (2)",
+          "type": "unordered-list-item",
+          "depth": 1,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00017",
+          "text": "Depth can go back and forth, it works fiiine (3)",
+          "type": "unordered-list-item",
+          "depth": 2,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00018",
+          "text": "Depth can go back and forth, it works fiiine (4)",
+          "type": "unordered-list-item",
+          "depth": 1,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00019",
+          "text": "Depth can go back and forth, it works fiiine (5)",
+          "type": "unordered-list-item",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00020",
+          "text": " ",
+          "type": "atomic",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": [
+            {
+              "offset": 0,
+              "length": 1,
+              "key": 6
+            }
+          ]
+        },
+        {
+          "key": "00021",
+          "text": "For developers 🚀",
+          "type": "header-three",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00022",
+          "text": "Import the library",
+          "type": "ordered-list-item",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00023",
+          "text": "Define your configuration",
+          "type": "ordered-list-item",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00024",
+          "text": "Go!",
+          "type": "ordered-list-item",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00025",
+          "text": "Optionally, define your custom components.",
+          "type": "ordered-list-item",
+          "depth": 1,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00026",
+          "text": "def Blockquote(props):\n    block_data = props['block']['data']\n    return DOM.create_element('blockquote', {\n        'cite': block_data.get('cite')\n    }, props['children'])\n",
+          "type": "code-block",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00027",
+          "text": "Voilà!",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        }
+      ],
+      "entityMap": {
+        "2": {
+          "type": "HORIZONTAL_RULE",
+          "mutability": "IMMUTABLE",
+          "data": {}
+        },
+        "3": {
+          "type": "LINK",
+          "mutability": "MUTABLE",
+          "data": {
+            "url": "https://facebook.github.io/react/docs/jsx-in-depth.html"
+          }
+        },
+        "0": {
+          "type": "LINK",
+          "mutability": "MUTABLE",
+          "data": {
+            "url": "https://github.com/facebook/draft-js"
+          }
+        },
+        "5": {
+          "type": "LINK",
+          "mutability": "MUTABLE",
+          "data": {
+            "url": "http://example.com/"
+          }
+        },
+        "6": {
+          "type": "IMAGE",
+          "mutability": "IMMUTABLE",
+          "data": {
+            "src": "https://placekitten.com/g/300/200",
+            "alt": "Test image alt text"
+          }
+        },
+        "4": {
+          "type": "LINK",
+          "mutability": "MUTABLE",
+          "data": {
+            "url": "https://github.com/wagtail/draftjs_exporter/pull/17"
+          }
+        },
+        "1": {
+          "type": "LINK",
+          "mutability": "MUTABLE",
+          "data": {
+            "url": "https://facebook.github.io/react/docs/top-level-api.html#react.createelement"
+          }
+        }
+      }
     }
   },
   {

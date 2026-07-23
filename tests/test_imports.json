@@ -1,0 +1,200 @@
+[
+  {
+    "label": "Italic with stars",
+    "markdown": "*a*",
+    "content_state": {
+      "entityMap": {},
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "a",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [
+            { "offset": 0, "length": 1, "style": "ITALIC" }
+          ],
+          "entityRanges": []
+        }
+      ]
+    }
+  },
+  {
+    "label": "Bold with underscores",
+    "markdown": "__a__",
+    "content_state": {
+      "entityMap": {},
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "a",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [{ "offset": 0, "length": 1, "style": "BOLD" }],
+          "entityRanges": []
+        }
+      ]
+    }
+  },
+  {
+    "label": "Plus bullet list",
+    "markdown": "+ a",
+    "content_state": {
+      "entityMap": {},
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "a",
+          "type": "unordered-list-item",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        }
+      ]
+    }
+  },
+  {
+    "label": "Paren ordered list",
+    "markdown": "1) a",
+    "content_state": {
+      "entityMap": {},
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "a",
+          "type": "ordered-list-item",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        }
+      ]
+    }
+  },
+  {
+    "label": "Tilde fence",
+    "markdown": "~~~\nx\n~~~",
+    "content_state": {
+      "entityMap": {},
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "x",
+          "type": "code-block",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        }
+      ]
+    }
+  },
+  {
+    "label": "Star thematic break",
+    "markdown": "***",
+    "content_state": {
+      "entityMap": {
+        "0": {
+          "type": "HORIZONTAL_RULE",
+          "mutability": "IMMUTABLE",
+          "data": {}
+        }
+      },
+      "blocks": [
+        {
+          "key": "00000",
+          "text": " ",
+          "type": "atomic",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": [{ "offset": 0, "length": 1, "key": 0 }]
+        }
+      ]
+    }
+  },
+  {
+    "label": "Inline HTML styles",
+    "markdown": "x <sup>2</sup>",
+    "config": {
+      "parser_config": { "inline_html_styles": { "sup": "SUPERSCRIPT" } }
+    },
+    "content_state": {
+      "entityMap": {},
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "x 2",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [
+            { "offset": 2, "length": 1, "style": "SUPERSCRIPT" }
+          ],
+          "entityRanges": []
+        }
+      ]
+    }
+  },
+  {
+    "label": "Wagtail internal image",
+    "markdown": "![alt](wagtail://image?id=10&format=left)",
+    "config": { "wagtail_resolvers": true },
+    "content_state": {
+      "entityMap": {
+        "0": {
+          "type": "IMAGE",
+          "mutability": "IMMUTABLE",
+          "data": { "id": 10, "format": "left", "alt": "alt" }
+        }
+      },
+      "blocks": [
+        {
+          "key": "00000",
+          "text": " ",
+          "type": "atomic",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": [{ "offset": 0, "length": 1, "key": 0 }]
+        }
+      ]
+    }
+  },
+  {
+    "label": "Wagtail page link",
+    "markdown": "[label](wagtail://page?id=3)",
+    "config": { "wagtail_resolvers": true },
+    "content_state": {
+      "entityMap": {
+        "0": { "type": "LINK", "mutability": "MUTABLE", "data": { "id": 3 } }
+      },
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "label",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": [{ "offset": 0, "length": 5, "key": 0 }]
+        }
+      ]
+    }
+  },
+  {
+    "label": "Filter demote in importer",
+    "markdown": "# T",
+    "config": {
+      "filter_rules": [
+        { "type": "block", "match": "header-one", "action": "demote" }
+      ]
+    },
+    "content_state": {
+      "entityMap": {},
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "T",
+          "type": "header-two",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        }
+      ]
+    }
+  }
+]
