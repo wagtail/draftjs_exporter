@@ -221,10 +221,21 @@ For every `BLOCK_TYPES.*`, `INLINE_STYLES.*`, `ENTITY_TYPES.*` value, see [the A
 
 ## Reference docs
 
-- [Getting started](https://wagtail.github.io/draftjs_exporter/getting-started/) · [Content state](https://wagtail.github.io/draftjs_exporter/content-state/) · [Configuration](https://wagtail.github.io/draftjs_exporter/configuration/) · [Custom components](https://wagtail.github.io/draftjs_exporter/custom-components/) · [Fallbacks](https://wagtail.github.io/draftjs_exporter/fallback-components/) · [Alternative engines](https://wagtail.github.io/draftjs_exporter/alternative-engines/) · [Custom engines](https://wagtail.github.io/draftjs_exporter/custom-engines/) · [Markdown](https://wagtail.github.io/draftjs_exporter/markdown/) · [Troubleshooting](https://wagtail.github.io/draftjs_exporter/troubleshooting/) · [Migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/) · [API reference](https://wagtail.github.io/draftjs_exporter/api/) · [Architecture](https://wagtail.github.io/draftjs_exporter/architecture/)
+- [Getting started](https://wagtail.github.io/draftjs_exporter/getting-started/)
+- [Content state](https://wagtail.github.io/draftjs_exporter/content-state/)
+- [Configuration](https://wagtail.github.io/draftjs_exporter/configuration/)
+- [Custom components](https://wagtail.github.io/draftjs_exporter/custom-components/)
+- [Fallbacks](https://wagtail.github.io/draftjs_exporter/fallback-components/)
+- [Alternative engines](https://wagtail.github.io/draftjs_exporter/alternative-engines/)
+- [Custom engines](https://wagtail.github.io/draftjs_exporter/custom-engines/)
+- [Markdown](https://wagtail.github.io/draftjs_exporter/markdown/)
+- [Troubleshooting](https://wagtail.github.io/draftjs_exporter/troubleshooting/)
+- [Migration guide](https://wagtail.github.io/draftjs_exporter/migration-guide/)
+- [API reference](https://wagtail.github.io/draftjs_exporter/api/)
+- [Architecture](https://wagtail.github.io/draftjs_exporter/architecture/)
 
 ## Resources
 
 - [Full docs site](https://wagtail.github.io/draftjs_exporter/)
-- [LLM-friendly combined docs](https://wagtail.github.io/draftjs_exporter/llms-full.txt)
+- [llms-full.txt](https://wagtail.github.io/draftjs_exporter/llms-full.txt)
 - [GitHub](https://github.com/wagtail/draftjs_exporter)
