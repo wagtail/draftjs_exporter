@@ -230,3 +230,30 @@ class TestLists(unittest.TestCase):
         self.assertEqual(
             block_types(cs), ["unstyled", "unordered-list-item", "unstyled"]
         )
+
+
+class TestStandaloneImages(unittest.TestCase):
+    def test_standalone_image_is_atomic(self):
+        cs = parse("![alt text](/img.jpg)")
+        block = cs["blocks"][0]
+        self.assertEqual(block["type"], "atomic")
+        self.assertEqual(block["text"], " ")
+        self.assertEqual(block["entityRanges"], [{"offset": 0, "length": 1, "key": 0}])
+        self.assertEqual(
+            cs["entityMap"]["0"],
+            {
+                "type": "IMAGE",
+                "mutability": "IMMUTABLE",
+                "data": {"src": "/img.jpg", "alt": "alt text"},
+            },
+        )
+
+    def test_image_with_text_stays_inline(self):
+        cs = parse("look ![alt](/x.jpg) here")
+        self.assertEqual(block_types(cs), ["unstyled"])
+        self.assertEqual(cs["blocks"][0]["text"], "look alt here")
+
+    def test_images_disabled_stays_text(self):
+        cs = parse("![alt](/x.jpg)", images=False)
+        self.assertEqual(block_types(cs), ["unstyled"])
+        self.assertEqual(cs["blocks"][0]["text"], "![alt](/x.jpg)")

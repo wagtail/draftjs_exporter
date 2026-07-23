@@ -99,10 +99,10 @@ class BlockParser:
         self.builder = builder
 
     def parse(self, text: str) -> None:
-        """Parse Markdown source, appending blocks to the builder.
+        r"""Parse Markdown source, appending blocks to the builder.
 
         Parameters:
-            text: Markdown with line endings normalized to ``\\n``.
+            text: Markdown with line endings normalized to ``\n``.
         """
         lines = text.split("\n")
         i = 0
