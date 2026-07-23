@@ -24,13 +24,20 @@ from bs4 import BeautifulSoup
 from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
-from draftjs_exporter.constants import ENTITY_TYPES
+from draftjs_exporter.constants import BLOCK_TYPES, ENTITY_TYPES, INLINE_STYLES
+from draftjs_exporter.contentstate_filter import ContentStateFilter
 from draftjs_exporter.defaults import BLOCK_MAP, STYLE_MAP
 from draftjs_exporter.dom import DOM
 from draftjs_exporter.html import HTML, ExporterConfig
 from draftjs_exporter.markdown import CONFIG as MARKDOWN_CONFIG
 from draftjs_exporter.markdown.escape import escape_text
-from tests.strategies import content_states, dangerous_content_states, escapable_text
+from draftjs_exporter.markdown_importer import MarkdownImporter
+from tests.strategies import (
+    content_states,
+    dangerous_content_states,
+    escapable_text,
+    roundtrip_content_states,
+)
 from tests.test_entities import link
 
 CONFIG: ExporterConfig = {
@@ -212,3 +219,47 @@ class TestMarkdownEscapingInvariants(unittest.TestCase):
         assert m is not None
         escaped = escape_text(text, at_line_start=True)
         self.assertTrue(escaped.startswith(f"{m.group(1)}\\{m.group(2)}"))
+
+
+class TestImporterProperties(unittest.TestCase):
+    @given(roundtrip_content_states())
+    def test_round_trip_preserves_block_types_and_text(self, content_state):
+        """Export → import keeps block types and text for safe content."""
+        markdown = HTML(MARKDOWN_CONFIG).render(content_state)
+        result = MarkdownImporter().import_markdown(markdown)
+        self.assertEqual(
+            [b["type"] for b in result["blocks"]],
+            [b["type"] for b in content_state["blocks"]],
+        )
+        self.assertEqual(
+            [b["text"] for b in result["blocks"]],
+            [b["text"] for b in content_state["blocks"]],
+        )
+
+    @given(content_states())
+    def test_filter_produces_valid_content_state(self, content_state):
+        """Filtered output never has orphaned entity ranges."""
+        filter_ = ContentStateFilter(
+            [{"type": "block", "match": BLOCK_TYPES.HEADER_ONE, "action": "remove"}]
+        )
+        result = filter_.apply(content_state)
+        entity_map = result.get("entityMap", {})
+        for block in result["blocks"]:
+            text_length = len(block.get("text", ""))
+            for r in block.get("entityRanges", []):
+                self.assertIn(str(r["key"]), entity_map)
+                self.assertLessEqual(r["offset"] + r["length"], text_length)
+            for style_range in block.get("inlineStyleRanges", []):
+                self.assertLessEqual(
+                    style_range["offset"] + style_range["length"], text_length
+                )
+
+    @given(content_states())
+    def test_filter_idempotent(self, content_state):
+        """Applying the same filter twice yields the same result."""
+        filter_ = ContentStateFilter(
+            [{"type": "inline_style", "match": INLINE_STYLES.BOLD, "action": "remove"}]
+        )
+        once = filter_.apply(content_state)
+        twice = filter_.apply(once)
+        self.assertEqual(once, twice)
