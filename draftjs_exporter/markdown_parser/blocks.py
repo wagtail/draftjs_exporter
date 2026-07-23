@@ -214,12 +214,75 @@ class BlockParser:
         return i
 
     def _parse_fence(self, lines: list[str], i: int, match: re.Match[str]) -> int:
-        """Parse a fenced code block. Implemented in Task 9."""
-        raise NotImplementedError
+        """Parse a fenced code block starting at line i.
+
+        Unclosed fences parse to end of input, per CommonMark.
+
+        Parameters:
+            lines: All source lines.
+            i: Index of the opening fence line.
+            match: The fence opener match.
+
+        Returns:
+            The index of the first line after the block.
+        """
+        fence = match.group(1)
+        marker = fence[0]
+        size = len(fence)
+        body: list[str] = []
+        i += 1
+        while i < len(lines):
+            close = FENCE_RE.match(lines[i])
+            if (
+                close is not None
+                and close.group(1)[0] == marker
+                and len(close.group(1)) >= size
+            ):
+                i += 1
+                break
+            body.append(lines[i])
+            i += 1
+        self.builder.add_block(BLOCK_TYPES.CODE, "\n".join(body))
+        return i
 
     def _parse_quote(self, lines: list[str], i: int) -> int:
-        """Parse a blockquote. Implemented in Task 9."""
-        raise NotImplementedError
+        """Parse consecutive blockquote lines into blockquote blocks.
+
+        Quoted lines join with newlines. A quoted line with no content
+        (``>`` alone) splits the quote into separate blocks.
+
+        Parameters:
+            lines: All source lines.
+            i: Index of the first quoted line.
+
+        Returns:
+            The index of the first line after the quote.
+        """
+        start = i
+        quote_lines: list[str] = []
+        while i < len(lines):
+            match = QUOTE_RE.match(lines[i])
+            if match is None:
+                break
+            quote_lines.append(match.group(1))
+            i += 1
+        paragraph: list[str] = []
+        for offset, content in enumerate(quote_lines):
+            if not content.strip():
+                if paragraph:
+                    self._add_text_block(
+                        BLOCK_TYPES.BLOCKQUOTE, "\n".join(paragraph), start + offset
+                    )
+                    paragraph = []
+            else:
+                paragraph.append(content)
+        if paragraph:
+            self._add_text_block(
+                BLOCK_TYPES.BLOCKQUOTE,
+                "\n".join(paragraph),
+                start + len(quote_lines) - 1,
+            )
+        return i
 
     def _parse_list(self, lines: list[str], i: int) -> int:
         """Parse a list. Implemented in Task 10."""
