@@ -74,3 +74,11 @@ build:
 # Publishes a new version to PyPI.
 publish: build
   uv publish
+
+# Run promptfoo evals for the draftjs-exporter skill.
+eval *args="":
+  npx promptfoo@latest eval -c docs/prompts/draftjs_exporter_skills.yaml {{args}}
+
+# Open the promptfoo viewer for the most recent eval results.
+eval-view:
+  npx promptfoo@latest view -y

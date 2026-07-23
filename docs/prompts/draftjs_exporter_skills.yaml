@@ -1,0 +1,101 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+# Evals for the `draftjs-exporter` OpenCode agent skill
+# (`.agents/skills/draftjs-exporter/SKILL.md`).
+#
+# Three exporter problems, each run against a 2x2 matrix:
+#   - DeepSeek V4 Flash vs. Google Gemini 2.5 Pro
+#   - With the skill loaded into OpenCode's `skill` tool vs. without
+#
+# With-skill rows assert `skill-used` (trigger discipline) plus correctness.
+# Without-skill rows assert correctness only, to surface what the base model
+# knows on its own. Comparing the two answers the underlying question: does
+# the skill materially help with this task, or has the model outgrown it?
+#
+# These are real `draftjs_exporter` adoption tasks, not skill-specific trivia.
+# They stay useful as a regression suite even if future model improvements
+# reduce the skill's relative value.
+#
+# Required env vars (set before `just eval`):
+#   - DEEPSEEK_API_KEY            — DeepSeek API key.
+#
+# Run:
+#   just eval
+#   just eval-view   # open the dashboard for the latest run.
+
+prompts:
+  - "{{prompt}}"
+
+providers:
+  # DeepSeek no skill
+  - id: opencode:sdk
+    label: deepseek-v4-flash (no skill)
+    config:
+      provider_id: deepseek
+      model: deepseek-v4-flash
+      apiKey: "{{ env.DEEPSEEK_API_KEY }}"
+      working_dir: ../..
+      tools:
+        skill: false
+        bash: false
+        edit: false
+        write: false
+        webfetch: false
+        read: false
+        grep: false
+        glob: false
+        list: false
+
+  # DeepSeek with skill
+  - id: opencode:sdk
+    label: deepseek-v4-flash (with skill)
+    config:
+      provider_id: deepseek
+      model: deepseek-v4-flash
+      apiKey: "{{ env.DEEPSEEK_API_KEY }}"
+      working_dir: ../..
+      tools:
+        skill: true
+        bash: false
+        edit: false
+        write: false
+        webfetch: false
+        read: false
+        grep: false
+        glob: false
+        list: false
+      permission:
+        skill: allow
+        external_directory: deny
+
+tracing:
+  enabled: true
+
+defaultTest:
+  options:
+    temperature: 0.3
+
+tests:
+  - description: skills troubleshooting
+    vars:
+      prompt: >-
+        /draftjs-exporter how do you configure Markdown output to use different bullet symbols?
+    assert:
+      - type: trajectory:step-count
+        value:
+          type: command
+          pattern: "*draftjs-exporter/SKILL.md*"
+          min: 1
+  # - description: Reserved props gotcha
+  #   vars:
+  #     prompt: >-
+  #       I'm writing a custom entity decorator in draftjs_exporter and
+  #       `props["entity"]` is being overwritten by the framework before my
+  #       function sees it. What's happening and how should I work around it?
+  #   assert:
+  #     - type: skill-used
+  #       value: draftjs-exporter
+  #     - type: llm-rubric
+  #       value: >-
+  #         The answer correctly identifies `entity` as a reserved key on the entity `props` dict that the framework replaces internally (`entity` becomes a dict with type/mutability).
+  #         The answer encourages picking different data keys.
