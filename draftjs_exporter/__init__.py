@@ -15,14 +15,26 @@ __copyright__ = "Copyright 2016-present Springload and Contributors"
 from draftjs_exporter.constants import BLOCK_TYPES as BLOCK_TYPES
 from draftjs_exporter.constants import ENTITY_TYPES as ENTITY_TYPES
 from draftjs_exporter.constants import INLINE_STYLES as INLINE_STYLES
+from draftjs_exporter.contentstate_filter import (
+    ContentStateFilter as ContentStateFilter,
+)
+from draftjs_exporter.contentstate_filter import FilterRule as FilterRule
 from draftjs_exporter.defaults import BLOCK_MAP as BLOCK_MAP
 from draftjs_exporter.defaults import STYLE_MAP as STYLE_MAP
 from draftjs_exporter.dom import DOM as DOM
+from draftjs_exporter.error import MarkdownParseError as MarkdownParseError
 from draftjs_exporter.html import HTML as HTML
 from draftjs_exporter.html import ExporterConfig as ExporterConfig
 from draftjs_exporter.markdown import CONFIG as MARKDOWN_CONFIG
 from draftjs_exporter.markdown import MarkdownOptions as MarkdownOptions
 from draftjs_exporter.markdown import build_markdown_config as build_markdown_config
+from draftjs_exporter.markdown_importer import ImporterConfig as ImporterConfig
+from draftjs_exporter.markdown_importer import MarkdownImporter as MarkdownImporter
+from draftjs_exporter.markdown_parser import EntityResolution as EntityResolution
+from draftjs_exporter.markdown_parser import EntityResolver as EntityResolver
+from draftjs_exporter.markdown_parser import MarkdownParser as MarkdownParser
+from draftjs_exporter.markdown_parser import ParserConfig as ParserConfig
+from draftjs_exporter.markdown_parser import scheme_resolver as scheme_resolver
 from draftjs_exporter.types import Block as Block
 from draftjs_exporter.types import Component as Component
 from draftjs_exporter.types import CompositeDecorators as CompositeDecorators
@@ -60,6 +72,17 @@ __all__ = [
     "MARKDOWN_CONFIG",
     "MarkdownOptions",
     "build_markdown_config",
+    # Importer
+    "MarkdownImporter",
+    "ImporterConfig",
+    "MarkdownParser",
+    "ParserConfig",
+    "ContentStateFilter",
+    "FilterRule",
+    "MarkdownParseError",
+    "EntityResolution",
+    "EntityResolver",
+    "scheme_resolver",
     # Constants
     "BLOCK_TYPES",
     "ENTITY_TYPES",
