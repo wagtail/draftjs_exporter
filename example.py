@@ -3,6 +3,7 @@
 
 import argparse
 import cProfile
+import difflib
 import json
 import logging
 import re
@@ -390,6 +391,25 @@ if __name__ == "__main__":
 
     print("=== Markdown import ===")  # noqa: T201
     print(json.dumps(imported, indent=2))  # noqa: T201
+
+    # --- Markdown round-trip: export the imported content state back to Markdown ---
+    re_exported = markdown_exporter.render(imported)
+
+    print("=== Markdown diff (original vs round-trip) ===")  # noqa: T201
+    if re_exported == markdown_output:
+        print("[no differences]")  # noqa: T201
+    else:
+        print(  # noqa: T201
+            "\n".join(
+                difflib.unified_diff(
+                    markdown_output.splitlines(),
+                    re_exported.splitlines(),
+                    fromfile="original",
+                    tofile="round-trip",
+                    lineterm="",
+                )
+            )
+        )
 
     styles = """
     /* Tacit CSS framework https://yegor256.github.io/tacit/ */
