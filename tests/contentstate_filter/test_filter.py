@@ -228,3 +228,33 @@ class TestEdgeCases(unittest.TestCase):
             ContentStateFilter(
                 [{"type": "entity", "match": "LINK", "action": lambda e: {}}]
             ).apply(cs)
+
+
+class TestDemoteChainGuards(unittest.TestCase):
+    def test_demote_after_callback_returning_bad_block_rejected(self):
+        from draftjs_exporter.error import ConfigException
+
+        cs = cs_with_blocks(make_block("header-one"))
+        with self.assertRaises(ConfigException):
+            ContentStateFilter(
+                [
+                    {"type": "block", "match": "header-one", "action": lambda b: {}},
+                    {"type": "block", "match": "header-one", "action": "demote"},
+                ]
+            ).apply(cs)
+
+    def test_demote_after_callback_changing_type_rejected(self):
+        from draftjs_exporter.error import ConfigException
+
+        cs = cs_with_blocks(make_block("header-one"))
+        with self.assertRaises(ConfigException):
+            ContentStateFilter(
+                [
+                    {
+                        "type": "block",
+                        "match": "header-one",
+                        "action": lambda b: {**b, "type": "unstyled"},
+                    },
+                    {"type": "block", "match": "header-one", "action": "demote"},
+                ]
+            ).apply(cs)

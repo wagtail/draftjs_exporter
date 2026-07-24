@@ -29,6 +29,9 @@ ESCAPABLE = frozenset('\\`*{}_[]<>()#+-.!|"')
 TAG_RE = re.compile(r"<([a-zA-Z][a-zA-Z0-9]*)>")
 """Matches an HTML opening tag without attributes."""
 
+MAX_INLINE_DEPTH = 100
+"""Maximum nesting depth for inline constructs before rejecting input."""
+
 
 class InlineParser:
     """Parse inline Markdown constructs into text with style/entity ranges.
@@ -137,6 +140,7 @@ class InlineParser:
         try:
             resolution: EntityResolution = resolve(resolvers, url, label, default)
         except MarkdownParseError:
+            # Propagate without wrapping; unexpected exceptions are wrapped below.
             raise
         except Exception as err:
             raise MarkdownParseError(
@@ -156,8 +160,18 @@ class InlineParser:
             entity_type, data, resolution.get("mutability", "MUTABLE")
         )
 
-    def _parse(self, text: str) -> tuple[str, list[Span]]:
-        """Scan text, returning output characters and annotation spans."""
+    def _parse(self, text: str, depth: int = 0) -> tuple[str, list[Span]]:
+        """Scan text, returning output characters and annotation spans.
+
+        Parameters:
+            text: The text to scan.
+            depth: Current recursion depth for nested constructs.
+
+        Raises:
+            MarkdownParseError: If nesting exceeds ``MAX_INLINE_DEPTH``.
+        """
+        if depth > MAX_INLINE_DEPTH:
+            raise MarkdownParseError("Inline nesting too deep")
         out: list[str] = []
         spans: list[Span] = []
         i = 0
@@ -207,7 +221,7 @@ class InlineParser:
                 result = self._link_target(text, i)
                 if result is not None:
                     label_src, url, end = result
-                    label_plain, label_spans = self._parse(label_src)
+                    label_plain, label_spans = self._parse(label_src, depth + 1)
                     start = len(out)
                     out.extend(label_plain)
                     spans.extend(
@@ -223,14 +237,14 @@ class InlineParser:
 
             # Emphasis: * _ ** __ *** ___
             if self.emphasis and ch in "*_":
-                consumed = self._parse_emphasis(text, i, out, spans)
+                consumed = self._parse_emphasis(text, i, out, spans, depth)
                 if consumed is not None:
                     i = consumed
                     continue
 
             # Whitelisted inline HTML tags.
             if ch == "<" and self.inline_html_styles:
-                consumed = self._parse_inline_html(text, i, out, spans)
+                consumed = self._parse_inline_html(text, i, out, spans, depth)
                 if consumed is not None:
                     i = consumed
                     continue
@@ -275,7 +289,7 @@ class InlineParser:
         return text[i + 1 : close], text[close + 2 : paren], paren + 1
 
     def _parse_emphasis(
-        self, text: str, i: int, out: list[str], spans: list[Span]
+        self, text: str, i: int, out: list[str], spans: list[Span], depth: int
     ) -> int | None:
         """Parse an emphasis delimiter run at index i.
 
@@ -287,6 +301,7 @@ class InlineParser:
             i: Index of the first delimiter character.
             out: Output characters accumulated so far.
             spans: Spans accumulated so far.
+            depth: Current recursion depth for nested constructs.
 
         Returns:
             The index after the closing delimiter, or None when the run
@@ -305,7 +320,7 @@ class InlineParser:
         end = self._find_closing(text, i + run, marker)
         if end == -1:
             return None
-        inner_plain, inner_spans = self._parse(text[i + run : end])
+        inner_plain, inner_spans = self._parse(text[i + run : end], depth + 1)
         start = len(out)
         out.extend(inner_plain)
         spans.extend(
@@ -349,7 +364,7 @@ class InlineParser:
             return end
 
     def _parse_inline_html(
-        self, text: str, i: int, out: list[str], spans: list[Span]
+        self, text: str, i: int, out: list[str], spans: list[Span], depth: int
     ) -> int | None:
         """Parse a whitelisted inline HTML tag at index i.
 
@@ -362,6 +377,7 @@ class InlineParser:
             i: Index of the ``<`` character.
             out: Output characters accumulated so far.
             spans: Spans accumulated so far.
+            depth: Current recursion depth for nested constructs.
 
         Returns:
             The index after the closing tag, or None when the tag does
@@ -378,7 +394,7 @@ class InlineParser:
         end = text.find(closing, match.end())
         if end == -1:
             return None
-        inner_plain, inner_spans = self._parse(text[match.end() : end])
+        inner_plain, inner_spans = self._parse(text[match.end() : end], depth + 1)
         start = len(out)
         out.extend(inner_plain)
         spans.extend(
