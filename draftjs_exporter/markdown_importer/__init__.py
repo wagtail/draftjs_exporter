@@ -44,7 +44,7 @@ class MarkdownImporter:
             config = {}
         parser_class = import_string(config.get("parser", DEFAULT_PARSER))
         self.parser: MarkdownParser = parser_class(config.get("parser_config"))
-        self.filter = ContentStateFilter(config.get("filter_rules"))
+        self.filter: ContentStateFilter = ContentStateFilter(config.get("filter_rules"))
 
     def import_markdown(self, markdown: str) -> ContentState:
         """Parse Markdown and apply filter rules.

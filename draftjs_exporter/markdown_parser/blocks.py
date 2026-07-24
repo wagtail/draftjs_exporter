@@ -41,6 +41,28 @@ HEADING_TYPES = [
 """Heading block types indexed by ATX level minus one."""
 
 
+def _indent_width(text: str, tab_size: int = 4) -> int:
+    """Compute the column width of indentation, expanding tabs to tab stops.
+
+    Per CommonMark, a tab advances the column position to the next
+    multiple of 4 rather than counting as a fixed number of spaces.
+
+    Parameters:
+        text: The leading whitespace of a line.
+        tab_size: The tab stop interval.
+
+    Returns:
+        The column position after the indentation.
+    """
+    col = 0
+    for ch in text:
+        if ch == "\t":
+            col += tab_size - (col % tab_size)
+        else:
+            col += 1
+    return col
+
+
 class BlockParser:
     """Parse Markdown line by line into Draft.js blocks.
 
@@ -309,7 +331,7 @@ class BlockParser:
             match = unordered or ordered
             if match is None:
                 break
-            indent = len(match.group(1).replace("\t", "    "))
+            indent = _indent_width(match.group(1))
             while stack and indent < stack[-1]:
                 stack.pop()
             if not stack or indent > stack[-1]:

@@ -44,3 +44,23 @@ class TestInlineHtml(unittest.TestCase):
         text, styles, _ = make_parser().parse("<sup>2</sup>")
         self.assertEqual(text, "<sup>2</sup>")
         self.assertEqual(styles, [])
+
+
+class TestNestingDepth(unittest.TestCase):
+    def test_depth_guard_rejects_excessive_recursion(self):
+        from draftjs_exporter.error import MarkdownParseError
+        from draftjs_exporter.markdown_parser.inline import MAX_INLINE_DEPTH
+
+        # The parser's find-first-closer semantics make deep nesting
+        # unreachable from real input (mis-paired constructs fall back to
+        # literal text), so the guard is exercised directly.
+        parser = make_parser(inline_html_styles=SUP_SUB)
+        with self.assertRaises(MarkdownParseError):
+            parser._parse("x", depth=MAX_INLINE_DEPTH + 1)
+
+    def test_moderate_nesting_still_parses(self):
+        text, styles, _ = make_parser(inline_html_styles=SUP_SUB).parse(
+            "<sup><sub>x</sub></sup>"
+        )
+        self.assertEqual(text, "x")
+        self.assertEqual(len(styles), 2)

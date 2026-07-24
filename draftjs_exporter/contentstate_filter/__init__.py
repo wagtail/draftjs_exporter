@@ -160,6 +160,12 @@ class ContentStateFilter:
                 current = None
                 continue
             if action == "demote":
+                if not isinstance(current, dict) or current.get("type") not in (
+                    HEADER_DEMOTION
+                ):
+                    raise ConfigException(
+                        "Filter callback must return a demotable header block"
+                    )
                 current = {**current, "type": HEADER_DEMOTION[current["type"]]}
                 continue
             current = action(current)

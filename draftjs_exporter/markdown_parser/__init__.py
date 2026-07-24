@@ -21,19 +21,46 @@ class ParserConfig(TypedDict, total=False):
     """Options controlling which Markdown constructs are recognized."""
 
     headings: bool
+    """Parse ATX headings (default: True)."""
+
     blockquote: bool
+    """Parse ``>`` blockquotes (default: True)."""
+
     code_fenced: bool
+    """Parse fenced code blocks (default: True)."""
+
     thematic_break: bool
+    """Parse thematic breaks (default: True)."""
+
     unordered_list: bool
+    """Parse unordered lists (default: True)."""
+
     ordered_list: bool
+    """Parse ordered lists (default: True)."""
+
     emphasis: bool
+    """Parse bold and italic delimiters (default: True)."""
+
     code_inline: bool
+    """Parse backtick code spans (default: True)."""
+
     links: bool
+    """Parse ``[label](url)`` links (default: True)."""
+
     images: bool
+    """Parse ``![alt](url)`` images (default: True)."""
+
     line_breaks: bool
+    """Strip two-space hard break markers (default: True)."""
+
     link_resolvers: list[EntityResolver]
+    """Resolver chain for link URLs (default: empty, uses ``LINK`` with the URL)."""
+
     image_resolvers: list[EntityResolver]
+    """Resolver chain for image URLs (default: empty, uses ``IMAGE`` with ``src``/``alt``)."""
+
     inline_html_styles: dict[str, str]
+    """Whitelist of HTML tags mapped to inline styles, e.g. ``{"sup": "SUPERSCRIPT"}``."""
 
 
 class MarkdownParser:
@@ -46,6 +73,8 @@ class MarkdownParser:
     """
 
     __slots__ = ("config",)
+
+    config: ParserConfig
 
     def __init__(self, config: ParserConfig | None = None) -> None:
         """Initialize the parser with the given configuration.

@@ -279,3 +279,15 @@ class TestQuoteAndErrorEdges(unittest.TestCase):
             parser.parse("[a](/b)")
         self.assertEqual(ctx.exception.line, 99)
         self.assertEqual(ctx.exception.message, "custom failure")
+
+
+class TestTabIndentation(unittest.TestCase):
+    def test_tab_advances_to_next_tab_stop(self):
+        # "  \t" is 4 columns per CommonMark (tab from column 2 advances
+        # to column 4), the same indent as four spaces.
+        cs = parse("- a\n    - b\n  \t- c")
+        self.assertEqual([b["depth"] for b in cs["blocks"]], [0, 1, 1])
+
+    def test_lone_tab_is_one_tab_stop(self):
+        cs = parse("- a\n\t- b")
+        self.assertEqual([b["depth"] for b in cs["blocks"]], [0, 1])
