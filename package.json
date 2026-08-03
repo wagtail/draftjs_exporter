@@ -5,7 +5,7 @@
   "description": "Library to convert rich text from Draft.js raw ContentState to HTML",
   "license": "MIT",
   "devDependencies": {
-    "prettier": "3.9.4"
+    "prettier": "3.9.5"
   },
   "scripts": {
     "lint": "prettier --check '**/?(.)*.{md,css,scss,js,json,jsonc,yaml,yml,html}'",
