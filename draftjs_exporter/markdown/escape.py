@@ -81,3 +81,76 @@ def _escape_line(line: str, at_line_start: bool) -> str:
         else:
             line = ORDERED_LIST_MARKER.sub(r"\1\\\2", line)
     return line
+
+
+def escape_link_destination(url: str) -> str:
+    """Escape a URL for use as an inline link destination inside ``](…)``.
+
+    Backslash-escapes backslashes and parentheses (which would otherwise
+    break out of the destination), and percent-encodes ASCII whitespace and
+    control characters, which inline destinations may not contain. URL
+    scheme validation is out of scope: it is the integrator's
+    responsibility (see ``docs/SECURITY.md``).
+
+    Parameters:
+        url: The URL to escape.
+
+    Returns:
+        The escaped destination.
+    """
+    escaped = url.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+    return "".join(
+        char if char > " " and char != "\x7f" else f"%{ord(char):02X}"
+        for char in escaped
+    )
+
+
+def longest_run(text: str, char: str) -> int:
+    """Compute the length of the longest run of a character in a string.
+
+    Parameters:
+        text: The string to scan.
+        char: The single character to count runs of.
+
+    Returns:
+        The longest run length, or ``0`` if the character is absent.
+    """
+    best = current = 0
+    for c in text:
+        current = current + 1 if c == char else 0
+        best = max(best, current)
+    return best
+
+
+def code_span_delimiters(content: str) -> tuple[str, str]:
+    """Compute opening and closing delimiters for an inline code span.
+
+    The delimiter is one backtick longer than the longest backtick run in
+    the content. When the content starts or ends with a backtick, a space
+    is added inside the delimiters, per CommonMark.
+
+    Parameters:
+        content: The raw code span content.
+
+    Returns:
+        A tuple of ``(opening, closing)`` delimiter strings.
+    """
+    ticks = "`" * max(1, longest_run(content, "`") + 1)
+    pad = " " if content.startswith("`") or content.endswith("`") else ""
+    return ticks + pad, pad + ticks
+
+
+def code_block_fence(content: str, fence_char: str) -> str:
+    """Compute a code fence that cannot be broken by the content.
+
+    The fence is one character longer than the longest run of the fence
+    character in the content, and at least three characters long.
+
+    Parameters:
+        content: The raw code block content.
+        fence_char: The fence character (backtick or tilde).
+
+    Returns:
+        The fence string.
+    """
+    return fence_char * max(3, longest_run(content, fence_char) + 1)
