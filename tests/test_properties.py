@@ -16,17 +16,20 @@ ty doesn't yet model the ParamSpec signature rewrite that `@st.composite` applie
 so it thinks `content_states()` is missing arguments. mypy understands this via type stubs.
 """
 
+import re
 import unittest
 from urllib.parse import unquote
 
 from bs4 import BeautifulSoup
 from hypothesis import example, given, settings
+from hypothesis import strategies as st
 
 from draftjs_exporter.constants import ENTITY_TYPES
 from draftjs_exporter.defaults import BLOCK_MAP, STYLE_MAP
 from draftjs_exporter.dom import DOM
 from draftjs_exporter.html import HTML, ExporterConfig
 from draftjs_exporter.markdown import CONFIG as MARKDOWN_CONFIG
+from draftjs_exporter.markdown.escape import escape_text
 from tests.strategies import content_states, dangerous_content_states
 from tests.test_entities import link
 
@@ -166,3 +169,29 @@ class TestRenderEscapingInvariants(unittest.TestCase):
                 self.assertEqual(links[0].get_text(), text)
             else:
                 self.assertEqual(parsed.get_text(), text)
+
+
+class TestMarkdownEscapingInvariants(unittest.TestCase):
+    """Invariants of Markdown escaping of user-controlled text."""
+
+    @given(st.text())
+    def test_escape_text_never_raises(self, text):
+        escape_text(text, at_line_start=True)
+        escape_text(text, at_line_start=False)
+
+    @given(st.text())
+    def test_no_unescaped_angle_bracket_or_ampersand(self, text):
+        escaped = escape_text(text, at_line_start=True)
+        self.assertIsNone(re.search(r"(?<!\\)<", escaped))
+        self.assertIsNone(re.search(r"(?<!\\)&", escaped))
+
+    @given(st.sampled_from("#-+>=|~").map(lambda c: c + "x"))
+    def test_line_start_char_always_escaped(self, text):
+        self.assertTrue(escape_text(text, at_line_start=True).startswith("\\"))
+
+    @given(st.from_regex(r"\d{1,9}[.)]x", fullmatch=True))
+    def test_ordered_list_marker_always_escaped(self, text):
+        m = re.match(r"(\d{1,9})([.)])", text)
+        assert m is not None
+        escaped = escape_text(text, at_line_start=True)
+        self.assertTrue(escaped.startswith(f"{m.group(1)}\\{m.group(2)}"))
