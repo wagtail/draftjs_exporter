@@ -1,26 +1,22 @@
 """Markdown code block components and fenced code builders."""
 
 from draftjs_exporter.dom import DOM
-from draftjs_exporter.markdown.lists import get_li_suffix
+from draftjs_exporter.markdown.helpers import mark_safe
 from draftjs_exporter.types import Component, Element, Props
 
 
-def make_code_element(fence: str) -> Component:
-    """Create a code-block element component using the given fence.
+def make_code_element() -> Component:
+    """Create a code-block line component.
 
-    Parameters:
-        fence: The delimiter to use at the closing of the code block.
+    Each Draft.js code block contributes one line to the shared code_block
+    node created by the wrapper.
 
     Returns:
-        A component that renders the contents and closing fence of a code block.
+        A component that renders one line of code block content.
     """
 
     def element(props: Props) -> Element:
-        suffix = get_li_suffix(props)
-        block_end = f"\n{fence}" if suffix == "\n\n" else ""
-        return DOM.create_element(
-            "fragment", {}, [props["children"], block_end, suffix]
-        )
+        return DOM.create_element("fragment", {}, [props["children"], mark_safe("\n")])
 
     return element
 
@@ -29,14 +25,15 @@ def make_code_wrapper(fence: str) -> Component:
     """Create a code-block wrapper component using the given fence.
 
     Parameters:
-        fence: The delimiter to place at the start of the code block.
+        fence: The fence delimiter; its first character sizes the rendered
+            fence (`` ``` `` or ``~~~``).
 
     Returns:
-        A component that renders only the opening fence.
+        A component that creates the code_block node holding all lines.
     """
-    prefix = f"{fence}\n"
-    return lambda props: DOM.create_element("fragment", {}, [prefix])
+    fence_char = fence[0]
+    return lambda props: DOM.create_element("code_block", {"fence": fence_char})
 
 
-code_element: Component = make_code_element("```")
+code_element: Component = make_code_element()
 code_wrapper: Component = make_code_wrapper("```")
