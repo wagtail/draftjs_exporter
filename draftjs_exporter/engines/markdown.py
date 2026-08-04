@@ -136,8 +136,8 @@ class DOMMarkdown(DOMEngine):
         Structural syntax wrapped in ``mark_safe`` elements renders verbatim.
         Line-start-sensitive characters are escaped when a string begins a
         line: at the start of the children list, when the output so far ends
-        with a newline, or right after a ``mark_safe`` element created with
-        ``block_prefix``.
+        with a newline or carriage return, or right after a ``mark_safe``
+        element created with ``block_prefix``.
 
         Parameters:
             children: A list of strings and elements to render.
@@ -158,11 +158,11 @@ class DOMMarkdown(DOMEngine):
                 ):
                     at_line_start = True
                 elif rendered:
-                    at_line_start = rendered.endswith("\n")
+                    at_line_start = rendered.endswith(("\n", "\r"))
             else:
                 out.append(escape_text(c, at_line_start))
                 if c:
-                    at_line_start = c.endswith("\n")
+                    at_line_start = c.endswith(("\n", "\r"))
         return "".join(out)
 
     @staticmethod

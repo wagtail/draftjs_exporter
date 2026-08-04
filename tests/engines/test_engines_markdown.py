@@ -184,6 +184,21 @@ class TestRenderChildrenEscaping(unittest.TestCase):
     def test_embedded_newline_in_text(self):
         self.assertEqual(M.render_children(["a\n- b"]), "a\n\\- b")
 
+    def test_embedded_carriage_return_in_text(self):
+        self.assertEqual(M.render_children(["a\r# b"]), "a\r\\# b")
+
+    def test_line_start_after_text_ending_carriage_return(self):
+        frag = M.create_tag("fragment")
+        M.append_child(frag, "a\r")
+        M.append_child(frag, "# b")
+        self.assertEqual(M.render(frag), "a\r\\# b")
+
+    def test_line_start_after_element_ending_carriage_return(self):
+        frag = M.create_tag("fragment")
+        M.append_child(frag, M.create_tag("mark_safe", {"markup": "intro\r"}))
+        M.append_child(frag, "# b")
+        self.assertEqual(M.render(frag), "intro\r\\# b")
+
     def test_html_element_children_escaped(self):
         elt = M.create_tag("sup")
         M.append_child(elt, "a<b")

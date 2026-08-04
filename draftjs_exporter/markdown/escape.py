@@ -43,32 +43,46 @@ LINE_START_ESCAPES: dict[str, str] = {
 ORDERED_LIST_MARKER = re.compile(r"^(\d{1,9})([.)])")
 """Matches an ordered list marker at the start of a line."""
 
+# CommonMark line endings: LF, CRLF, and lone CR. The capture group keeps
+# the separators in re.split output so the original endings are preserved.
+LINE_ENDING = re.compile(r"(\r\n|\r|\n)")
+"""Matches a single CommonMark line ending (``\\r\\n``, ``\\r``, or ``\\n``)."""
+
 
 def escape_text(text: str, at_line_start: bool = False) -> str:
-    """Escape Markdown metacharacters in user-controlled text.
+    r"""Escape Markdown metacharacters in user-controlled text.
 
     Applies CommonMark backslash escapes. Line-start-sensitive characters
     are only escaped at the start of a line: when ``at_line_start`` is true
-    for the first line, and after every embedded newline.
+    for the first line, and after every embedded line ending. All
+    CommonMark line endings (``\n``, ``\r\n``, and lone ``\r``) count as
+    line starts, and the original endings are preserved in the output.
 
     Parameters:
-        text: The user-controlled text to escape. May contain newlines.
+        text: The user-controlled text to escape. May contain line endings.
         at_line_start: Whether the first character of ``text`` begins a line.
 
     Returns:
         The escaped text, safe to emit into Markdown output.
     """
-    lines = text.split("\n")
-    return "\n".join(
-        _escape_line(line, at_line_start or i > 0) for i, line in enumerate(lines)
-    )
+    segments = LINE_ENDING.split(text)
+    # re.split with a capture group keeps the separators at odd indices;
+    # only the text segments at even indices are escaped.
+    for i in range(0, len(segments), 2):
+        segments[i] = _escape_line(segments[i], at_line_start or i > 0)
+    return "".join(segments)
 
 
 def _escape_line(line: str, at_line_start: bool) -> str:
     """Escape a single line of text.
 
+    Line-start rules apply after any leading run of spaces: CommonMark
+    allows block constructs to be indented, so ``"  # x"`` is just as
+    dangerous as ``"# x"``. Tabs are not stripped: a leading tab already
+    makes an indented code block, where escaping is unnecessary.
+
     Parameters:
-        line: One line of user text, without newline characters.
+        line: One line of user text, without line ending characters.
         at_line_start: Whether the line is at the start of a rendered line.
 
     Returns:
@@ -76,10 +90,13 @@ def _escape_line(line: str, at_line_start: bool) -> str:
     """
     line = line.translate(ANYWHERE_ESCAPES)
     if at_line_start:
-        if line[:1] in LINE_START_ESCAPES:
-            line = LINE_START_ESCAPES[line[0]] + line[1:]
+        content = line.lstrip(" ")
+        indent = line[: len(line) - len(content)]
+        if content[:1] in LINE_START_ESCAPES:
+            content = LINE_START_ESCAPES[content[0]] + content[1:]
         else:
-            line = ORDERED_LIST_MARKER.sub(r"\1\\\2", line)
+            content = ORDERED_LIST_MARKER.sub(r"\1\\\2", content)
+        line = indent + content
     return line
 
 

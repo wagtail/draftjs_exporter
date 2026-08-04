@@ -110,6 +110,36 @@ class TestMarkdownEscaping(unittest.TestCase):
     def test_soft_break_line_start(self):
         self.assertEqual(self.render("a\n# b"), "a\n\\# b\n\n")
 
+    def test_carriage_return_line_start(self):
+        self.assertEqual(self.render("a\r# b"), "a\r\\# b\n\n")
+
+    def test_crlf_line_start(self):
+        self.assertEqual(self.render("a\r\n- b"), "a\r\n\\- b\n\n")
+
+    def test_heading_like_text_after_spaces(self):
+        self.assertEqual(self.render("   # heading"), "   \\# heading\n\n")
+
+    def test_unordered_list_like_text_after_spaces(self):
+        self.assertEqual(self.render("  - item"), "  \\- item\n\n")
+
+    def test_blockquote_like_text_after_spaces(self):
+        self.assertEqual(self.render(" > quote"), " \\> quote\n\n")
+
+    def test_ordered_list_like_text_after_spaces(self):
+        self.assertEqual(self.render("  1. item"), "  1\\. item\n\n")
+
+    def test_setext_underline_like_text_after_spaces(self):
+        self.assertEqual(self.render("a\n ---"), "a\n \\---\n\n")
+
+    def test_code_fence_like_text_after_spaces(self):
+        self.assertEqual(self.render("   ~~~"), "   \\~~~\n\n")
+
+    def test_spaces_after_blockquote_marker(self):
+        self.assertEqual(
+            self.render("  # x", type_="blockquote"),
+            ">   \\# x\n\n",
+        )
+
     def test_line_start_in_list_item(self):
         self.assertEqual(
             self.render("# x", type_="unordered-list-item"),
