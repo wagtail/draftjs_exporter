@@ -229,7 +229,7 @@ def test_custom_block_fallback():
 
     config = build_markdown_config({"block_fallback": custom_block})
     result = HTML(config).render(UNKNOWN_BLOCK_CONTENT)
-    assert result == "[UNKNOWN] text\n\n"
+    assert result == "\\[UNKNOWN\\] text\n\n"
 
 
 def test_custom_entity_fallback():

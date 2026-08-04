@@ -3,7 +3,11 @@
 from html import escape
 
 from draftjs_exporter.engines.base import Attr, DOMEngine
-from draftjs_exporter.markdown.escape import code_block_fence, code_span_delimiters
+from draftjs_exporter.markdown.escape import (
+    code_block_fence,
+    code_span_delimiters,
+    escape_text,
+)
 from draftjs_exporter.types import HTML, Tag
 
 # http://w3c.github.io/html/single-page.html#void-elements
@@ -126,17 +130,40 @@ class DOMMarkdown(DOMEngine):
 
     @staticmethod
     def render_children(children: list[HTML | Elt]) -> HTML:
-        """Render a list of children to a string without escaping text.
+        """Render a list of children, escaping plain strings as user text.
+
+        A plain ``str`` child is always user-controlled text and is escaped.
+        Structural syntax wrapped in ``mark_safe`` elements renders verbatim.
+        Line-start-sensitive characters are escaped when a string begins a
+        line: at the start of the children list, when the output so far ends
+        with a newline, or right after a ``mark_safe`` element created with
+        ``block_prefix``.
 
         Parameters:
             children: A list of strings and elements to render.
 
         Returns:
-            The concatenated child content.
+            The rendered children.
         """
-        return "".join(
-            [DOMMarkdown.render(c) if isinstance(c, Elt) else c for c in children]
-        )
+        out: list[str] = []
+        at_line_start = True
+        for c in children:
+            if isinstance(c, Elt):
+                rendered = DOMMarkdown.render(c)
+                out.append(rendered)
+                if (
+                    c.type == "mark_safe"
+                    and c.attr
+                    and c.attr.get("block_prefix") == "true"
+                ):
+                    at_line_start = True
+                elif rendered:
+                    at_line_start = rendered.endswith("\n")
+            else:
+                out.append(escape_text(c, at_line_start))
+                if c:
+                    at_line_start = c.endswith("\n")
+        return "".join(out)
 
     @staticmethod
     def flatten_text(children: list["str | Elt"]) -> str:

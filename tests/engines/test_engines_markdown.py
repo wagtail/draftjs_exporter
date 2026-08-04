@@ -69,11 +69,11 @@ class TestDOMMarkdown(unittest.TestCase):
             'render children<p class="intro"></p>test test',
         )
 
-    def test_render_children_no_escaping(self):
-        """Unlike DOMString, the Markdown engine does not escape text content."""
+    def test_render_children_escapes_text(self):
+        """Plain string children are user text and are escaped."""
         self.assertEqual(
             M.render_children(["<strong>not escaped</strong>"]),
-            "<strong>not escaped</strong>",
+            "\\<strong>not escaped\\</strong>",
         )
 
     def test_render(self):
@@ -136,3 +136,62 @@ class TestCodeBlockNode(unittest.TestCase):
     def test_empty_content(self):
         elt = M.create_tag("code_block", {"fence": "`"})
         self.assertEqual(M.render(elt), "```\n```\n\n")
+
+
+class TestRenderChildrenEscaping(unittest.TestCase):
+    def test_metacharacters_escaped(self):
+        self.assertEqual(
+            M.render_children(["*a* _b_ [c] `d` &e"]),
+            "\\*a\\* \\_b\\_ \\[c\\] \\`d\\` \\&e",
+        )
+
+    def test_first_string_is_line_start(self):
+        self.assertEqual(M.render_children(["# not a heading"]), "\\# not a heading")
+
+    def test_line_start_after_newline(self):
+        frag = M.create_tag("fragment")
+        M.append_child(frag, M.create_tag("mark_safe", {"markup": "intro\n"}))
+        M.append_child(frag, "# b")
+        self.assertEqual(M.render(frag), "intro\n\\# b")
+
+    def test_no_line_start_mid_line(self):
+        frag = M.create_tag("fragment")
+        M.append_child(frag, M.create_tag("mark_safe", {"markup": "# "}))
+        M.append_child(frag, "#tag")
+        self.assertEqual(M.render(frag), "# #tag")
+
+    def test_line_start_after_block_prefix(self):
+        frag = M.create_tag("fragment")
+        M.append_child(
+            frag, M.create_tag("mark_safe", {"markup": "- ", "block_prefix": "true"})
+        )
+        M.append_child(frag, "# not a heading")
+        self.assertEqual(M.render(frag), "- \\# not a heading")
+
+    def test_no_line_start_after_plain_mark_safe(self):
+        frag = M.create_tag("fragment")
+        M.append_child(frag, M.create_tag("mark_safe", {"markup": "**"}))
+        M.append_child(frag, "#bold")
+        self.assertEqual(M.render(frag), "**#bold")
+
+    def test_mark_safe_verbatim_among_text(self):
+        frag = M.create_tag("fragment")
+        M.append_child(frag, "a")
+        M.append_child(frag, M.create_tag("mark_safe", {"markup": "**"}))
+        M.append_child(frag, "b")
+        self.assertEqual(M.render(frag), "a**b")
+
+    def test_embedded_newline_in_text(self):
+        self.assertEqual(M.render_children(["a\n- b"]), "a\n\\- b")
+
+    def test_html_element_children_escaped(self):
+        elt = M.create_tag("sup")
+        M.append_child(elt, "a<b")
+        self.assertEqual(M.render(elt), "<sup>a\\<b</sup>")
+
+    def test_line_start_tracking_across_element(self):
+        frag = M.create_tag("fragment")
+        M.append_child(frag, M.create_tag("sup"))
+        M.append_child(frag, "# x")
+        # <sup></sup> does not end with a newline: mid-line, no escape.
+        self.assertEqual(M.render(frag), "<sup></sup># x")
