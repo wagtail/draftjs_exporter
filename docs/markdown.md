@@ -108,7 +108,7 @@ from draftjs_exporter import BLOCK_MAP as HTML_BLOCK_MAP, BLOCK_TYPES, ENTITY_TY
 from draftjs_exporter.markdown.blocks import list_wrapper, make_ul, ol, prefixed_block
 from draftjs_exporter.markdown.code import code_element, code_wrapper
 from draftjs_exporter.markdown.entities import image, link, make_horizontal_rule
-from draftjs_exporter.markdown.styles import inline_style
+from draftjs_exporter.markdown.styles import code_span, inline_style
 
 config = {
     "engine": "draftjs_exporter.engines.markdown.DOMMarkdown",
@@ -125,7 +125,7 @@ config = {
             "element": ol,
             "wrapper": list_wrapper,
         },
-        BLOCK_TYPES.BLOCKQUOTE: prefixed_block("> "),
+        BLOCK_TYPES.BLOCKQUOTE: prefixed_block("> ", block_prefix=True),
         BLOCK_TYPES.CODE: {
             "element": code_element,
             "wrapper": code_wrapper,
@@ -135,7 +135,7 @@ config = {
         HTML_STYLE_MAP,
         **{
             INLINE_STYLES.BOLD: inline_style("__"),
-            INLINE_STYLES.CODE: inline_style("`"),
+            INLINE_STYLES.CODE: code_span,
             INLINE_STYLES.ITALIC: inline_style("*"),
             INLINE_STYLES.STRIKETHROUGH: inline_style("~~"),
         },
@@ -156,6 +156,59 @@ The Markdown exporter escapes user-controlled text so it renders literally rathe
 - At the start of a line: `#`, `-`, `+`, `>`, `=`, `|`, `~`, and ordered list markers like `1.` (rendered as `1\.`). "Start of a line" means the start of a block, after any line ending (`\n`, `\r\n`, or a lone `\r`), or after a list/blockquote marker. The line-start rules also apply after any leading run of spaces, since CommonMark allows block constructs to be indented.
 - Link and image URLs inside `](…)` get destination-specific escaping: `\`, `(`, `)` are backslash-escaped and whitespace/control characters are percent-encoded. URL scheme validation (`javascript:` etc.) remains the integrating application's responsibility.
 - Code spans and code blocks are never escaped. Instead, the exporter sizes the delimiters to the content: a code span containing a backtick is wrapped in double backticks, and a code block containing a fence gets a fence one character longer.
+
+For example, block text that looks like Markdown syntax renders literally:
+
+```python
+from draftjs_exporter import HTML, MARKDOWN_CONFIG
+
+exporter = HTML(MARKDOWN_CONFIG)
+exporter.render({
+    "entityMap": {},
+    "blocks": [{
+        "key": "6m5fh",
+        "text": "# Not a heading, *not emphasis*, <b>not HTML</b>, &copy;",
+        "type": "unstyled",
+        "depth": 0,
+        "inlineStyleRanges": [],
+        "entityRanges": [],
+    }],
+})
+# "\\# Not a heading, \\*not emphasis\\*, \\<b>not HTML\\</b>, \\&copy;\n\n"
+```
+
+### Escaping in custom components
+
+When you write custom Markdown components, any plain strings they emit are escaped as user text. Wrap structural syntax with `mark_safe` so it renders verbatim, and route URLs through `link_destination`:
+
+```python
+from draftjs_exporter import DOM, Element, Props
+from draftjs_exporter.markdown.helpers import link_destination, mark_safe
+
+
+def mention(props: Props) -> Element:
+    """Render a mention entity as a Markdown link to a profile."""
+    return DOM.create_element(
+        "fragment",
+        {},
+        [
+            mark_safe("[@"),
+            props["children"],  # Plain text, escaped automatically.
+            mark_safe("]("),
+            link_destination(props["url"]),  # Escaped for ](…) destinations.
+            mark_safe(")"),
+        ],
+    )
+```
+
+Use `mark_safe(markup, block_prefix=True)` for prefixes after which nested blocks can start (list markers, blockquote `> `), so text following them still gets line-start escaping. The escaping functions are also available directly for lower-level needs:
+
+```python
+from draftjs_exporter.markdown.escape import escape_link_destination, escape_text
+
+escape_text("# Not a heading", at_line_start=True)  # "\\# Not a heading"
+escape_link_destination("https://example.com/a(b)")  # "https://example.com/a\\(b\\)"
+```
 
 Limitations:
 
