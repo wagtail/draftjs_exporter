@@ -3,6 +3,7 @@
 from html import escape
 
 from draftjs_exporter.engines.base import Attr, DOMEngine
+from draftjs_exporter.markdown.escape import code_block_fence, code_span_delimiters
 from draftjs_exporter.types import HTML, Tag
 
 # http://w3c.github.io/html/single-page.html#void-elements
@@ -28,7 +29,9 @@ VOID_ELEMENTS = (
 class Elt:
     """A DOM element that the Markdown engine manipulates.
 
-    Identical to the string engine's Elt, but rendering does not escape text.
+    Identical to the string engine's Elt, with extra Markdown-specific node
+    types: ``mark_safe`` (structural syntax rendered verbatim), ``code_span``
+    and ``code_block`` (content rendered unescaped with sized delimiters).
     """
 
     __slots__ = ("type", "attr", "children", "markup")
@@ -60,7 +63,12 @@ class Elt:
 
 
 class DOMMarkdown(DOMEngine):
-    """String concatenation implementation of the DOM API for Markdown output."""
+    """String concatenation implementation of the DOM API for Markdown output.
+
+    Invariant: a plain ``str`` child in the tree is always user-controlled
+    text. Structural Markdown syntax must be wrapped in ``mark_safe``
+    elements by components, or it will be escaped as text.
+    """
 
     @staticmethod
     def create_tag(type_: Tag, attr: Attr | None = None) -> Elt:
@@ -131,6 +139,32 @@ class DOMMarkdown(DOMEngine):
         )
 
     @staticmethod
+    def flatten_text(children: list["str | Elt"]) -> str:
+        """Flatten children to raw text, discarding element structure.
+
+        ``mark_safe`` and ``escaped_html`` markup is included verbatim;
+        other elements contribute only their text content.
+
+        Parameters:
+            children: A list of strings and elements.
+
+        Returns:
+            The concatenated raw text.
+        """
+        parts = []
+        for c in children:
+            if isinstance(c, Elt):
+                if c.type == "mark_safe":
+                    parts.append(c.attr["markup"] if c.attr else "")
+                elif c.markup:
+                    parts.append(c.markup)
+                else:
+                    parts.append(DOMMarkdown.flatten_text(c.children))
+            else:
+                parts.append(c)
+        return "".join(parts)
+
+    @staticmethod
     def render(elt: Elt) -> HTML:
         """Render the given element and its children to HTML.
 
@@ -150,8 +184,19 @@ class DOMMarkdown(DOMEngine):
         match type_:
             case "fragment":
                 return children
+            case "mark_safe":
+                return elt.attr["markup"] if elt.attr else ""
             case "escaped_html":
                 return elt.markup
+            case "code_span":
+                content = DOMMarkdown.flatten_text(elt.children)
+                opening, closing = code_span_delimiters(content)
+                return f"{opening}{content}{closing}"
+            case "code_block":
+                content = DOMMarkdown.flatten_text(elt.children)
+                fence_char = (elt.attr or {}).get("fence", "`")
+                fence = code_block_fence(content, fence_char)
+                return f"{fence}\n{content}{fence}\n\n"
             case _ if type_ in VOID_ELEMENTS:
                 return f"<{type_}{attr}/>"
             case _:
