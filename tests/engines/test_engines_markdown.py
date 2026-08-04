@@ -106,6 +106,12 @@ class TestCodeSpanNode(unittest.TestCase):
         M.append_child(elt, "a*b`c")
         self.assertEqual(M.render(elt), "``a*b`c``")
 
+    def test_escaped_html_markup_included_verbatim(self):
+        elt = M.create_tag("code_span")
+        M.append_child(elt, "a")
+        M.append_child(elt, M.parse_html("<b>"))
+        self.assertEqual(M.render(elt), "`a<b>`")
+
     def test_plain_content(self):
         elt = M.create_tag("code_span")
         M.append_child(elt, "foo")
