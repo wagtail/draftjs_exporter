@@ -95,8 +95,8 @@ class TestMarkdownEscaping(unittest.TestCase):
             "\\<script>alert(1)\\</script>\n\n",
         )
 
-    def test_entity_reference(self):
-        self.assertEqual(self.render("&copy;"), "\\&copy;\n\n")
+    def test_entity_reference_not_escaped(self):
+        self.assertEqual(self.render("&copy;"), "&copy;\n\n")
 
     def test_link_syntax_in_prose(self):
         self.assertEqual(
@@ -221,7 +221,7 @@ class TestMarkdownEscaping(unittest.TestCase):
     def test_link_text_escaped(self):
         self.assertEqual(
             self.render(
-                "a&b",
+                "a[b",
                 entity_ranges=[{"offset": 0, "length": 3, "key": 0}],
                 entity_map={
                     "0": {
@@ -231,7 +231,7 @@ class TestMarkdownEscaping(unittest.TestCase):
                     }
                 },
             ),
-            "[a\\&b](https://example.com/)\n\n",
+            "[a\\[b](https://example.com/)\n\n",
         )
 
     def test_image_alt_bracket_escaped(self):

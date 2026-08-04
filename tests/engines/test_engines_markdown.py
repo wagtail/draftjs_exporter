@@ -148,7 +148,7 @@ class TestRenderChildrenEscaping(unittest.TestCase):
     def test_metacharacters_escaped(self):
         self.assertEqual(
             M.render_children(["*a* _b_ [c] `d` &e"]),
-            "\\*a\\* \\_b\\_ \\[c\\] \\`d\\` \\&e",
+            "\\*a\\* \\_b\\_ \\[c\\] \\`d\\` &e",
         )
 
     def test_first_string_is_line_start(self):

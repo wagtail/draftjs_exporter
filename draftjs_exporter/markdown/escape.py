@@ -20,7 +20,6 @@ ANYWHERE_ESCAPES: dict[int, str] = str.maketrans(
         "[": "\\[",
         "]": "\\]",
         "<": "\\<",
-        "&": "\\&",
     }
 )
 """Characters that must be escaped everywhere, including mid-line."""

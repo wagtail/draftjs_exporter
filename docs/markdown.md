@@ -152,7 +152,7 @@ config = {
 
 The Markdown exporter escapes user-controlled text so it renders literally rather than as Markdown syntax, following CommonMark backslash-escape rules. This is always on; there is no configuration option.
 
-- Anywhere in text: `\`, `` ` ``, `*`, `_`, `[`, `]`, `<`, `&`.
+- Anywhere in text: `\`, `` ` ``, `*`, `_`, `[`, `]`, `<`.
 - At the start of a line: `#`, `-`, `+`, `>`, `=`, `|`, `~`, and ordered list markers like `1.` (rendered as `1\.`). "Start of a line" means the start of a block, after any line ending (`\n`, `\r\n`, or a lone `\r`), or after a list/blockquote marker. The line-start rules also apply after any leading run of spaces, since CommonMark allows block constructs to be indented.
 - Link and image URLs inside `](…)` get destination-specific escaping: `\`, `(`, `)` are backslash-escaped and whitespace/control characters are percent-encoded. URL scheme validation (`javascript:` etc.) remains the integrating application's responsibility.
 - Code spans and code blocks are never escaped. Instead, the exporter sizes the delimiters to the content: a code span containing a backtick is wrapped in double backticks, and a code block containing a fence gets a fence one character longer.
@@ -174,7 +174,7 @@ exporter.render({
         "entityRanges": [],
     }],
 })
-# "\\# Not a heading, \\*not emphasis\\*, \\<b>not HTML\\</b>, \\&copy;\n\n"
+# "\\# Not a heading, \\*not emphasis\\*, \\<b>not HTML\\</b>, &copy;\n\n"
 ```
 
 ### Escaping in custom components
@@ -212,6 +212,7 @@ escape_link_destination("https://example.com/a(b)")  # "https://example.com/a\\(
 
 Limitations:
 
+- Entity references (`&copy;`, `&#60;`) are not escaped: they decode to their character downstream rather than rendering literally. They cannot inject markup, so this is a fidelity trade-off, not a security issue.
 - Text starting with four or more spaces or a tab may render as an indented code block downstream. Backslash escapes cannot protect leading whitespace.
 - GFM-only syntax other than tables (`|`) is not escaped — for example autolinkable bare URLs remain autolinkable.
 

@@ -26,8 +26,9 @@ class TestEscapeTextAnywhere(unittest.TestCase):
     def test_angle_bracket(self):
         self.assertEqual(escape_text("<script>"), "\\<script>")
 
-    def test_ampersand(self):
-        self.assertEqual(escape_text("&copy;"), "\\&copy;")
+    def test_ampersand_not_escaped(self):
+        # Entity references decode downstream but cannot inject markup.
+        self.assertEqual(escape_text("&copy;"), "&copy;")
 
     def test_parentheses_not_escaped(self):
         self.assertEqual(escape_text("(hi)"), "(hi)")
