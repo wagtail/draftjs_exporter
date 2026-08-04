@@ -211,7 +211,7 @@ Here are some features worth highlighting:
 
 - Convert line breaks to `<br>`
 elements.
-- Automatic conversion of entity data to HTML attributes (int \& boolean to string, [`style object` to `style string`](https://facebook.github.io/react/docs/jsx-in-depth.html)).
+- Automatic conversion of entity data to HTML attributes (int & boolean to string, [`style object` to `style string`](https://facebook.github.io/react/docs/jsx-in-depth.html)).
 - Wrapped blocks (`<li>` elements go inside `<ul>` or `<ol>`).
   - With arbitrary nesting.
     - Common text styles: **Bold**, _Italic_, <u>Underline</u>, `Monospace`, ~Strikethrough.~ cmd + b
@@ -249,7 +249,7 @@ Discarded block but the content stays.<div>Render as <span class="missing-entity
 ## Markdown escaping
 
 ```markdown
-\# Not a heading, \*not emphasis\*, \<b>not HTML\</b>, \&copy;
+\# Not a heading, \*not emphasis\*, \<b>not HTML\</b>
 
 1\. Not a list item
 

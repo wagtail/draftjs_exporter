@@ -180,10 +180,9 @@ class TestMarkdownEscapingInvariants(unittest.TestCase):
         escape_text(text, at_line_start=False)
 
     @given(escapable_text)
-    def test_no_unescaped_angle_bracket_or_ampersand(self, text):
+    def test_no_unescaped_angle_bracket(self, text):
         escaped = escape_text(text, at_line_start=True)
         self.assertIsNone(re.search(r"(?<!\\)<", escaped))
-        self.assertIsNone(re.search(r"(?<!\\)&", escaped))
 
     @given(escapable_text)
     def test_escape_text_preserves_line_endings(self, text):

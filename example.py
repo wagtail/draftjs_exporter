@@ -321,7 +321,7 @@ if __name__ == "__main__":
         "blocks": [
             {
                 "key": "esc01",
-                "text": "# Not a heading, *not emphasis*, <b>not HTML</b>, &copy;",
+                "text": "# Not a heading, *not emphasis*, <b>not HTML</b>",
                 "type": "unstyled",
                 "depth": 0,
                 "inlineStyleRanges": [],
