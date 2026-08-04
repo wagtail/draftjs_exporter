@@ -16,13 +16,16 @@ ANYWHERE_ESCAPES: dict[int, str] = str.maketrans(
         "\\": "\\\\",
         "`": "\\`",
         "*": "\\*",
-        "_": "\\_",
         "[": "\\[",
         "]": "\\]",
         "<": "\\<",
     }
 )
-"""Characters that must be escaped everywhere, including mid-line."""
+"""Characters that must be escaped everywhere, including mid-line.
+
+Underscores are deliberately absent: they are handled by
+``_escape_underscores``, which only escapes runs that could form emphasis.
+"""
 
 # Characters escaped only at the start of a line, where they would open a
 # block-level construct. None of these are in ANYWHERE_ESCAPES, so applying
@@ -41,6 +44,14 @@ LINE_START_ESCAPES: dict[str, str] = {
 # Ordered list markers: 1-9 digits followed by "." or ")" (CommonMark limit).
 ORDERED_LIST_MARKER = re.compile(r"^(\d{1,9})([.)])")
 """Matches an ordered list marker at the start of a line."""
+
+# Underscore runs are escaped only when they could form emphasis.
+# CommonMark's flanking rules make a run inert when both adjacent
+# characters are alphanumeric, so intraword runs like snake_case pass
+# through unescaped. Everywhere else, escaping is conservative: some
+# inert runs (e.g. between spaces) are escaped harmlessly.
+UNDERSCORE_RUN = re.compile(r"_+")
+"""Matches a run of underscores."""
 
 # CommonMark line endings: LF, CRLF, and lone CR. The capture group keeps
 # the separators in re.split output so the original endings are preserved.
@@ -88,6 +99,7 @@ def _escape_line(line: str, at_line_start: bool) -> str:
         The escaped line.
     """
     line = line.translate(ANYWHERE_ESCAPES)
+    line = _escape_underscores(line)
     if at_line_start:
         content = line.lstrip(" ")
         indent = line[: len(line) - len(content)]
@@ -97,6 +109,31 @@ def _escape_line(line: str, at_line_start: bool) -> str:
             content = ORDERED_LIST_MARKER.sub(r"\1\\\2", content)
         line = indent + content
     return line
+
+
+def _escape_underscores(line: str) -> str:
+    """Escape underscore runs that could form emphasis.
+
+    A run is left unescaped only when both adjacent characters are
+    alphanumeric, where CommonMark's flanking rules guarantee it can
+    neither open nor close emphasis.
+
+    Parameters:
+        line: The line to process, with other escapes already applied.
+
+    Returns:
+        The line with escapable underscore runs backslash-escaped.
+    """
+
+    def replace(match: re.Match[str]) -> str:
+        run = match.group(0)
+        before = line[match.start() - 1] if match.start() > 0 else ""
+        after = line[match.end()] if match.end() < len(line) else ""
+        if before.isalnum() and after.isalnum():
+            return run
+        return "\\_" * len(run)
+
+    return UNDERSCORE_RUN.sub(replace, line)
 
 
 def escape_link_destination(url: str) -> str:

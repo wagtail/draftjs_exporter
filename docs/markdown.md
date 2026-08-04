@@ -152,7 +152,7 @@ config = {
 
 The Markdown exporter escapes user-controlled text so it renders literally rather than as Markdown syntax, following CommonMark backslash-escape rules. This is always on; there is no configuration option.
 
-- Anywhere in text: `\`, `` ` ``, `*`, `_`, `[`, `]`, `<`.
+- Anywhere in text: `\`, `` ` ``, `*`, `[`, `]`, `<`, plus `_` where it could form emphasis. Intraword underscore runs (as in `snake_case`) are left unescaped — CommonMark's flanking rules guarantee they are inert.
 - At the start of a line: `#`, `-`, `+`, `>`, `=`, `|`, `~`, and ordered list markers like `1.` (rendered as `1\.`). "Start of a line" means the start of a block, after any line ending (`\n`, `\r\n`, or a lone `\r`), or after a list/blockquote marker. The line-start rules also apply after any leading run of spaces, since CommonMark allows block constructs to be indented.
 - Link and image URLs inside `](…)` get destination-specific escaping: `\`, `(`, `)` are backslash-escaped and whitespace/control characters are percent-encoded. URL scheme validation (`javascript:` etc.) remains the integrating application's responsibility.
 - Code spans and code blocks are never escaped. Instead, the exporter sizes the delimiters to the content: a code span containing a backtick is wrapped in double backticks, and a code block containing a fence gets a fence one character longer.
