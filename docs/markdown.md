@@ -148,6 +148,20 @@ config = {
 }
 ```
 
+## Escaping
+
+The Markdown exporter escapes user-controlled text so it renders literally rather than as Markdown syntax, following CommonMark backslash-escape rules. This is always on; there is no configuration option.
+
+- Anywhere in text: `\`, `` ` ``, `*`, `_`, `[`, `]`, `<`, `&`.
+- At the start of a line: `#`, `-`, `+`, `>`, `=`, `|`, `~`, and ordered list markers like `1.` (rendered as `1\.`). "Start of a line" means the start of a block, after a soft break, or after a list/blockquote marker.
+- Link and image URLs inside `](…)` get destination-specific escaping: `\`, `(`, `)` are backslash-escaped and whitespace/control characters are percent-encoded. URL scheme validation (`javascript:` etc.) remains the integrating application's responsibility.
+- Code spans and code blocks are never escaped. Instead, the exporter sizes the delimiters to the content: a code span containing a backtick is wrapped in double backticks, and a code block containing a fence gets a fence one character longer.
+
+Limitations:
+
+- Text starting with four or more spaces or a tab may render as an indented code block downstream. Backslash escapes cannot protect leading whitespace.
+- GFM-only syntax other than tables (`|`) is not escaped — for example autolinkable bare URLs remain autolinkable.
+
 ## Unsupported
 
 The Markdown exporter has inherent limitations compared to the HTML exporter.
@@ -157,5 +171,4 @@ The Markdown exporter has inherent limitations compared to the HTML exporter.
 - **No table support**: Draft.js has no built-in table block type, and the exporter does not attempt to generate Markdown tables from custom block types.
 - **No Setext-style headings**: Headings always use ATX style (`# Heading`).
 - **Entity data fidelity**: The Markdown link syntax `[text](url)` only preserves the URL.
-- **No HTML escaping in text**: If your Draft.js content contains literal HTML characters like like `<` or `>`, the Markdown output will include them unescaped, which may be interpreted as HTML by Markdown renderers.
 - **Inline style nesting edge cases**: When bold and italic styles partially overlap, the exporter may produce markers that some strict Markdown parsers reject (e.g. `**Bold **_Italic_**`). Most renderers handle this correctly, but it is not guaranteed by the CommonMark spec.

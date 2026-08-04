@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Markdown export now escapes user-controlled text and link destinations following CommonMark rules, and sizes code span/block delimiters to their content. Markdown output containing metacharacters changes as a result. See [Markdown escaping](https://wagtail.github.io/draftjs_exporter/markdown/#escaping).
+
 ## [v6.0.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v6.0.0)
 
 ### Added
