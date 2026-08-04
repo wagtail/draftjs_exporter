@@ -35,7 +35,7 @@ from draftjs_exporter.markdown.fallbacks import (
     entity_fallback,
     style_fallback,
 )
-from draftjs_exporter.markdown.styles import inline_style
+from draftjs_exporter.markdown.styles import code_span, inline_style
 from draftjs_exporter.types import Component, ConfigMap
 
 
@@ -85,7 +85,7 @@ STYLE_MAP: ConfigMap = dict(
     HTML_STYLE_MAP,
     **{
         INLINE_STYLES.BOLD: inline_style("**"),
-        INLINE_STYLES.CODE: inline_style("`"),
+        INLINE_STYLES.CODE: code_span,
         INLINE_STYLES.ITALIC: inline_style("_"),
         INLINE_STYLES.STRIKETHROUGH: inline_style("~"),
         INLINE_STYLES.FALLBACK: style_fallback,
@@ -149,7 +149,7 @@ def build_markdown_config(options: MarkdownOptions | None = None) -> ExporterCon
         },
         BLOCK_TYPES.BLOCKQUOTE: prefixed_block("> ", block_prefix=True),
         BLOCK_TYPES.CODE: {
-            "element": make_code_element(fence),
+            "element": make_code_element(),
             "wrapper": make_code_wrapper(fence),
         },
         BLOCK_TYPES.ATOMIC: lambda props: props["children"],
@@ -158,7 +158,7 @@ def build_markdown_config(options: MarkdownOptions | None = None) -> ExporterCon
     style_map: ConfigMap = {
         **HTML_STYLE_MAP,
         INLINE_STYLES.BOLD: inline_style(bold),
-        INLINE_STYLES.CODE: inline_style("`"),
+        INLINE_STYLES.CODE: code_span,
         INLINE_STYLES.ITALIC: inline_style(italic),
         INLINE_STYLES.STRIKETHROUGH: inline_style(strikethrough),
     }
