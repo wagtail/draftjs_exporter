@@ -1,7 +1,41 @@
 """Low-level helper components for inline and block Markdown fragments."""
 
 from draftjs_exporter.dom import DOM
+from draftjs_exporter.markdown.escape import escape_link_destination
 from draftjs_exporter.types import Element
+
+
+def mark_safe(markup: str, block_prefix: bool = False) -> Element:
+    """Create an element holding structural Markdown syntax.
+
+    The Markdown engine renders ``mark_safe`` markup verbatim, without the
+    escaping applied to plain text children. Every piece of structural
+    syntax emitted by Markdown components must be wrapped with this helper.
+
+    Parameters:
+        markup: The structural Markdown to emit (markers, fences, spacing).
+        block_prefix: Whether text following this markup can start a nested
+            block. True for list markers, list indentation, and blockquote
+            ``"> "`` prefixes; false for heading prefixes and inline marks.
+
+    Returns:
+        An element the Markdown engine renders without escaping.
+    """
+    return DOM.create_element(
+        "mark_safe", {"markup": markup, "block_prefix": block_prefix}
+    )
+
+
+def link_destination(url: str) -> Element:
+    """Create an element holding a link or image URL for ``](…)``.
+
+    Parameters:
+        url: The URL to escape and emit.
+
+    Returns:
+        An element rendering the escaped URL without further escaping.
+    """
+    return mark_safe(escape_link_destination(url))
 
 
 def inline(children: list[str | Element]) -> Element:
@@ -25,4 +59,4 @@ def block(children: list[str | Element]) -> Element:
     Returns:
         A fragment containing the children and a trailing blank line.
     """
-    return DOM.create_element("fragment", {}, children + ["\n\n"])
+    return DOM.create_element("fragment", {}, children + [mark_safe("\n\n")])

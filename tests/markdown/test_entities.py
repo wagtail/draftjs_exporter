@@ -31,6 +31,18 @@ class TestEntities(unittest.TestCase):
             "[test](http://www.example.com/)",
         )
 
+    def test_link_url_escaped(self):
+        self.assertEqual(
+            DOM.render(link({"url": "https://example.com/a(b)", "children": "x"})),
+            "[x](https://example.com/a\\(b\\))",
+        )
+
+    def test_image_src_escaped(self):
+        self.assertEqual(
+            DOM.render(image({"src": "a b.png"})),
+            "![](a%20b.png)\n\n",
+        )
+
     def test_make_horizontal_rule_stars(self):
         self.assertEqual(DOM.render(make_horizontal_rule("***")({})), "***\n\n")
 

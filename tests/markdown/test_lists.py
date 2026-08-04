@@ -1,6 +1,7 @@
 import unittest
 
 from draftjs_exporter.dom import DOM
+from draftjs_exporter.markdown.blocks import ul
 from draftjs_exporter.markdown.lists import (
     get_block_index,
     get_li_suffix,
@@ -365,6 +366,19 @@ class TestListItem(unittest.TestCase):
             ),
             "- test\n",
         )
+
+    def test_list_item_marker_uses_mark_safe(self):
+        item = ul(
+            {
+                "block": {"key": "a", "type": "unordered-list-item", "depth": 0},
+                "blocks": [],
+                "children": "x",
+            }
+        )
+        types = [c.type if hasattr(c, "type") else c for c in item.children]
+        self.assertEqual(types, ["mark_safe", "mark_safe", "x", "mark_safe"])
+        # children ("x") sits between the prefix and suffix mark_safe nodes
+        self.assertEqual(item.children[2], "x")
 
     def test_list_item_depth(self):
         self.assertEqual(

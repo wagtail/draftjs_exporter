@@ -3,6 +3,7 @@
 from collections.abc import Callable
 
 from draftjs_exporter.dom import DOM
+from draftjs_exporter.markdown.helpers import mark_safe
 from draftjs_exporter.types import Block, Element, Props
 
 
@@ -102,5 +103,12 @@ def list_item(prefix: str, props: Props) -> Element:
     suffix = get_li_suffix(props)
 
     return DOM.create_element(
-        "fragment", {}, [indent, prefix, props["children"], suffix]
+        "fragment",
+        {},
+        [
+            mark_safe(indent, block_prefix=True),
+            mark_safe(prefix, block_prefix=True),
+            props["children"],
+            mark_safe(suffix),
+        ],
     )
