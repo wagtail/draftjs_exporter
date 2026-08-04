@@ -2,6 +2,14 @@
 
 This page collects the upgrade notes for each major (and selected minor) release of the exporter. Each section describes the breaking changes and the steps to follow when upgrading from the previous version. For the full list of changes in each release, see the [CHANGELOG](https://github.com/wagtail/draftjs_exporter/blob/main/CHANGELOG.md).
 
+## Upgrading to v6.1.0
+
+### Markdown export now escapes text
+
+The Markdown exporter now escapes user-controlled text and link destinations following CommonMark rules, so content like `#`, `[`, `<`, or `&` in block text renders literally instead of being interpreted as Markdown or HTML. Code spans and code blocks are not escaped; their delimiters are instead sized to the content, which also fixes output corruption when code content contains backticks or fences.
+
+Any Markdown output containing metacharacters in text changes. If your tests compare exact Markdown output, update them. Markdown support remains experimental.
+
 ## Upgrading to v6.0.0
 
 ### Python 3.7, 3.8, and 3.9 support removed
