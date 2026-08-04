@@ -26,6 +26,17 @@ Add a tagged-release workflow that builds with `uv`, publishes to PyPI, updates 
 
 Provide a cookbook showing how to prompt LLMs to draft block maps/entity decorators from HTML samples, and scripts to turn that output into typed configs and fixtures.
 
+### Better automated code review
+
+Improve our AI code review setup (currently OpenCodeReview in CI) based on false-positive patterns observed on real PRs:
+
+- **Require evidence before breakage claims.** Findings that claim behavior is broken ("X will never match") should be verified against the test suite first — several flagged "bugs" were directly refuted by existing passing tests the bot itself cited.
+- **Verify type-coercion claims against the code.** Claims about type mismatches should check the actual data flow (e.g. attribute stringification in `DOM.create_element`) before asserting a comparison can never hold.
+- **Deduplicate findings.** The same issue was reported three times across two runs (a cosmetic comparison-idiom nit). Group repeats into a single finding.
+- **Suppress non-findings.** Comments that suggest exactly the code as written, or conclude "no issue", should not be posted.
+- **Calibrate severity by failure mode.** Distinguish "fails safe / cosmetic / hypothetical misuse" from real defects, and only post inline comments for actionable items.
+- **Domain-aware reasoning.** Findings about Markdown/CommonMark behavior should be checked against the spec (e.g. what is legal inside a link destination) rather than pattern-matched from HTML escaping.
+
 ## Experimental
 
 > Possible changes that require R&D, and high-risk ideas that could bring large benefits but with likely trade-offs.
