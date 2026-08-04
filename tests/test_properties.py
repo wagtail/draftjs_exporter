@@ -30,7 +30,7 @@ from draftjs_exporter.dom import DOM
 from draftjs_exporter.html import HTML, ExporterConfig
 from draftjs_exporter.markdown import CONFIG as MARKDOWN_CONFIG
 from draftjs_exporter.markdown.escape import escape_text
-from tests.strategies import content_states, dangerous_content_states
+from tests.strategies import content_states, dangerous_content_states, escapable_text
 from tests.test_entities import link
 
 CONFIG: ExporterConfig = {
@@ -174,20 +174,38 @@ class TestRenderEscapingInvariants(unittest.TestCase):
 class TestMarkdownEscapingInvariants(unittest.TestCase):
     """Invariants of Markdown escaping of user-controlled text."""
 
-    @given(st.text())
+    @given(escapable_text)
     def test_escape_text_never_raises(self, text):
         escape_text(text, at_line_start=True)
         escape_text(text, at_line_start=False)
 
-    @given(st.text())
+    @given(escapable_text)
     def test_no_unescaped_angle_bracket_or_ampersand(self, text):
         escaped = escape_text(text, at_line_start=True)
         self.assertIsNone(re.search(r"(?<!\\)<", escaped))
         self.assertIsNone(re.search(r"(?<!\\)&", escaped))
 
+    @given(escapable_text)
+    def test_escape_text_preserves_line_endings(self, text):
+        # Escaping may add backslashes but never alters the line endings
+        # themselves: \n, \r\n, and lone \r all survive verbatim, in order.
+        endings = re.compile(r"\r\n|\r|\n")
+        escaped = escape_text(text, at_line_start=True)
+        self.assertEqual(endings.findall(escaped), endings.findall(text))
+
     @given(st.sampled_from("#-+>=|~").map(lambda c: c + "x"))
     def test_line_start_char_always_escaped(self, text):
         self.assertTrue(escape_text(text, at_line_start=True).startswith("\\"))
+
+    @given(
+        st.tuples(
+            st.text(alphabet=" ", min_size=1, max_size=5),
+            st.sampled_from("#-+>=|~"),
+        ).map(lambda t: t[0] + t[1] + "x")
+    )
+    def test_line_start_char_after_spaces_always_escaped(self, text):
+        escaped = escape_text(text, at_line_start=True)
+        self.assertTrue(escaped.lstrip(" ").startswith("\\"))
 
     @given(st.from_regex(r"\d{1,9}[.)]x", fullmatch=True))
     def test_ordered_list_marker_always_escaped(self, text):

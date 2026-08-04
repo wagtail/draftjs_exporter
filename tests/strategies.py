@@ -43,6 +43,14 @@ block_text = st.text(
     max_size=40,
 )
 
+# Text for Markdown escaping properties. Like ``block_text``, but with a
+# high density of line endings: CommonMark recognizes \n, \r\n, and lone
+# \r, all of which must count as line starts for escaping.
+escapable_text = st.text(
+    alphabet=st.characters(blacklist_categories=["Cs", "Cc"]) | st.sampled_from("\n\r"),
+    max_size=40,
+)
+
 
 @st.composite
 def ranges(
