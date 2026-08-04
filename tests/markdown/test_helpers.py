@@ -14,7 +14,7 @@ class TestHelpers(unittest.TestCase):
 
 class TestMarkSafe(unittest.TestCase):
     def test_renders_verbatim(self):
-        self.assertEqual(DOM.render(inline([mark_safe("# "), "x"])), "# x")
+        self.assertEqual(DOM.render(inline([mark_safe("# "), "*x*"])), "# \\*x\\*")
 
     def test_block_prefix_flag(self):
         elt = mark_safe("- ", block_prefix=True)
