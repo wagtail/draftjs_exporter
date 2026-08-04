@@ -197,7 +197,7 @@
 
 ## Markdown
 
-## draftjs\_exporter is an HTML exporter for [Draft.js](https://github.com/facebook/draft-js) content
+## draftjs_exporter is an HTML exporter for [Draft.js](https://github.com/facebook/draft-js) content
 
 > Try it out by running this file!
 

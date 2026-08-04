@@ -17,6 +17,16 @@ class TestEscapeTextAnywhere(unittest.TestCase):
     def test_emphasis_chars(self):
         self.assertEqual(escape_text("*em* _em_"), "\\*em\\* \\_em\\_")
 
+    def test_intraword_underscores_not_escaped(self):
+        self.assertEqual(escape_text("draftjs_exporter"), "draftjs_exporter")
+        self.assertEqual(escape_text("a__b"), "a__b")
+
+    def test_boundary_underscores_escaped(self):
+        self.assertEqual(escape_text("_foo_"), "\\_foo\\_")
+        self.assertEqual(escape_text("a_ b"), "a\\_ b")
+        # Conservative: inert between spaces, but escaped harmlessly.
+        self.assertEqual(escape_text("a _ b"), "a \\_ b")
+
     def test_code_backtick(self):
         self.assertEqual(escape_text("a`b"), "a\\`b")
 
