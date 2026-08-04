@@ -87,3 +87,52 @@ class TestDOMMarkdown(unittest.TestCase):
             M.render_debug(M.create_tag("p", {"class": "intro"})),
             '<p class="intro"></p>',
         )
+
+
+class TestMarkSafe(unittest.TestCase):
+    def test_rendered_verbatim(self):
+        elt = M.create_tag("mark_safe", {"markup": "# ", "block_prefix": "true"})
+        self.assertEqual(M.render(elt), "# ")
+
+    def test_block_prefix_readable(self):
+        elt = M.create_tag("mark_safe", {"markup": "- ", "block_prefix": "true"})
+        assert elt.attr is not None
+        self.assertEqual(elt.attr.get("block_prefix"), "true")
+
+
+class TestCodeSpanNode(unittest.TestCase):
+    def test_content_not_escaped(self):
+        elt = M.create_tag("code_span")
+        M.append_child(elt, "a*b`c")
+        self.assertEqual(M.render(elt), "``a*b`c``")
+
+    def test_plain_content(self):
+        elt = M.create_tag("code_span")
+        M.append_child(elt, "foo")
+        self.assertEqual(M.render(elt), "`foo`")
+
+    def test_leading_backtick_padded(self):
+        elt = M.create_tag("code_span")
+        M.append_child(elt, "`x")
+        self.assertEqual(M.render(elt), "`` `x ``")
+
+
+class TestCodeBlockNode(unittest.TestCase):
+    def test_content_not_escaped(self):
+        elt = M.create_tag("code_block", {"fence": "`"})
+        M.append_child(elt, "# <script>\n")
+        self.assertEqual(M.render(elt), "```\n# <script>\n```\n\n")
+
+    def test_fence_sized_to_content(self):
+        elt = M.create_tag("code_block", {"fence": "`"})
+        M.append_child(elt, "a```b\n")
+        self.assertEqual(M.render(elt), "````\na```b\n````\n\n")
+
+    def test_tilde_fence(self):
+        elt = M.create_tag("code_block", {"fence": "~"})
+        M.append_child(elt, "x\n")
+        self.assertEqual(M.render(elt), "~~~\nx\n~~~\n\n")
+
+    def test_empty_content(self):
+        elt = M.create_tag("code_block", {"fence": "`"})
+        self.assertEqual(M.render(elt), "```\n```\n\n")
