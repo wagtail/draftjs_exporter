@@ -1,6 +1,6 @@
 """Markdown inline style components for bold, italic, code, and strikethrough."""
 
-from draftjs_exporter.markdown.helpers import inline
+from draftjs_exporter.markdown.helpers import inline, mark_safe
 from draftjs_exporter.types import Component
 
 
@@ -13,4 +13,4 @@ def inline_style(mark: str) -> Component:
     Returns:
         A component that renders the marked inline style.
     """
-    return lambda props: inline([mark, props["children"], mark])
+    return lambda props: inline([mark_safe(mark), props["children"], mark_safe(mark)])

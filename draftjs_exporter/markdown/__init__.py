@@ -72,7 +72,7 @@ BLOCK_MAP: ConfigMap = {
             "element": ol,
             "wrapper": list_wrapper,
         },
-        BLOCK_TYPES.BLOCKQUOTE: prefixed_block("> "),
+        BLOCK_TYPES.BLOCKQUOTE: prefixed_block("> ", block_prefix=True),
         BLOCK_TYPES.CODE: {
             "element": code_element,
             "wrapper": code_wrapper,
@@ -147,7 +147,7 @@ def build_markdown_config(options: MarkdownOptions | None = None) -> ExporterCon
             "element": make_ol(ol_delimiter),
             "wrapper": list_wrapper,
         },
-        BLOCK_TYPES.BLOCKQUOTE: prefixed_block("> "),
+        BLOCK_TYPES.BLOCKQUOTE: prefixed_block("> ", block_prefix=True),
         BLOCK_TYPES.CODE: {
             "element": make_code_element(fence),
             "wrapper": make_code_wrapper(fence),

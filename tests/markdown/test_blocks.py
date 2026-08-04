@@ -17,6 +17,14 @@ class TestBlocks(unittest.TestCase):
             DOM.render(prefixed_block("> ")({"children": "test"})), "> test\n\n"
         )
 
+    def test_prefixed_block_uses_mark_safe(self):
+        elt = prefixed_block("# ")({"children": "x"})
+        self.assertEqual(elt.children[0].type, "mark_safe")
+
+    def test_prefixed_block_block_prefix_flag(self):
+        elt = prefixed_block("> ", block_prefix=True)({"children": "x"})
+        self.assertEqual(elt.children[0].attr["block_prefix"], "true")
+
     def test_ul(self):
         self.assertEqual(
             DOM.render(

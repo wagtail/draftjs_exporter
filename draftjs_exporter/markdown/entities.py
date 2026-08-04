@@ -1,6 +1,6 @@
 """Markdown entity decorators for images, links, and horizontal rules."""
 
-from draftjs_exporter.markdown.helpers import block, inline
+from draftjs_exporter.markdown.helpers import block, inline, link_destination, mark_safe
 from draftjs_exporter.types import Component, Element, Props
 
 
@@ -13,7 +13,15 @@ def image(props: Props) -> Element:
     Returns:
         A block-level image element.
     """
-    return block(["![", props.get("alt", ""), "](", props["src"], ")"])
+    return block(
+        [
+            mark_safe("!["),
+            props.get("alt", ""),
+            mark_safe("]("),
+            link_destination(props["src"]),
+            mark_safe(")"),
+        ]
+    )
 
 
 def link(props: Props) -> Element:
@@ -25,7 +33,15 @@ def link(props: Props) -> Element:
     Returns:
         An inline link element.
     """
-    return inline(["[", props["children"], "](", props["url"], ")"])
+    return inline(
+        [
+            mark_safe("["),
+            props["children"],
+            mark_safe("]("),
+            link_destination(props["url"]),
+            mark_safe(")"),
+        ]
+    )
 
 
 def make_horizontal_rule(marker: str) -> Component:
@@ -37,7 +53,7 @@ def make_horizontal_rule(marker: str) -> Component:
     Returns:
         A component that renders a horizontal rule.
     """
-    return lambda props: block([marker])
+    return lambda props: block([mark_safe(marker)])
 
 
 horizontal_rule: Component = make_horizontal_rule("---")

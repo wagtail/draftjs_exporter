@@ -1,20 +1,24 @@
 """Markdown block-level components: headings, lists, blockquotes, and plain paragraphs."""
 
-from draftjs_exporter.markdown.helpers import block, inline
+from draftjs_exporter.markdown.helpers import block, inline, mark_safe
 from draftjs_exporter.markdown.lists import list_item, make_numbered_li_prefix
 from draftjs_exporter.types import Component, Element, Props
 
 
-def prefixed_block(prefix: str) -> Component:
+def prefixed_block(prefix: str, block_prefix: bool = False) -> Component:
     """Create a block component that prefixes its children with the given string.
 
     Parameters:
         prefix: The literal prefix to insert before the block's children.
+        block_prefix: Whether children can start a nested block after the
+            prefix (true for blockquotes, false for headings).
 
     Returns:
         A component that renders the prefixed block.
     """
-    return lambda props: block([prefix, props["children"]])
+    return lambda props: block(
+        [mark_safe(prefix, block_prefix=block_prefix), props["children"]]
+    )
 
 
 def make_ul(marker: str) -> Component:
