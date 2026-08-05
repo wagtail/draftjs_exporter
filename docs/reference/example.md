@@ -248,7 +248,6 @@ Discarded block but the content stays.<div>Render as <span class="missing-entity
 
 ## Markdown escaping
 
-```markdown
 \# Not a heading, \*not emphasis\*, \<b>not HTML\</b>
 
 1\. Not a list item
@@ -260,4 +259,3 @@ A code block containing ``` gets a longer fence
 [A link](https://example.com/search?q=\(draft\))
 
 
-```

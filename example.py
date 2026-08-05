@@ -405,8 +405,6 @@ if __name__ == "__main__":
 
 ## Markdown escaping
 
-```markdown
 {escaping_output}
-```
 """
         )
