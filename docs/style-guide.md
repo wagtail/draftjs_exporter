@@ -81,6 +81,12 @@ We use Markdown blockquotes for short, scoped callouts:
 
 Keep callouts to one or two sentences. Use them when the information directly affects how the reader proceeds, not as a general aside.
 
+## Formatting
+
+- Do not hard-wrap lines in prose. Let the editor handle wrapping. Prettier is configured with `proseWrap: "preserve"` and will not rewrap prose for you, so wrapping is a review-level concern rather than something `just format` fixes.
+- Match the formatting of the document you are editing: heading levels, list styles, sentence structure, and how code spans and links are used. When an existing document and this guide disagree, prefer the document's conventions.
+- Comments in code blocks follow the source code rule: avoid hard-wrapping, except at full stops or other natural punctuation breaks.
+
 ## Links
 
 - Use **inline links** in prose. Prefer `[link text](url)` over bare URLs.
@@ -126,9 +132,6 @@ Exceptions:
   - **Unit tests** – individual classes and functions in isolation.
   - **Integration tests** – `test_output.py` exercises the full pipeline end-to-end.
   ```
-
-- Avoid hard-wrapping lines in prose. Let the editor handle wrapping, and run `just format` (prettier) before committing so Markdown is formatted consistently.
-- Comments in code blocks follow the same rule as source code: avoid hard-wrapping, except at full stops or other natural punctuation breaks.
 
 ### Referring to the reader
 
