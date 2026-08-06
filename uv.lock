@@ -328,7 +328,7 @@ wheels = [
 
 [[package]]
 name = "draftjs-exporter"
-version = "6.0.0"
+version = "7.0.0"
 source = { editable = "." }
 
 [package.optional-dependencies]
