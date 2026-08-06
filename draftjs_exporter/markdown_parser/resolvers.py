@@ -94,8 +94,10 @@ def scheme_resolver(
 
     The URL host selects the entity type via ``type_map``. Query string
     parameters become entity data, optionally converted per key via
-    ``coerce``. When ``label_key`` is set, a non-empty Markdown label
-    fills that data key if the query string did not provide it.
+    ``coerce``. When a query key repeats, the last value wins (standard
+    ``urllib`` dict semantics). When ``label_key`` is set, a non-empty
+    Markdown label fills that data key if the query string did not
+    provide it.
 
     Parameters:
         scheme: The URL scheme to match, e.g. ``"wagtail"``.

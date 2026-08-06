@@ -57,5 +57,7 @@ class MarkdownImporter:
 
         Raises:
             MarkdownParseError: If the input cannot be parsed.
+            ConfigException: If a filter callback returns an invalid value
+                during filtering.
         """
         return self.filter.apply(self.parser.parse(markdown))
