@@ -138,3 +138,62 @@ class TestDirectImports(unittest.TestCase):
                     normalize(importer.import_markdown(fixture["markdown"])),
                     normalize(fixture["content_state"]),
                 )
+
+
+class TestEscapingRoundTrip(unittest.TestCase):
+    """Escaped Markdown forms the exporter emits must re-import as text.
+
+    These cases mirror ``draftjs_exporter.markdown.escape`` output so the
+    escaping round-trip contract is exercised directly, independent of the
+    export snapshot fixtures.
+    """
+
+    def test_round_trip(self) -> None:
+        importer = make_importer()
+        # Each entry is (escaped Markdown, expected plain text). The Markdown
+        # is what the exporter emits for the text on the right.
+        cases = [
+            # Anywhere escapes.
+            (r"\*not emphasis\*", "*not emphasis*"),
+            (r"\`d\`", "`d`"),
+            (r"\[c\]", "[c]"),
+            (r"\<b\>", "<b>"),
+            # Backslash escape of a backslash.
+            (r"a\\b", r"a\b"),
+            # Line-start escapes.
+            (r"\# Not a heading", "# Not a heading"),
+            (r"\- not a list item", "- not a list item"),
+            (r"1\. not a list item", "1. not a list item"),
+            (r"\> not a quote", "> not a quote"),
+            (r"\===foo", "===foo"),
+            (r"\~ not a fence", "~ not a fence"),
+            (r"\+ not a list item", "+ not a list item"),
+        ]
+        for markdown, expected in cases:
+            with self.subTest(markdown=markdown):
+                blocks = importer.import_markdown(markdown)["blocks"]
+                self.assertEqual(len(blocks), 1)
+                self.assertEqual(blocks[0]["type"], "unstyled")
+                self.assertEqual(blocks[0]["inlineStyleRanges"], [])
+                self.assertEqual(blocks[0]["entityRanges"], [])
+                self.assertEqual(blocks[0]["text"], expected)
+
+    def test_sized_code_spans(self) -> None:
+        """Sized code span delimiters round-trip to a CODE range."""
+        importer = make_importer()
+        # (markdown, expected text) for code spans the exporter emits.
+        cases = [
+            ("``a`b``", "a`b"),
+            ("`` ` ``", "`"),
+            ("`code`", "code"),
+        ]
+        for markdown, expected in cases:
+            with self.subTest(markdown=markdown):
+                block = importer.import_markdown(markdown)["blocks"][0]
+                self.assertEqual(block["type"], "unstyled")
+                self.assertEqual(block["text"], expected)
+                self.assertEqual(
+                    block["inlineStyleRanges"],
+                    [{"offset": 0, "length": len(expected), "style": "CODE"}],
+                )
+                self.assertEqual(block["entityRanges"], [])
