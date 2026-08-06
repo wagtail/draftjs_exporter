@@ -196,5 +196,138 @@
         }
       ]
     }
+  },
+  {
+    "label": "Escaped line-start hash is paragraph",
+    "markdown": "\\# Not a heading",
+    "content_state": {
+      "entityMap": {},
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "# Not a heading",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        }
+      ]
+    }
+  },
+  {
+    "label": "Escaped ordered list marker is paragraph",
+    "markdown": "1\\. Not a list item",
+    "content_state": {
+      "entityMap": {},
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "1. Not a list item",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        }
+      ]
+    }
+  },
+  {
+    "label": "Escaped line-start equals and tilde",
+    "markdown": "\\===foo\n\n\\~bar",
+    "content_state": {
+      "entityMap": {},
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "===foo",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        },
+        {
+          "key": "00001",
+          "text": "~bar",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        }
+      ]
+    }
+  },
+  {
+    "label": "Escaped metacharacters are literal",
+    "markdown": "\\*not emphasis\\* \\[c\\] \\<b\\>",
+    "content_state": {
+      "entityMap": {},
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "*not emphasis* [c] <b>",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": []
+        }
+      ]
+    }
+  },
+  {
+    "label": "Link destination with escaped parens",
+    "markdown": "[a](https://example.com/a\\(b\\))",
+    "content_state": {
+      "entityMap": {
+        "0": {
+          "type": "LINK",
+          "mutability": "MUTABLE",
+          "data": { "url": "https://example.com/a(b)" }
+        }
+      },
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "a",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [],
+          "entityRanges": [{ "offset": 0, "length": 1, "key": 0 }]
+        }
+      ]
+    }
+  },
+  {
+    "label": "Sized code span with backtick",
+    "markdown": "``a`b``",
+    "content_state": {
+      "entityMap": {},
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "a`b",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [{ "offset": 0, "length": 3, "style": "CODE" }],
+          "entityRanges": []
+        }
+      ]
+    }
+  },
+  {
+    "label": "Sized code span single backtick content",
+    "markdown": "`` ` ``",
+    "content_state": {
+      "entityMap": {},
+      "blocks": [
+        {
+          "key": "00000",
+          "text": "`",
+          "type": "unstyled",
+          "depth": 0,
+          "inlineStyleRanges": [{ "offset": 0, "length": 1, "style": "CODE" }],
+          "entityRanges": []
+        }
+      ]
+    }
   }
 ]
