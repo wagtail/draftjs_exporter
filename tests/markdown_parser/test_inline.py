@@ -42,6 +42,28 @@ class TestEscapes(unittest.TestCase):
         text, _, _ = make_parser().parse(r"\a")
         self.assertEqual(text, r"\a")
 
+    def test_line_start_equals_escape_inverts_exporter(self):
+        # The exporter escapes a leading '=' so it is not read as Setext.
+        text, _, _ = make_parser().parse(r"\===foo")
+        self.assertEqual(text, "===foo")
+
+    def test_line_start_tilde_escape_inverts_exporter(self):
+        # The exporter escapes a leading '~' so it is not read as a fence.
+        text, _, _ = make_parser().parse(r"\~foo")
+        self.assertEqual(text, "~foo")
+
+    def test_full_commonmark_punctuation_set(self):
+        # Every ASCII punctuation char is backslash-escapable per CommonMark.
+        punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+        for ch in punctuation:
+            with self.subTest(ch=ch):
+                text, _, _ = make_parser().parse(f"\\{ch}")
+                self.assertEqual(text, ch)
+
+    def test_backslash_before_non_ascii_is_literal(self):
+        text, _, _ = make_parser().parse(r"\é")
+        self.assertEqual(text, r"\é")
+
 
 class TestCodeSpans(unittest.TestCase):
     def test_code_span(self):
@@ -62,6 +84,43 @@ class TestCodeSpans(unittest.TestCase):
     def test_code_disabled(self):
         text, styles, _ = make_parser(code_inline=False).parse("`x`")
         self.assertEqual(text, "`x`")
+        self.assertEqual(styles, [])
+
+    def test_sized_delimiters_for_backtick_content(self):
+        # Round-trips the exporter's `` ``a`b`` `` output for a code span
+        # whose content contains a backtick.
+        text, styles, _ = make_parser().parse("``a`b``")
+        self.assertEqual(text, "a`b")
+        self.assertEqual(styles, [{"offset": 0, "length": 3, "style": "CODE"}])
+
+    def test_sized_delimiters_with_space_padding(self):
+        # Content that is a single backtick: exporter pads with spaces and
+        # sizes delimiters to two backticks. CommonMark strips the padding.
+        text, styles, _ = make_parser().parse("`` ` ``")
+        self.assertEqual(text, "`")
+        self.assertEqual(styles, [{"offset": 0, "length": 1, "style": "CODE"}])
+
+    def test_code_span_strips_padded_spaces(self):
+        # CommonMark strips one leading/trailing space when the span both
+        # begins and ends with a space and is not all spaces.
+        text, styles, _ = make_parser().parse("` hi `")
+        self.assertEqual(text, "hi")
+        self.assertEqual(styles, [{"offset": 0, "length": 2, "style": "CODE"}])
+
+    def test_all_spaces_code_span_not_stripped(self):
+        text, styles, _ = make_parser().parse("`  `")
+        self.assertEqual(text, "  ")
+        self.assertEqual(styles, [{"offset": 0, "length": 2, "style": "CODE"}])
+
+    def test_longer_closer_run_does_not_close_shorter_opener(self):
+        # A three-backtick run cannot close a two-backtick opener.
+        text, styles, _ = make_parser().parse("``a```")
+        self.assertEqual(text, "``a```")
+        self.assertEqual(styles, [])
+
+    def test_unmatched_sized_opener_is_literal(self):
+        text, styles, _ = make_parser().parse("``a")
+        self.assertEqual(text, "``a")
         self.assertEqual(styles, [])
 
 
@@ -216,6 +275,44 @@ class TestLinks(unittest.TestCase):
         parser, builder = parse_with_builder(link_resolvers=[lambda url, label: None])
         parser.parse("[a](/b)")
         self.assertEqual(builder.entity_map["0"]["type"], "LINK")
+
+    def test_link_destination_unescapes_parens(self):
+        # Round-trips the exporter's escape_link_destination output.
+        parser, builder = parse_with_builder()
+        text, _, _ = parser.parse(r"[a](https://example.com/a\(b\))")
+        self.assertEqual(text, "a")
+        self.assertEqual(
+            builder.entity_map["0"]["data"]["url"],
+            "https://example.com/a(b)",
+        )
+
+    def test_link_destination_unescapes_backslash(self):
+        parser, builder = parse_with_builder()
+        # Markdown source: [a](https://example.com/a\\b) -> two backslashes.
+        parser.parse(r"[a](https://example.com/a\\b)")
+        self.assertEqual(
+            builder.entity_map["0"]["data"]["url"],
+            r"https://example.com/a\b",
+        )
+
+    def test_link_destination_keeps_percent_encoding(self):
+        # Percent-encoding is not a Markdown escape and is left intact.
+        parser, builder = parse_with_builder()
+        parser.parse("[a](https://example.com/a%20b)")
+        self.assertEqual(
+            builder.entity_map["0"]["data"]["url"],
+            "https://example.com/a%20b",
+        )
+
+    def test_link_destination_escaped_paren_does_not_close(self):
+        parser, builder = parse_with_builder()
+        text, _, entities = parser.parse(r"[a](https://example.com/a\)c)")
+        self.assertEqual(text, "a")
+        self.assertEqual(len(entities), 1)
+        self.assertEqual(
+            builder.entity_map["0"]["data"]["url"],
+            "https://example.com/a)c",
+        )
 
 
 class TestImages(unittest.TestCase):
