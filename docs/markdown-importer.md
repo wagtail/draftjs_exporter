@@ -244,6 +244,23 @@ importer = MarkdownImporter({
 
 A parser engine is a class accepting a config dict (or `None`) and exposing `parse(markdown: str) -> ContentState`. Filtering applies to the engine's output as usual.
 
+## Escaping
+
+The importer inverts [CommonMark backslash escapes](https://spec.commonmark.org/current/#backslash-escapes): any ASCII punctuation character preceded by `\` is imported as that literal character. This mirrors the [Markdown exporter's text escaping](markdown.md#escaping) so that Markdown the exporter produces round-trips back to the original text.
+
+```python
+MarkdownImporter().import_markdown(r"\# Not a heading, \*not emphasis\*")
+# text: "# Not a heading, *not emphasis*" (paragraph, no styles)
+```
+
+Link and image destinations are also unescaped: `\(`, `\)`, and `\\` inside `](…)` revert to the literal characters, matching what the exporter emits for URLs containing parentheses.
+
+### Known round-trip limitations
+
+- **Underscore emphasis and mid-word italic.** The exporter's default italic marker is `_`, and it leaves intraword `_` runs unescaped (treating them as inert per CommonMark flanking). The importer cannot apply full CommonMark flanking to invert this, because the exporter also emits intraword `_` markers for legitimate mid-word italic (e.g. `fan_tastic_` for italic on "tastic"). Those two cases are structurally identical to plain identifiers like `foo_bar_baz`, so the importer has no way to tell them apart. As a result, multi-underscore identifiers may import as spurious emphasis. Resolving this fully requires an exporter-side change (use `*` for italic when the marker would be intraword, or default italic to `*`).
+
+Percent-encoding the exporter applies to whitespace and control characters inside link destinations is left intact: `%20` is a valid URL byte sequence, not a Markdown escape, so it is not decoded.
+
 ## Safety guarantees
 
 - **Structural integrity**: the parser always produces valid ContentState (unique block keys, entity ranges backed by the entity map, in-bounds ranges) or raises `MarkdownParseError`.

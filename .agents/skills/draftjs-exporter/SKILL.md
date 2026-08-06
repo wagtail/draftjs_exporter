@@ -180,7 +180,7 @@ config = build_markdown_config({
 exporter = HTML(config)
 ````
 
-All defaults produce valid [CommonMark](https://commonmark.org/). Limitations: no underline/subscript/reference-style links/tables; no HTML escaping in text; partial bold/italic overlap can produce markers strict parsers reject. See [Markdown support](https://wagtail.github.io/draftjs_exporter/markdown/).
+All defaults produce valid [CommonMark](https://commonmark.org/). The exporter [escapes](https://wagtail.github.io/draftjs_exporter/markdown/#escaping) user text so it renders literally rather than as Markdown syntax. Limitations: no underline/subscript/reference-style links/tables; partial bold/italic overlap can produce markers strict parsers reject. See [Markdown support](https://wagtail.github.io/draftjs_exporter/markdown/).
 
 ### Importer
 
@@ -206,7 +206,7 @@ importer = MarkdownImporter({
 content_state = importer.import_markdown(markdown)
 ```
 
-See [Markdown importer](https://wagtail.github.io/draftjs_exporter/markdown-importer/).
+See [Markdown importer](https://wagtail.github.io/draftjs_exporter/markdown-importer/). The importer inverts the exporter's text escaping and sized code-span delimiters on round-trip; see [Known round-trip limitations](https://wagtail.github.io/draftjs_exporter/markdown-importer/#known-round-trip-limitations) for the remaining gaps.
 
 ## Common gotchas
 
