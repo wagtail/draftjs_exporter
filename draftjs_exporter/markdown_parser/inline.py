@@ -23,8 +23,12 @@ Span: TypeAlias = tuple[int, int, str, "str | int"]
 integer entity key).
 """
 
-ESCAPABLE = frozenset('\\`*{}_[]<>()#+-.!|"')
-"""Punctuation characters that can be backslash-escaped per CommonMark."""
+# The full set of ASCII punctuation characters that CommonMark permits
+# to be backslash-escaped ("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"). The
+# exporter only emits escapes for a subset, but the importer accepts any
+# valid backslash-escaped punctuation so user-authored Markdown round-trips.
+ESCAPABLE = frozenset("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")
+"""ASCII punctuation that can be backslash-escaped per CommonMark."""
 
 TAG_RE = re.compile(r"<([a-zA-Z][a-zA-Z0-9]*)>")
 """Matches an HTML opening tag without attributes."""
@@ -185,15 +189,19 @@ class InlineParser:
                 i += 2
                 continue
 
-            # Code spans.
+            # Code spans: a backtick run opens; an equal-length run closes.
             if ch == "`" and self.code_inline:
-                end = text.find("`", i + 1)
-                if end != -1:
-                    content = text[i + 1 : end]
+                run = 1
+                while i + run < n and text[i + run] == "`":
+                    run += 1
+                close = InlineParser._find_code_closer(text, i + run, run)
+                if close != -1:
+                    raw = text[i + run : close]
+                    content = InlineParser._normalize_code_content(raw)
                     start = len(out)
                     out.extend(content)
                     spans.append((start, len(content), "style", INLINE_STYLES.CODE))
-                    i = end + 1
+                    i = close + run
                     continue
 
             # Images: ![alt](url)
@@ -269,7 +277,7 @@ class InlineParser:
 
     @staticmethod
     def _link_target(text: str, i: int) -> tuple[str, str, int] | None:
-        """Parse ``[label](url)`` starting at the opening bracket.
+        r"""Parse ``[label](url)`` starting at the opening bracket.
 
         Parameters:
             text: The full source text.
@@ -277,16 +285,129 @@ class InlineParser:
 
         Returns:
             ``(label, url, end_index)`` or None when the construct does
-            not parse. Labels containing ``](`` and URLs containing
-            ``)`` are not supported.
+            not parse. Labels containing ``](`` are not supported. URLs
+            may contain escaped parentheses (``\\(``, ``\\)``), which
+            are unescaped in the returned URL.
         """
         close = text.find("](", i)
         if close == -1:
             return None
-        paren = text.find(")", close + 2)
+        paren = InlineParser._find_unescaped_paren(text, close + 2)
         if paren == -1:
             return None
-        return text[i + 1 : close], text[close + 2 : paren], paren + 1
+        url = InlineParser._unescape_destination(text[close + 2 : paren])
+        return text[i + 1 : close], url, paren + 1
+
+    @staticmethod
+    def _find_code_closer(text: str, start: int, n: int) -> int:
+        """Find a backtick run of exactly length ``n`` at or after ``start``.
+
+        Per CommonMark, a code span opener only closes on a backtick
+        string of equal length: a shorter or longer run is part of the
+        content. Skips backslash-escaped backticks.
+
+        Parameters:
+            text: The full source text.
+            start: Index to begin scanning from.
+            n: The exact backtick run length to match.
+
+        Returns:
+            The start index of the closing run, or -1 when none is found.
+        """
+        i = start
+        length = len(text)
+        while i < length:
+            if text[i] == "\\" and i + 1 < length:
+                i += 2
+                continue
+            if text[i] != "`":
+                i += 1
+                continue
+            run = 0
+            j = i
+            while j < length and text[j] == "`":
+                run += 1
+                j += 1
+            if run == n:
+                return i
+            i = j
+        return -1
+
+    @staticmethod
+    def _normalize_code_content(raw: str) -> str:
+        """Normalize raw code span content per CommonMark.
+
+        Newlines become spaces. When the content both begins and ends
+        with a space and is not entirely spaces, one leading and one
+        trailing space are stripped (so delimiters can pad content that
+        starts or ends with a backtick).
+
+        Parameters:
+            raw: The text between the opening and closing backtick runs.
+
+        Returns:
+            The normalized code span content.
+        """
+        content = raw.replace("\n", " ")
+        if (
+            len(content) >= 2
+            and content[0] == " "
+            and content[-1] == " "
+            and content.strip()
+        ):
+            content = content[1:-1]
+        return content
+
+    @staticmethod
+    def _find_unescaped_paren(text: str, start: int) -> int:
+        """Find the next ``)`` not preceded by a backslash escape.
+
+        Parameters:
+            text: The full source text.
+            start: Index to begin scanning from.
+
+        Returns:
+            The index of the closing paren, or -1 when none is found.
+        """
+        i = start
+        n = len(text)
+        while i < n:
+            ch = text[i]
+            if ch == "\\" and i + 1 < n:
+                i += 2
+                continue
+            if ch == ")":
+                return i
+            i += 1
+        return -1
+
+    @staticmethod
+    def _unescape_destination(url: str) -> str:
+        """Unescape backslash escapes in an inline link destination.
+
+        Mirrors the exporter's ``escape_link_destination``: backslash
+        before ASCII punctuation yields the punctuation, a backslash
+        before any other character is kept literal. Percent-encoded
+        bytes (whitespace and control characters the exporter encoded
+        for validity) are left intact — they are not a Markdown escape.
+
+        Parameters:
+            url: The raw destination text between ``](`` and ``)``.
+
+        Returns:
+            The unescaped URL.
+        """
+        out: list[str] = []
+        i = 0
+        n = len(url)
+        while i < n:
+            if url[i] == "\\" and i + 1 < n and url[i + 1] in ESCAPABLE:
+                out.append(url[i + 1])
+                i += 2
+                continue
+            out.append(url[i])
+            i += 1
+        return "".join(out)
 
     def _parse_emphasis(
         self, text: str, i: int, out: list[str], spans: list[Span], depth: int
