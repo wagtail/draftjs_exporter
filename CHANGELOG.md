@@ -4,15 +4,15 @@
 
 ## [Unreleased]
 
-### Changed
-
-- Markdown export now escapes user-controlled text and link destinations following CommonMark rules, and sizes code span/block delimiters to their content. Markdown output containing metacharacters changes as a result. See [Markdown escaping](https://wagtail.github.io/draftjs_exporter/markdown/#escaping).
+## [v7.0.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v7.0.0)
 
 ### Added
 
-- Add experimental Markdown importer: `MarkdownImporter` converts Markdown to Draft.js ContentState, with configurable entity resolvers (`scheme_resolver` for internal URL schemes), an inline HTML style whitelist, and `ContentStateFilter` for content policy.
-- Invert the Markdown exporter's text escaping on import: backslash escapes cover the full CommonMark punctuation set, and link/image destinations unescape `\(`, `\)`, and `\\` so URLs containing parentheses round-trip.
-- Parse sized code span delimiters (equal-length backtick runs, with CommonMark space-padding normalization), inverting the exporter's `code_span_delimiters` so code spans containing backticks round-trip.
+- Add experimental [Markdown importer](https://wagtail.github.io/draftjs_exporter/markdown-importer/): `MarkdownImporter` converts Markdown to Draft.js ContentState, with configurable entity resolvers (`scheme_resolver` for internal URL schemes), an inline HTML style whitelist, and `ContentStateFilter` for content policy.
+
+### Changed
+
+- The Markdown export now escapes all content. See [Markdown escaping](https://wagtail.github.io/draftjs_exporter/markdown/#escaping).
 
 ## [v6.0.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v6.0.0)
 
