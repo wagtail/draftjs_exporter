@@ -30,12 +30,11 @@ Provide a cookbook showing how to prompt LLMs to draft block maps/entity decorat
 
 Improve our AI code review setup (currently OpenCodeReview in CI) based on false-positive patterns observed on real PRs:
 
-- **Require evidence before breakage claims.** Findings that claim behavior is broken ("X will never match") should be verified against the test suite first — several flagged "bugs" were directly refuted by existing passing tests the bot itself cited.
-- **Verify type-coercion claims against the code.** Claims about type mismatches should check the actual data flow (e.g. attribute stringification in `DOM.create_element`) before asserting a comparison can never hold.
-- **Deduplicate findings.** The same issue was reported three times across two runs (a cosmetic comparison-idiom nit). Group repeats into a single finding.
-- **Suppress non-findings.** Comments that suggest exactly the code as written, or conclude "no issue", should not be posted.
-- **Calibrate severity by failure mode.** Distinguish "fails safe / cosmetic / hypothetical misuse" from real defects, and only post inline comments for actionable items.
-- **Domain-aware reasoning.** Findings about Markdown/CommonMark behavior should be checked against the spec (e.g. what is legal inside a link destination) rather than pattern-matched from HTML escaping.
+- **Recognize multi-checker setups.** Several findings flagged `# ty: ignore` as a typo of `# type: ignore`, and `X as X` re-exports as redundant. Both are intentional: `ty` is a separate type checker with its own directive, and `no_implicit_reexport` requires explicit `as` aliases. The reviewer should read tool config (`pyproject.toml`, test-module docstrings) before asserting typos.
+- **Verify claims against passing tests.** Findings that cite a test by name to argue behavior is broken were directly refuted by that same test passing (e.g. `_indent_width` coverage). Cross-checking a single test name against the suite output would eliminate this class of false positive.
+- **Calibrate severity by failure mode.** Distinguish "fails safe / cosmetic / hypothetical misuse" from real defects. Several findings acknowledged "no action needed" or suggested exactly the code as written — inline comments should not be posted for non-findings.
+- **Deduplicate findings across runs.** The same cosmetic nit recurred across review runs. Repeated findings should be grouped into a single comment.
+- **Respect project conventions.** TypedDict-without-runtime-validation and centralized string validation tuples are established patterns here; flagging them as missing is noise unless the project already violates its own convention.
 
 ## Experimental
 
