@@ -83,7 +83,7 @@ We follow [PEP 8](https://peps.python.org/pep-0008/) for Python code style, enfo
 - **Performance**: core classes should use `__slots__` to reduce memory overhead.
 - **Imports**: organized automatically by `ruff` (isort rules in `pyproject.toml`).
 - **Error handling**: use specific exception types; avoid bare `except:` clauses (BLE rules).
-- **Comments**: avoid hard-wrapping lines, except at full stops, or other punctuation like commas if must be.
+- **Comments and docs**: avoid hard-wrapping lines, except at full stops, or other punctuation like commas if must be.
 
 Additionally, we follow:
 
@@ -143,7 +143,7 @@ Follow these conventions for all production code:
 - User-facing docs live in `docs/`; the README is the entry point.
 - Keep language concise and in **Sentence case** (no Title Case).
 - Follow the [documentation style guide](style-guide.md) for tone, terminology, headings, and linking conventions.
-- Run `just format` before committing so prettier formats Markdown files consistently.
+- Run `just format` before committing. Prettier formats Markdown with `proseWrap: "preserve"` (see `prettier.config.js`), so it will not rewrap prose – verify wrapping manually against the [style guide](style-guide.md#formatting).
 
 ## Testing
 
