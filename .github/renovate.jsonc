@@ -14,7 +14,7 @@
 
   "labels": ["dependencies"],
 
-  "minimumReleaseAge": "14 days",
+  "minimumReleaseAge": "7 days",
 
   // Periodically refresh uv.lock to catch transitive dependency updates.
   "lockFileMaintenance": {
