@@ -26,9 +26,9 @@ from draftjs_exporter import (
     ExporterConfig,
     MarkdownImporter,
     Props,
+    md_link,
+    scheme_resolver,
 )
-from draftjs_exporter.markdown.entities import link as markdown_link
-from draftjs_exporter.markdown_parser import scheme_resolver
 
 
 def blockquote(props: Props) -> Element:
@@ -136,7 +136,7 @@ def linkify_markdown(props: Props) -> Element:
     if href.startswith("www"):
         link_props["url"] = "http://" + href
 
-    return markdown_link(link_props)
+    return md_link(link_props)
 
 
 def block_fallback(props: Props) -> Element:

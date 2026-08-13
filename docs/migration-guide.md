@@ -2,7 +2,7 @@
 
 This page collects the upgrade notes for each major (and selected minor) release of the exporter. Each section describes the breaking changes and the steps to follow when upgrading from the previous version. For the full list of changes in each release, see the [CHANGELOG](https://github.com/wagtail/draftjs_exporter/blob/main/CHANGELOG.md).
 
-## Upgrading to v6.1.0
+## Upgrading to v7.0.0
 
 ### Markdown export now escapes text
 

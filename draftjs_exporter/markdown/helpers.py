@@ -5,7 +5,7 @@ from draftjs_exporter.markdown.escape import escape_link_destination
 from draftjs_exporter.types import Element
 
 
-def mark_safe(markup: str, block_prefix: bool = False) -> Element:
+def md_mark_safe(markup: str, block_prefix: bool = False) -> Element:
     """Create an element holding structural Markdown syntax.
 
     The Markdown engine renders ``mark_safe`` markup verbatim, without the
@@ -26,7 +26,7 @@ def mark_safe(markup: str, block_prefix: bool = False) -> Element:
     )
 
 
-def link_destination(url: str) -> Element:
+def md_link_destination(url: str) -> Element:
     """Create an element holding a link or image URL for ``](…)``.
 
     Parameters:
@@ -35,10 +35,10 @@ def link_destination(url: str) -> Element:
     Returns:
         An element rendering the escaped URL without further escaping.
     """
-    return mark_safe(escape_link_destination(url))
+    return md_mark_safe(escape_link_destination(url))
 
 
-def inline(children: list[str | Element]) -> Element:
+def md_inline(children: list[str | Element]) -> Element:
     """Create an inline fragment for inline formatting such as bold, links, and code.
 
     Parameters:
@@ -50,7 +50,7 @@ def inline(children: list[str | Element]) -> Element:
     return DOM.create_element("fragment", {}, children)
 
 
-def block(children: list[str | Element]) -> Element:
+def md_block(children: list[str | Element]) -> Element:
     """Create a block fragment followed by an empty line.
 
     Parameters:
@@ -59,4 +59,4 @@ def block(children: list[str | Element]) -> Element:
     Returns:
         A fragment containing the children and a trailing blank line.
     """
-    return DOM.create_element("fragment", {}, children + [mark_safe("\n\n")])
+    return DOM.create_element("fragment", {}, children + [md_mark_safe("\n\n")])

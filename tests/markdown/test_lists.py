@@ -1,20 +1,20 @@
 import unittest
 
 from draftjs_exporter.dom import DOM
-from draftjs_exporter.markdown.blocks import ul
+from draftjs_exporter.markdown.blocks import md_ul
 from draftjs_exporter.markdown.lists import (
-    get_block_index,
-    get_li_suffix,
-    get_numbered_li_prefix,
-    list_item,
-    make_numbered_li_prefix,
+    md_get_block_index,
+    md_get_li_suffix,
+    md_get_numbered_li_prefix,
+    md_list_item,
+    md_make_numbered_li_prefix,
 )
 
 
 class TestGetBlockIndex(unittest.TestCase):
     def test_get_block_index(self):
         self.assertEqual(
-            get_block_index(
+            md_get_block_index(
                 [{"key": "a"}, {"key": "b"}, {"key": "c"}],
                 "b",
             ),
@@ -23,7 +23,7 @@ class TestGetBlockIndex(unittest.TestCase):
 
     def test_get_block_index_not_found(self):
         self.assertEqual(
-            get_block_index(
+            md_get_block_index(
                 [{"key": "a"}, {"key": "b"}, {"key": "c"}],
                 "h",
             ),
@@ -39,7 +39,7 @@ class TestGetLiSuffix(unittest.TestCase):
             "depth": 0,
         }
         self.assertEqual(
-            get_li_suffix(
+            md_get_li_suffix(
                 {
                     "block": b,
                     "blocks": [b, dict(b, **{"key": "b"})],
@@ -55,7 +55,7 @@ class TestGetLiSuffix(unittest.TestCase):
             "depth": 0,
         }
         self.assertEqual(
-            get_li_suffix(
+            md_get_li_suffix(
                 {
                     "block": b,
                     "blocks": [
@@ -74,7 +74,7 @@ class TestGetLiSuffix(unittest.TestCase):
             "depth": 0,
         }
         self.assertEqual(
-            get_li_suffix(
+            md_get_li_suffix(
                 {
                     "block": b,
                     "blocks": [b, dict(b)],
@@ -92,7 +92,7 @@ class TestGetNumberedLiPrefix(unittest.TestCase):
             "depth": 0,
         }
         self.assertEqual(
-            get_numbered_li_prefix(
+            md_get_numbered_li_prefix(
                 {
                     "block": b,
                     "blocks": [b, dict(b, **{"key": "b"})],
@@ -108,7 +108,7 @@ class TestGetNumberedLiPrefix(unittest.TestCase):
             "depth": 0,
         }
         self.assertEqual(
-            get_numbered_li_prefix(
+            md_get_numbered_li_prefix(
                 {
                     "block": b,
                     "blocks": [dict(b, **{"key": "b"}), b],
@@ -124,7 +124,7 @@ class TestGetNumberedLiPrefix(unittest.TestCase):
             "depth": 0,
         }
         self.assertEqual(
-            get_numbered_li_prefix(
+            md_get_numbered_li_prefix(
                 {
                     "block": b,
                     "blocks": [
@@ -146,7 +146,7 @@ class TestGetNumberedLiPrefix(unittest.TestCase):
             "depth": 0,
         }
         self.assertEqual(
-            get_numbered_li_prefix(
+            md_get_numbered_li_prefix(
                 {
                     "block": b,
                     "blocks": [
@@ -170,7 +170,7 @@ class TestGetNumberedLiPrefix(unittest.TestCase):
             "depth": 0,
         }
         self.assertEqual(
-            get_numbered_li_prefix(
+            md_get_numbered_li_prefix(
                 {
                     "block": dict(b, **{"depth": 2}),
                     "blocks": [
@@ -193,7 +193,7 @@ class TestGetNumberedLiPrefix(unittest.TestCase):
             "depth": 0,
         }
         self.assertEqual(
-            get_numbered_li_prefix(
+            md_get_numbered_li_prefix(
                 {
                     "block": b,
                     "blocks": [b],
@@ -209,7 +209,7 @@ class TestGetNumberedLiPrefix(unittest.TestCase):
             "depth": 0,
         }
         self.assertEqual(
-            get_numbered_li_prefix(
+            md_get_numbered_li_prefix(
                 {
                     "block": b,
                     "blocks": [dict(b, **{"key": "b"})],
@@ -226,7 +226,7 @@ class TestMakeNumberedLiPrefix(unittest.TestCase):
             "type": "ordered-list-item",
             "depth": 0,
         }
-        get_prefix = make_numbered_li_prefix(")")
+        get_prefix = md_make_numbered_li_prefix(")")
         self.assertEqual(
             get_prefix(
                 {
@@ -243,7 +243,7 @@ class TestMakeNumberedLiPrefix(unittest.TestCase):
             "type": "ordered-list-item",
             "depth": 0,
         }
-        get_prefix = make_numbered_li_prefix(")")
+        get_prefix = md_make_numbered_li_prefix(")")
         self.assertEqual(
             get_prefix(
                 {
@@ -260,7 +260,7 @@ class TestMakeNumberedLiPrefix(unittest.TestCase):
             "type": "ordered-list-item",
             "depth": 0,
         }
-        get_prefix = make_numbered_li_prefix(")")
+        get_prefix = md_make_numbered_li_prefix(")")
         self.assertEqual(
             get_prefix(
                 {
@@ -281,7 +281,7 @@ class TestMakeNumberedLiPrefix(unittest.TestCase):
             "type": "ordered-list-item",
             "depth": 1,
         }
-        get_prefix = make_numbered_li_prefix(")")
+        get_prefix = md_make_numbered_li_prefix(")")
         self.assertEqual(
             get_prefix(
                 {
@@ -302,7 +302,7 @@ class TestMakeNumberedLiPrefix(unittest.TestCase):
             "type": "ordered-list-item",
             "depth": 0,
         }
-        get_prefix = make_numbered_li_prefix(")")
+        get_prefix = md_make_numbered_li_prefix(")")
         self.assertEqual(
             get_prefix(
                 {
@@ -323,7 +323,7 @@ class TestMakeNumberedLiPrefix(unittest.TestCase):
             "type": "ordered-list-item",
             "depth": 0,
         }
-        get_prefix = make_numbered_li_prefix(")")
+        get_prefix = md_make_numbered_li_prefix(")")
         self.assertEqual(
             get_prefix(
                 {
@@ -339,7 +339,7 @@ class TestMakeNumberedLiPrefix(unittest.TestCase):
             "type": "ordered-list-item",
             "depth": 0,
         }
-        get_prefix = make_numbered_li_prefix(")")
+        get_prefix = md_make_numbered_li_prefix(")")
         self.assertEqual(
             get_prefix(
                 {
@@ -355,7 +355,7 @@ class TestListItem(unittest.TestCase):
     def test_list_item(self):
         self.assertEqual(
             DOM.render(
-                list_item(
+                md_list_item(
                     "- ",
                     {
                         "block": {"depth": 0},
@@ -368,7 +368,7 @@ class TestListItem(unittest.TestCase):
         )
 
     def test_list_item_marker_uses_mark_safe(self):
-        item = ul(
+        item = md_ul(
             {
                 "block": {"key": "a", "type": "unordered-list-item", "depth": 0},
                 "blocks": [],
@@ -377,13 +377,13 @@ class TestListItem(unittest.TestCase):
         )
         types = [c.type if hasattr(c, "type") else c for c in item.children]
         self.assertEqual(types, ["mark_safe", "mark_safe", "x", "mark_safe"])
-        # children ("x") sits between the prefix and suffix mark_safe nodes
+        # children ("x") sits between the prefix and suffix md_mark_safe nodes
         self.assertEqual(item.children[2], "x")
 
     def test_list_item_depth(self):
         self.assertEqual(
             DOM.render(
-                list_item(
+                md_list_item(
                     "- ",
                     {
                         "block": {"depth": 2},

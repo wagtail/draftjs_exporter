@@ -2,33 +2,33 @@ import unittest
 
 from draftjs_exporter.dom import DOM
 from draftjs_exporter.markdown.blocks import (
-    list_wrapper,
-    make_ol,
-    make_ul,
-    ol,
-    prefixed_block,
-    ul,
+    md_list_wrapper,
+    md_make_ol,
+    md_make_ul,
+    md_ol,
+    md_prefixed_block,
+    md_ul,
 )
 
 
 class TestBlocks(unittest.TestCase):
     def test_prefixed_block(self):
         self.assertEqual(
-            DOM.render(prefixed_block("> ")({"children": "test"})), "> test\n\n"
+            DOM.render(md_prefixed_block("> ")({"children": "test"})), "> test\n\n"
         )
 
     def test_prefixed_block_uses_mark_safe(self):
-        elt = prefixed_block("# ")({"children": "x"})
+        elt = md_prefixed_block("# ")({"children": "x"})
         self.assertEqual(elt.children[0].type, "mark_safe")
 
     def test_prefixed_block_block_prefix_flag(self):
-        elt = prefixed_block("> ", block_prefix=True)({"children": "x"})
+        elt = md_prefixed_block("> ", block_prefix=True)({"children": "x"})
         self.assertEqual(elt.children[0].attr["block_prefix"], "true")
 
     def test_ul(self):
         self.assertEqual(
             DOM.render(
-                ul(
+                md_ul(
                     {
                         "block": {
                             "depth": 0,
@@ -48,7 +48,7 @@ class TestBlocks(unittest.TestCase):
         }
         self.assertEqual(
             DOM.render(
-                ol(
+                md_ol(
                     {
                         "block": b,
                         "blocks": [b],
@@ -67,7 +67,7 @@ class TestBlocks(unittest.TestCase):
         }
         self.assertEqual(
             DOM.render(
-                ol(
+                md_ol(
                     {
                         "block": b,
                         "blocks": [
@@ -84,7 +84,7 @@ class TestBlocks(unittest.TestCase):
     def test_make_ul_star(self):
         self.assertEqual(
             DOM.render(
-                make_ul("*")(
+                md_make_ul("*")(
                     {
                         "block": {"depth": 0},
                         "children": "test",
@@ -97,7 +97,7 @@ class TestBlocks(unittest.TestCase):
     def test_make_ul_plus(self):
         self.assertEqual(
             DOM.render(
-                make_ul("+")(
+                md_make_ul("+")(
                     {
                         "block": {"depth": 0},
                         "children": "test",
@@ -115,7 +115,7 @@ class TestBlocks(unittest.TestCase):
         }
         self.assertEqual(
             DOM.render(
-                make_ol(")")(
+                md_make_ol(")")(
                     {
                         "block": b,
                         "blocks": [b],
@@ -134,7 +134,7 @@ class TestBlocks(unittest.TestCase):
         }
         self.assertEqual(
             DOM.render(
-                make_ol(".")(
+                md_make_ol(".")(
                     {
                         "block": b,
                         "blocks": [
@@ -149,4 +149,4 @@ class TestBlocks(unittest.TestCase):
         )
 
     def test_list_wrapper(self):
-        self.assertEqual(DOM.render(list_wrapper({})), "")
+        self.assertEqual(DOM.render(md_list_wrapper({})), "")

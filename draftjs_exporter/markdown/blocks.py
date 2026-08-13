@@ -1,11 +1,11 @@
 """Markdown block-level components: headings, lists, blockquotes, and plain paragraphs."""
 
-from draftjs_exporter.markdown.helpers import block, inline, mark_safe
-from draftjs_exporter.markdown.lists import list_item, make_numbered_li_prefix
+from draftjs_exporter.markdown.helpers import md_block, md_inline, md_mark_safe
+from draftjs_exporter.markdown.lists import md_list_item, md_make_numbered_li_prefix
 from draftjs_exporter.types import Component, Element, Props
 
 
-def prefixed_block(prefix: str, block_prefix: bool = False) -> Component:
+def md_prefixed_block(prefix: str, block_prefix: bool = False) -> Component:
     """Create a block component that prefixes its children with the given string.
 
     Parameters:
@@ -16,12 +16,12 @@ def prefixed_block(prefix: str, block_prefix: bool = False) -> Component:
     Returns:
         A component that renders the prefixed block.
     """
-    return lambda props: block(
-        [mark_safe(prefix, block_prefix=block_prefix), props["children"]]
+    return lambda props: md_block(
+        [md_mark_safe(prefix, block_prefix=block_prefix), props["children"]]
     )
 
 
-def make_ul(marker: str) -> Component:
+def md_make_ul(marker: str) -> Component:
     """Create an unordered list item component using the given marker.
 
     Parameters:
@@ -31,10 +31,10 @@ def make_ul(marker: str) -> Component:
         A component that renders one unordered list item.
     """
     prefix = f"{marker} "
-    return lambda props: list_item(prefix, props)
+    return lambda props: md_list_item(prefix, props)
 
 
-def make_ol(delimiter: str) -> Component:
+def md_make_ol(delimiter: str) -> Component:
     """Create an ordered list item component using the given delimiter.
 
     Parameters:
@@ -43,11 +43,11 @@ def make_ol(delimiter: str) -> Component:
     Returns:
         A component that renders one ordered list item.
     """
-    get_prefix = make_numbered_li_prefix(delimiter)
-    return lambda props: list_item(get_prefix(props), props)
+    get_prefix = md_make_numbered_li_prefix(delimiter)
+    return lambda props: md_list_item(get_prefix(props), props)
 
 
-def list_wrapper(props: Props) -> Element:
+def md_list_wrapper(props: Props) -> Element:
     """Render a list wrapper as an empty inline fragment.
 
     Markdown lists are built from individual items, so no extra wrapper
@@ -59,8 +59,8 @@ def list_wrapper(props: Props) -> Element:
     Returns:
         An empty fragment that lets list items sit next to each other.
     """
-    return inline([])
+    return md_inline([])
 
 
-ul: Component = make_ul("-")
-ol: Component = make_ol(".")
+md_ul: Component = md_make_ul("-")
+md_ol: Component = md_make_ol(".")

@@ -10,12 +10,44 @@ from draftjs_exporter import (
     ContentState,
     Exporter,
     ExporterConfig,
+    HTMLExporter,
+    code_block,
+    md_block,
+    md_image,
+    md_link,
+    md_mark_safe,
+    render_children,
 )
+from draftjs_exporter.defaults import (
+    code_block as defaults_code_block,
+)
+from draftjs_exporter.defaults import (
+    render_children as defaults_render_children,
+)
+from draftjs_exporter.markdown.entities import md_image as entities_md_image
+from draftjs_exporter.markdown.entities import md_link as entities_md_link
+from draftjs_exporter.markdown.helpers import md_block as helpers_md_block
+from draftjs_exporter.markdown.helpers import md_mark_safe as helpers_md_mark_safe
 
 
 class TestTopLevelAPI(unittest.TestCase):
     def test_exporter_is_html(self):
         self.assertIs(Exporter, HTML)
+
+    def test_html_exporter_is_html(self):
+        self.assertIs(HTMLExporter, HTML)
+
+    def test_code_block_reexport(self):
+        self.assertIs(code_block, defaults_code_block)
+
+    def test_render_children_reexport(self):
+        self.assertIs(render_children, defaults_render_children)
+
+    def test_markdown_helpers_reexport(self):
+        self.assertIs(md_block, helpers_md_block)
+        self.assertIs(md_mark_safe, helpers_md_mark_safe)
+        self.assertIs(md_image, entities_md_image)
+        self.assertIs(md_link, entities_md_link)
 
     def test_all_members_importable(self):
         for name in draftjs_exporter.__all__:

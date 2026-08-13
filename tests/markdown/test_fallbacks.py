@@ -5,11 +5,11 @@ from draftjs_exporter.error import ConfigException
 from draftjs_exporter.html import HTML
 from draftjs_exporter.markdown import CONFIG, build_markdown_config
 from draftjs_exporter.markdown.fallbacks import (
-    block_fallback,
-    entity_fallback,
-    style_fallback,
+    md_block_fallback,
+    md_entity_fallback,
+    md_style_fallback,
 )
-from draftjs_exporter.markdown.helpers import block
+from draftjs_exporter.markdown.helpers import md_block
 from draftjs_exporter.types import ContentState, Element, Props
 
 LOGGER = "draftjs_exporter.markdown.fallbacks"
@@ -20,7 +20,7 @@ LOGGER = "draftjs_exporter.markdown.fallbacks"
 UNIT_CASES = [
     (
         "block",
-        block_fallback,
+        md_block_fallback,
         {"block": {"type": "custom-block"}, "children": "content"},
         "custom-block",
         "content\n\n",
@@ -28,7 +28,7 @@ UNIT_CASES = [
     ),
     (
         "entity",
-        entity_fallback,
+        md_entity_fallback,
         {"entity": {"type": "CUSTOM_ENTITY"}, "children": "link text"},
         "CUSTOM_ENTITY",
         "link text",
@@ -36,7 +36,7 @@ UNIT_CASES = [
     ),
     (
         "style",
-        style_fallback,
+        md_style_fallback,
         {"inline_style_range": {"style": "CUSTOM_STYLE"}, "children": "styled"},
         "CUSTOM_STYLE",
         "styled",
@@ -225,7 +225,7 @@ def test_custom_style_fallback():
 
 def test_custom_block_fallback():
     def custom_block(props: Props) -> Element:
-        return block(["[UNKNOWN] ", props["children"]])
+        return md_block(["[UNKNOWN] ", props["children"]])
 
     config = build_markdown_config({"block_fallback": custom_block})
     result = HTML(config).render(UNKNOWN_BLOCK_CONTENT)
