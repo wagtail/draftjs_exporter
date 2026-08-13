@@ -7,10 +7,10 @@ The exporter output is extensively configurable to cater for varied rich text re
 The configuration is a single dict passed to `HTML()`. It has four keys: `block_map`, `style_map`, `entity_decorators`, and `composite_decorators`. Each is optional and can be combined with the defaults the exporter provides.
 
 ```python
-from draftjs_exporter import BLOCK_MAP, BLOCK_TYPES, DOM, ENTITY_TYPES, INLINE_STYLES, STYLE_MAP
+from draftjs_exporter import BLOCK_MAP, BLOCK_TYPES, DOM, ENTITY_TYPES, INLINE_STYLES, STYLE_MAP, code_block, render_children
 ```
 
-The exporter ships with `BLOCK_MAP` and `STYLE_MAP` — sensible defaults for common HTML elements. Extend them with `**` to start from the defaults, or build your own from scratch.
+The exporter ships with `BLOCK_MAP` and `STYLE_MAP` — sensible defaults for common HTML elements. Extend them with `**` to start from the defaults, or build your own from scratch. The default `CODE` and `ATOMIC` entries use the reusable `code_block` and `render_children` components; import those when you want the same behavior in a custom map.
 
 ## Block map
 

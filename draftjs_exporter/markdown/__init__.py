@@ -11,31 +11,31 @@ from draftjs_exporter.defaults import BLOCK_MAP as HTML_BLOCK_MAP
 from draftjs_exporter.defaults import STYLE_MAP as HTML_STYLE_MAP
 from draftjs_exporter.html import ExporterConfig
 from draftjs_exporter.markdown.blocks import (
-    list_wrapper,
-    make_ol,
-    make_ul,
-    ol,
-    prefixed_block,
-    ul,
+    md_list_wrapper,
+    md_make_ol,
+    md_make_ul,
+    md_ol,
+    md_prefixed_block,
+    md_ul,
 )
 from draftjs_exporter.markdown.code import (
-    code_element,
-    code_wrapper,
-    make_code_element,
-    make_code_wrapper,
+    md_code_element,
+    md_code_wrapper,
+    md_make_code_element,
+    md_make_code_wrapper,
 )
 from draftjs_exporter.markdown.entities import (
-    horizontal_rule,
-    image,
-    link,
-    make_horizontal_rule,
+    md_horizontal_rule,
+    md_image,
+    md_link,
+    md_make_horizontal_rule,
 )
 from draftjs_exporter.markdown.fallbacks import (
-    block_fallback,
-    entity_fallback,
-    style_fallback,
+    md_block_fallback,
+    md_entity_fallback,
+    md_style_fallback,
 )
-from draftjs_exporter.markdown.styles import code_span, inline_style
+from draftjs_exporter.markdown.styles import md_code_span, md_inline_style
 from draftjs_exporter.types import Component, ConfigMap
 
 
@@ -57,46 +57,46 @@ class MarkdownOptions(TypedDict, total=False):
 BLOCK_MAP: ConfigMap = {
     **HTML_BLOCK_MAP,
     **{
-        BLOCK_TYPES.UNSTYLED: prefixed_block(""),
-        BLOCK_TYPES.HEADER_ONE: prefixed_block("# "),
-        BLOCK_TYPES.HEADER_TWO: prefixed_block("## "),
-        BLOCK_TYPES.HEADER_THREE: prefixed_block("### "),
-        BLOCK_TYPES.HEADER_FOUR: prefixed_block("#### "),
-        BLOCK_TYPES.HEADER_FIVE: prefixed_block("##### "),
-        BLOCK_TYPES.HEADER_SIX: prefixed_block("###### "),
+        BLOCK_TYPES.UNSTYLED: md_prefixed_block(""),
+        BLOCK_TYPES.HEADER_ONE: md_prefixed_block("# "),
+        BLOCK_TYPES.HEADER_TWO: md_prefixed_block("## "),
+        BLOCK_TYPES.HEADER_THREE: md_prefixed_block("### "),
+        BLOCK_TYPES.HEADER_FOUR: md_prefixed_block("#### "),
+        BLOCK_TYPES.HEADER_FIVE: md_prefixed_block("##### "),
+        BLOCK_TYPES.HEADER_SIX: md_prefixed_block("###### "),
         BLOCK_TYPES.UNORDERED_LIST_ITEM: {
-            "element": ul,
-            "wrapper": list_wrapper,
+            "element": md_ul,
+            "wrapper": md_list_wrapper,
         },
         BLOCK_TYPES.ORDERED_LIST_ITEM: {
-            "element": ol,
-            "wrapper": list_wrapper,
+            "element": md_ol,
+            "wrapper": md_list_wrapper,
         },
-        BLOCK_TYPES.BLOCKQUOTE: prefixed_block("> ", block_prefix=True),
+        BLOCK_TYPES.BLOCKQUOTE: md_prefixed_block("> ", block_prefix=True),
         BLOCK_TYPES.CODE: {
-            "element": code_element,
-            "wrapper": code_wrapper,
+            "element": md_code_element,
+            "wrapper": md_code_wrapper,
         },
-        BLOCK_TYPES.FALLBACK: block_fallback,
+        BLOCK_TYPES.FALLBACK: md_block_fallback,
     },
 }
 
 STYLE_MAP: ConfigMap = dict(
     HTML_STYLE_MAP,
     **{
-        INLINE_STYLES.BOLD: inline_style("**"),
-        INLINE_STYLES.CODE: code_span,
-        INLINE_STYLES.ITALIC: inline_style("_"),
-        INLINE_STYLES.STRIKETHROUGH: inline_style("~"),
-        INLINE_STYLES.FALLBACK: style_fallback,
+        INLINE_STYLES.BOLD: md_inline_style("**"),
+        INLINE_STYLES.CODE: md_code_span,
+        INLINE_STYLES.ITALIC: md_inline_style("_"),
+        INLINE_STYLES.STRIKETHROUGH: md_inline_style("~"),
+        INLINE_STYLES.FALLBACK: md_style_fallback,
     },
 )
 
 ENTITY_DECORATORS: ConfigMap = {
-    ENTITY_TYPES.IMAGE: image,
-    ENTITY_TYPES.LINK: link,
-    ENTITY_TYPES.HORIZONTAL_RULE: horizontal_rule,
-    ENTITY_TYPES.FALLBACK: entity_fallback,
+    ENTITY_TYPES.IMAGE: md_image,
+    ENTITY_TYPES.LINK: md_link,
+    ENTITY_TYPES.HORIZONTAL_RULE: md_horizontal_rule,
+    ENTITY_TYPES.FALLBACK: md_entity_fallback,
 }
 
 ENGINE = "draftjs_exporter.engines.markdown.DOMMarkdown"
@@ -132,41 +132,41 @@ def build_markdown_config(options: MarkdownOptions | None = None) -> ExporterCon
     fence = opts.get("code_fence", "```")
 
     block_map: ConfigMap = {
-        BLOCK_TYPES.UNSTYLED: prefixed_block(""),
-        BLOCK_TYPES.HEADER_ONE: prefixed_block("# "),
-        BLOCK_TYPES.HEADER_TWO: prefixed_block("## "),
-        BLOCK_TYPES.HEADER_THREE: prefixed_block("### "),
-        BLOCK_TYPES.HEADER_FOUR: prefixed_block("#### "),
-        BLOCK_TYPES.HEADER_FIVE: prefixed_block("##### "),
-        BLOCK_TYPES.HEADER_SIX: prefixed_block("###### "),
+        BLOCK_TYPES.UNSTYLED: md_prefixed_block(""),
+        BLOCK_TYPES.HEADER_ONE: md_prefixed_block("# "),
+        BLOCK_TYPES.HEADER_TWO: md_prefixed_block("## "),
+        BLOCK_TYPES.HEADER_THREE: md_prefixed_block("### "),
+        BLOCK_TYPES.HEADER_FOUR: md_prefixed_block("#### "),
+        BLOCK_TYPES.HEADER_FIVE: md_prefixed_block("##### "),
+        BLOCK_TYPES.HEADER_SIX: md_prefixed_block("###### "),
         BLOCK_TYPES.UNORDERED_LIST_ITEM: {
-            "element": make_ul(ul_marker),
-            "wrapper": list_wrapper,
+            "element": md_make_ul(ul_marker),
+            "wrapper": md_list_wrapper,
         },
         BLOCK_TYPES.ORDERED_LIST_ITEM: {
-            "element": make_ol(ol_delimiter),
-            "wrapper": list_wrapper,
+            "element": md_make_ol(ol_delimiter),
+            "wrapper": md_list_wrapper,
         },
-        BLOCK_TYPES.BLOCKQUOTE: prefixed_block("> ", block_prefix=True),
+        BLOCK_TYPES.BLOCKQUOTE: md_prefixed_block("> ", block_prefix=True),
         BLOCK_TYPES.CODE: {
-            "element": make_code_element(),
-            "wrapper": make_code_wrapper(fence),
+            "element": md_make_code_element(),
+            "wrapper": md_make_code_wrapper(fence),
         },
         BLOCK_TYPES.ATOMIC: lambda props: props["children"],
     }
 
     style_map: ConfigMap = {
         **HTML_STYLE_MAP,
-        INLINE_STYLES.BOLD: inline_style(bold),
-        INLINE_STYLES.CODE: code_span,
-        INLINE_STYLES.ITALIC: inline_style(italic),
-        INLINE_STYLES.STRIKETHROUGH: inline_style(strikethrough),
+        INLINE_STYLES.BOLD: md_inline_style(bold),
+        INLINE_STYLES.CODE: md_code_span,
+        INLINE_STYLES.ITALIC: md_inline_style(italic),
+        INLINE_STYLES.STRIKETHROUGH: md_inline_style(strikethrough),
     }
 
     entity_decorators: ConfigMap = {
-        ENTITY_TYPES.IMAGE: image,
-        ENTITY_TYPES.LINK: link,
-        ENTITY_TYPES.HORIZONTAL_RULE: make_horizontal_rule(hr),
+        ENTITY_TYPES.IMAGE: md_image,
+        ENTITY_TYPES.LINK: md_link,
+        ENTITY_TYPES.HORIZONTAL_RULE: md_make_horizontal_rule(hr),
     }
 
     _apply_fallback(
@@ -174,21 +174,21 @@ def build_markdown_config(options: MarkdownOptions | None = None) -> ExporterCon
         BLOCK_TYPES.FALLBACK,
         "block_fallback" in opts,
         opts.get("block_fallback"),
-        block_fallback,
+        md_block_fallback,
     )
     _apply_fallback(
         style_map,
         INLINE_STYLES.FALLBACK,
         "style_fallback" in opts,
         opts.get("style_fallback"),
-        style_fallback,
+        md_style_fallback,
     )
     _apply_fallback(
         entity_decorators,
         ENTITY_TYPES.FALLBACK,
         "entity_fallback" in opts,
         opts.get("entity_fallback"),
-        entity_fallback,
+        md_entity_fallback,
     )
 
     return {

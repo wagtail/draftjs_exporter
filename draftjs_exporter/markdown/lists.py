@@ -3,11 +3,11 @@
 from collections.abc import Callable
 
 from draftjs_exporter.dom import DOM
-from draftjs_exporter.markdown.helpers import mark_safe
+from draftjs_exporter.markdown.helpers import md_mark_safe
 from draftjs_exporter.types import Block, Element, Props
 
 
-def get_block_index(blocks: list[Block], key: str) -> int:
+def md_get_block_index(blocks: list[Block], key: str) -> int:
     """Find the index of the block with the given key.
 
     Parameters:
@@ -21,7 +21,7 @@ def get_block_index(blocks: list[Block], key: str) -> int:
     return keys[0] if keys else -1
 
 
-def get_li_suffix(props: Props) -> str:
+def md_get_li_suffix(props: Props) -> str:
     r"""Choose a list item suffix based on the following block type.
 
     Parameters:
@@ -36,13 +36,13 @@ def get_li_suffix(props: Props) -> str:
         return "\n"
 
     blocks = props["blocks"]
-    i = get_block_index(blocks, key)
+    i = md_get_block_index(blocks, key)
     next_block_type = blocks[i + 1]["type"] if i + 1 < len(blocks) else None
 
     return "\n\n" if next_block_type != props["block"]["type"] else "\n"
 
 
-def make_numbered_li_prefix(delimiter: str) -> Callable[[Props], str]:
+def md_make_numbered_li_prefix(delimiter: str) -> Callable[[Props], str]:
     """Create a function that computes an ordered list item prefix.
 
     The returned function counts preceding list items at the same depth
@@ -86,10 +86,10 @@ def make_numbered_li_prefix(delimiter: str) -> Callable[[Props], str]:
     return get_prefix
 
 
-get_numbered_li_prefix: Callable[[Props], str] = make_numbered_li_prefix(".")
+md_get_numbered_li_prefix: Callable[[Props], str] = md_make_numbered_li_prefix(".")
 
 
-def list_item(prefix: str, props: Props) -> Element:
+def md_list_item(prefix: str, props: Props) -> Element:
     """Render a single Markdown list item with indentation and suffix.
 
     Parameters:
@@ -100,15 +100,15 @@ def list_item(prefix: str, props: Props) -> Element:
         A fragment containing the indented prefix, children, and trailing newline.
     """
     indent = "  " * props["block"]["depth"]
-    suffix = get_li_suffix(props)
+    suffix = md_get_li_suffix(props)
 
     return DOM.create_element(
         "fragment",
         {},
         [
-            mark_safe(indent, block_prefix=True),
-            mark_safe(prefix, block_prefix=True),
+            md_mark_safe(indent, block_prefix=True),
+            md_mark_safe(prefix, block_prefix=True),
             props["children"],
-            mark_safe(suffix),
+            md_mark_safe(suffix),
         ],
     )

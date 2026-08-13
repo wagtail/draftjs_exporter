@@ -1,10 +1,15 @@
 """Markdown entity decorators for images, links, and horizontal rules."""
 
-from draftjs_exporter.markdown.helpers import block, inline, link_destination, mark_safe
+from draftjs_exporter.markdown.helpers import (
+    md_block,
+    md_inline,
+    md_link_destination,
+    md_mark_safe,
+)
 from draftjs_exporter.types import Component, Element, Props
 
 
-def image(props: Props) -> Element:
+def md_image(props: Props) -> Element:
     """Render an image as a Markdown image reference.
 
     Parameters:
@@ -13,18 +18,18 @@ def image(props: Props) -> Element:
     Returns:
         A block-level image element.
     """
-    return block(
+    return md_block(
         [
-            mark_safe("!["),
+            md_mark_safe("!["),
             props.get("alt", ""),
-            mark_safe("]("),
-            link_destination(props["src"]),
-            mark_safe(")"),
+            md_mark_safe("]("),
+            md_link_destination(props["src"]),
+            md_mark_safe(")"),
         ]
     )
 
 
-def link(props: Props) -> Element:
+def md_link(props: Props) -> Element:
     """Render a link as a Markdown inline reference.
 
     Parameters:
@@ -33,18 +38,18 @@ def link(props: Props) -> Element:
     Returns:
         An inline link element.
     """
-    return inline(
+    return md_inline(
         [
-            mark_safe("["),
+            md_mark_safe("["),
             props["children"],
-            mark_safe("]("),
-            link_destination(props["url"]),
-            mark_safe(")"),
+            md_mark_safe("]("),
+            md_link_destination(props["url"]),
+            md_mark_safe(")"),
         ]
     )
 
 
-def make_horizontal_rule(marker: str) -> Component:
+def md_make_horizontal_rule(marker: str) -> Component:
     """Create a horizontal rule component using the given marker.
 
     Parameters:
@@ -53,7 +58,7 @@ def make_horizontal_rule(marker: str) -> Component:
     Returns:
         A component that renders a horizontal rule.
     """
-    return lambda props: block([mark_safe(marker)])
+    return lambda props: md_block([md_mark_safe(marker)])
 
 
-horizontal_rule: Component = make_horizontal_rule("---")
+md_horizontal_rule: Component = md_make_horizontal_rule("---")

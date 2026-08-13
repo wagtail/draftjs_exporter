@@ -44,6 +44,17 @@ def blockquote(props):
 
 Pass `props['children']` as the last argument to `DOM.create_element` so the block's content is displayed inside the element you create.
 
+The package also ships two reusable block components you can import from the root:
+
+```python
+from draftjs_exporter import code_block, render_children
+```
+
+- `code_block` wraps children in `<pre><code>…</code></pre>` (used by default for `BLOCK_TYPES.CODE`).
+- `render_children` returns children with no wrapping markup (used by default for `BLOCK_TYPES.ATOMIC`).
+
+Reuse them when extending `BLOCK_MAP`, or as a starting point for your own components.
+
 ## Nesting and reusing components
 
 `DOM.create_element` accepts any number of children after the props dict. Children can be strings, DOM elements, other components, or `None` (which renders nothing). This lets you compose components the same way you would compose HTML tags.

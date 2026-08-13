@@ -2,13 +2,13 @@
 
 import logging
 
-from draftjs_exporter.markdown.helpers import block
+from draftjs_exporter.markdown.helpers import md_block
 from draftjs_exporter.types import Element, Props
 
 logger = logging.getLogger(__name__)
 
 
-def block_fallback(props: Props) -> Element:
+def md_block_fallback(props: Props) -> Element:
     """Render an unknown block type as plain text.
 
     Parameters:
@@ -19,10 +19,10 @@ def block_fallback(props: Props) -> Element:
     """
     type_ = props["block"]["type"]
     logger.warning('Unknown block type "%s". Rendering as plain text.', type_)
-    return block([props["children"]])
+    return md_block([props["children"]])
 
 
-def entity_fallback(props: Props) -> Element:
+def md_entity_fallback(props: Props) -> Element:
     """Render an unknown entity type as plain text.
 
     Parameters:
@@ -36,7 +36,7 @@ def entity_fallback(props: Props) -> Element:
     return props["children"]
 
 
-def style_fallback(props: Props) -> Element:
+def md_style_fallback(props: Props) -> Element:
     """Render an unknown inline style as plain text.
 
     Parameters:

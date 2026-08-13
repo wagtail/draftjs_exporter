@@ -4,6 +4,18 @@
 
 ## [Unreleased]
 
+## [v7.1.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v7.1.0)
+
+### Added
+
+- Re-export `code_block` and `render_children` from the package root.
+- Add `HTMLExporter` as a compatibility alias for `HTML` (alongside `Exporter`).
+- Re-export Markdown helpers from the package root with an `md_` prefix (for example `md_link`, `md_image`, `md_mark_safe`, `md_prefixed_block`).
+
+### Changed
+
+- Rename Markdown component helpers to use an `md_` prefix (for example `link` → `md_link`, `mark_safe` → `md_mark_safe`). Import them from `draftjs_exporter` under their new names.
+
 ## [v7.0.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v7.0.0)
 
 ### Added

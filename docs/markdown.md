@@ -51,12 +51,11 @@ All are optional. Omitted options use the defaults shown below. All defaults pro
 The three fallback options control what happens when the exporter encounters a block type, entity type, or inline style that has no explicit mapping. By default, each logs a warning and renders the content as plain text. Pass a custom `Component` function to change this behavior, or `None` to disable the fallback entirely.
 
 ```python
-from draftjs_exporter import HTML, build_markdown_config
-from draftjs_exporter.markdown.helpers import block
+from draftjs_exporter import HTML, build_markdown_config, md_block
 
 
 def my_block_fallback(props):
-    return block(["<!-- unknown --> ", props["children"]])
+    return md_block(["<!-- unknown --> ", props["children"]])
 
 
 config = build_markdown_config({
@@ -101,49 +100,62 @@ The following table shows every Draft.js content type the Markdown exporter hand
 
 ## Low-level API
 
-For cases where `build_markdown_config` is not flexible enough, you can build a config dict manually from the individual component functions. This is the same approach used by the default `CONFIG` and `build_markdown_config` internally. The constants and default maps are available from the top-level package; the Markdown-specific component functions live in submodules:
+For cases where `build_markdown_config` is not flexible enough, you can build a config dict manually from the individual component functions. This is the same approach used by the default `CONFIG` and `build_markdown_config` internally. All Markdown helpers are re-exported from the package root with an `md_` prefix:
 
 ```python
-from draftjs_exporter import BLOCK_MAP as HTML_BLOCK_MAP, BLOCK_TYPES, ENTITY_TYPES, INLINE_STYLES, STYLE_MAP as HTML_STYLE_MAP
-from draftjs_exporter.markdown.blocks import list_wrapper, make_ul, ol, prefixed_block
-from draftjs_exporter.markdown.code import code_element, code_wrapper
-from draftjs_exporter.markdown.entities import image, link, make_horizontal_rule
-from draftjs_exporter.markdown.styles import code_span, inline_style
+from draftjs_exporter import (
+    BLOCK_MAP as HTML_BLOCK_MAP,
+    BLOCK_TYPES,
+    ENTITY_TYPES,
+    INLINE_STYLES,
+    STYLE_MAP as HTML_STYLE_MAP,
+    md_code_element,
+    md_code_span,
+    md_code_wrapper,
+    md_image,
+    md_inline_style,
+    md_link,
+    md_list_wrapper,
+    md_make_horizontal_rule,
+    md_make_ul,
+    md_ol,
+    md_prefixed_block,
+)
 
 config = {
     "engine": "draftjs_exporter.engines.markdown.DOMMarkdown",
     "block_map": {
         **HTML_BLOCK_MAP,
-        BLOCK_TYPES.UNSTYLED: prefixed_block(""),
-        BLOCK_TYPES.HEADER_ONE: prefixed_block("# "),
+        BLOCK_TYPES.UNSTYLED: md_prefixed_block(""),
+        BLOCK_TYPES.HEADER_ONE: md_prefixed_block("# "),
         # ... other headings ...
         BLOCK_TYPES.UNORDERED_LIST_ITEM: {
-            "element": make_ul("*"),
-            "wrapper": list_wrapper,
+            "element": md_make_ul("*"),
+            "wrapper": md_list_wrapper,
         },
         BLOCK_TYPES.ORDERED_LIST_ITEM: {
-            "element": ol,
-            "wrapper": list_wrapper,
+            "element": md_ol,
+            "wrapper": md_list_wrapper,
         },
-        BLOCK_TYPES.BLOCKQUOTE: prefixed_block("> ", block_prefix=True),
+        BLOCK_TYPES.BLOCKQUOTE: md_prefixed_block("> ", block_prefix=True),
         BLOCK_TYPES.CODE: {
-            "element": code_element,
-            "wrapper": code_wrapper,
+            "element": md_code_element,
+            "wrapper": md_code_wrapper,
         },
     },
     "style_map": dict(
         HTML_STYLE_MAP,
         **{
-            INLINE_STYLES.BOLD: inline_style("__"),
-            INLINE_STYLES.CODE: code_span,
-            INLINE_STYLES.ITALIC: inline_style("*"),
-            INLINE_STYLES.STRIKETHROUGH: inline_style("~~"),
+            INLINE_STYLES.BOLD: md_inline_style("__"),
+            INLINE_STYLES.CODE: md_code_span,
+            INLINE_STYLES.ITALIC: md_inline_style("*"),
+            INLINE_STYLES.STRIKETHROUGH: md_inline_style("~~"),
         },
     ),
     "entity_decorators": {
-        ENTITY_TYPES.IMAGE: image,
-        ENTITY_TYPES.LINK: link,
-        ENTITY_TYPES.HORIZONTAL_RULE: make_horizontal_rule("***"),
+        ENTITY_TYPES.IMAGE: md_image,
+        ENTITY_TYPES.LINK: md_link,
+        ENTITY_TYPES.HORIZONTAL_RULE: md_make_horizontal_rule("***"),
     },
 }
 ```
@@ -179,11 +191,10 @@ exporter.render({
 
 ### Escaping in custom components
 
-When you write custom Markdown components, any plain strings they emit are escaped as user text. Wrap structural syntax with `mark_safe` so it renders verbatim, and route URLs through `link_destination`:
+When you write custom Markdown components, any plain strings they emit are escaped as user text. Wrap structural syntax with `md_mark_safe` so it renders verbatim, and route URLs through `md_link_destination`:
 
 ```python
-from draftjs_exporter import DOM, Element, Props
-from draftjs_exporter.markdown.helpers import link_destination, mark_safe
+from draftjs_exporter import DOM, Element, Props, md_link_destination, md_mark_safe
 
 
 def mention(props: Props) -> Element:
@@ -192,16 +203,16 @@ def mention(props: Props) -> Element:
         "fragment",
         {},
         [
-            mark_safe("[@"),
+            md_mark_safe("[@"),
             props["children"],  # Plain text, escaped automatically.
-            mark_safe("]("),
-            link_destination(props["url"]),  # Escaped for ](…) destinations.
-            mark_safe(")"),
+            md_mark_safe("]("),
+            md_link_destination(props["url"]),  # Escaped for ](…) destinations.
+            md_mark_safe(")"),
         ],
     )
 ```
 
-Use `mark_safe(markup, block_prefix=True)` for prefixes after which nested blocks can start (list markers, blockquote `> `), so text following them still gets line-start escaping. The escaping functions are also available directly for lower-level needs:
+Use `md_mark_safe(markup, block_prefix=True)` for prefixes after which nested blocks can start (list markers, blockquote `> `), so text following them still gets line-start escaping. The escaping functions are also available directly for lower-level needs:
 
 ```python
 from draftjs_exporter.markdown.escape import escape_link_destination, escape_text

@@ -10,7 +10,7 @@ metadata:
 
 Python library converting Draft.js raw [ContentState](https://wagtail.github.io/draftjs_exporter/content-state/) JSON into HTML or Markdown. Maintained by [Wagtail](https://wagtail.org/) contributors, developed alongside the [Draftail](https://www.draftail.org/) rich text editor.
 
-The public API is small: an `HTML` exporter class, a `DOM` namespace with a React-like `create_element`, default config maps (`BLOCK_MAP`, `STYLE_MAP`), constants (`BLOCK_TYPES`, `ENTITY_TYPES`, `INLINE_STYLES`), and type aliases (`Props`, `Element`, `Component`, `ContentState`). Almost everything else is configuration.
+The public API is small: an `HTMLExporter` class, a `DOM` namespace with a React-like `create_element`, default config maps (`BLOCK_MAP`, `STYLE_MAP`) and helpers (`code_block`, `render_children`), Markdown helpers (`md_*`), constants (`BLOCK_TYPES`, `ENTITY_TYPES`, `INLINE_STYLES`), and type aliases (`Props`, `Element`, `Component`, `ContentState`). Almost everything else is configuration.
 
 ## Quick reference
 
@@ -223,11 +223,13 @@ See [Markdown importer](https://wagtail.github.io/draftjs_exporter/markdown-impo
 
 All imported from `draftjs_exporter` directly:
 
-- **`HTML`** (alias: `Exporter`) — `HTML(config).render(content_state)`.
+- **`HTMLExporter`** — `HTMLExporter(config).render(content_state)`.
 - **`DOM`** — facade over the active engine. `create_element`, `render`, `render_debug`, `parse_html`, `append_child`, `camel_to_dash`. Engine constants: `DOM.STRING`, `DOM.HTML5LIB`, `DOM.LXML`, `DOM.STRING_COMPAT`, `DOM.MARKDOWN`.
 - **Default maps & configs**: `BLOCK_MAP`, `STYLE_MAP`, `HTML_CONFIG`, `MARKDOWN_CONFIG`.
+- **Default components**: `code_block` (`pre` > `code`), `render_children` (passthrough; used for atomic blocks).
 - **Constants**: `BLOCK_TYPES`, `INLINE_STYLES`, `ENTITY_TYPES` (each with a `FALLBACK` member).
 - **Markdown helper**: `build_markdown_config(options)`, plus the option type alias `MarkdownOptions`.
+- **Markdown components**: `md_block`, `md_inline`, `md_mark_safe`, `md_link_destination`, `md_link`, `md_image`, `md_prefixed_block`, `md_make_ul` / `md_ul`, `md_make_ol` / `md_ol`, `md_list_wrapper`, `md_code_element` / `md_code_wrapper`, `md_inline_style`, `md_code_span`, `md_horizontal_rule` / `md_make_horizontal_rule`, `md_*_fallback`.
 - **Importer**: `MarkdownImporter(config).import_markdown(markdown)` — converts Markdown to ContentState. Config keys: `parser` (dotted path), `parser_config` (feature toggles, `link_resolvers`/`image_resolvers`, `inline_html_styles`), `filter_rules`.
 - **Parser**: `MarkdownParser(config).parse(markdown)`, `ParserConfig`, `scheme_resolver(scheme, type_map, coerce, label_key, mutability)`, `EntityResolver`, `EntityResolution`.
 - **Filter**: `ContentStateFilter(rules).apply(content_state)`, `FilterRule` (`type`/`match`/`action`; actions `remove`/`keep`/`demote`/callable).

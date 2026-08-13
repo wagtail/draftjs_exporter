@@ -4,10 +4,10 @@ from draftjs_exporter.dom import DOM
 from draftjs_exporter.html import HTML
 from draftjs_exporter.markdown import CONFIG as MARKDOWN_CONFIG
 from draftjs_exporter.markdown.code import (
-    code_element,
-    code_wrapper,
-    make_code_element,
-    make_code_wrapper,
+    md_code_element,
+    md_code_wrapper,
+    md_make_code_element,
+    md_make_code_wrapper,
 )
 
 
@@ -33,7 +33,7 @@ def render_code_block(text: str) -> str:
 class TestCodeElement(unittest.TestCase):
     def test_renders_line_with_newline(self):
         self.assertEqual(
-            DOM.render(code_element({"block": {}, "children": "test"})),
+            DOM.render(md_code_element({"block": {}, "children": "test"})),
             "test\n",
         )
 
@@ -41,21 +41,21 @@ class TestCodeElement(unittest.TestCase):
 class TestMakeCodeElement(unittest.TestCase):
     def test_renders_line_with_newline(self):
         self.assertEqual(
-            DOM.render(make_code_element()({"block": {}, "children": "test"})),
+            DOM.render(md_make_code_element()({"block": {}, "children": "test"})),
             "test\n",
         )
 
 
 class TestCodeWrapper(unittest.TestCase):
     def test_renders_code_block_node(self):
-        elt = code_wrapper({"block": {}})
+        elt = md_code_wrapper({"block": {}})
         self.assertEqual(elt.type, "code_block")
         self.assertEqual(elt.attr["fence"], "`")
 
 
 class TestMakeCodeWrapper(unittest.TestCase):
     def test_tilde_fence(self):
-        elt = make_code_wrapper("~~~")({"block": {}})
+        elt = md_make_code_wrapper("~~~")({"block": {}})
         self.assertEqual(elt.attr["fence"], "~")
 
 
