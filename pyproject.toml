@@ -1,6 +1,6 @@
 [project]
 name = "draftjs_exporter"
-version = "7.0.0"
+version = "7.1.0"
 description = "Library to convert rich text from Draft.js raw ContentState to HTML"
 readme = "README.md"
 license = "MIT"
