@@ -27,7 +27,9 @@ class DOMListTree(DOMEngine):
 Reference your engine in the exporter config using dotted module syntax, so the exporter can import it at runtime:
 
 ```python
-exporter = HTML({
-    'engine': 'my_project.example.DOMListTree',
-})
+exporter = HTML(
+    {
+        "engine": "my_project.example.DOMListTree",
+    }
+)
 ```

@@ -87,9 +87,11 @@ Not supported: reference-style links, Setext headings, indented code blocks, tab
 Disabled constructs pass through as plain text. For example, with `"headings": False`, the source `# Title` imports as a paragraph containing the literal text `# Title`.
 
 ```python
-importer = MarkdownImporter({
-    "parser_config": {"blockquote": False},
-})
+importer = MarkdownImporter(
+    {
+        "parser_config": {"blockquote": False},
+    }
+)
 ```
 
 ## Entity resolution
@@ -108,26 +110,28 @@ Resolvers can return any entity type, so a single chain can route different URL 
 ```python
 from draftjs_exporter import MarkdownImporter, scheme_resolver
 
-importer = MarkdownImporter({
-    "parser_config": {
-        "link_resolvers": [
-            scheme_resolver(
-                "wagtail",
-                {"page": "LINK", "document": "DOCUMENT"},
-                coerce={"id": int},
-            ),
-        ],
-        "image_resolvers": [
-            scheme_resolver(
-                "wagtail",
-                {"image": "IMAGE", "media": "EMBED"},
-                coerce={"id": int},
-                label_key="alt",
-                mutability="IMMUTABLE",
-            ),
-        ],
-    },
-})
+importer = MarkdownImporter(
+    {
+        "parser_config": {
+            "link_resolvers": [
+                scheme_resolver(
+                    "wagtail",
+                    {"page": "LINK", "document": "DOCUMENT"},
+                    coerce={"id": int},
+                ),
+            ],
+            "image_resolvers": [
+                scheme_resolver(
+                    "wagtail",
+                    {"image": "IMAGE", "media": "EMBED"},
+                    coerce={"id": int},
+                    label_key="alt",
+                    mutability="IMMUTABLE",
+                ),
+            ],
+        },
+    }
+)
 ```
 
 With this configuration:
@@ -156,9 +160,12 @@ def user_mentions(url, label):
         return {"type": "LINK", "data": {"username": username}}
     return None
 
-importer = MarkdownImporter({
-    "parser_config": {"link_resolvers": [user_mentions]},
-})
+
+importer = MarkdownImporter(
+    {
+        "parser_config": {"link_resolvers": [user_mentions]},
+    }
+)
 ```
 
 Resolvers run in order; the first non-`None` result wins. A resolution must include a `type`, and `data` must be a dict when present — anything else raises `MarkdownParseError`.
@@ -170,14 +177,16 @@ Markdown has no syntax for some inline styles, such as superscript and subscript
 ```python
 from draftjs_exporter import INLINE_STYLES, MarkdownImporter
 
-importer = MarkdownImporter({
-    "parser_config": {
-        "inline_html_styles": {
-            "sup": INLINE_STYLES.SUPERSCRIPT,
-            "sub": INLINE_STYLES.SUBSCRIPT,
+importer = MarkdownImporter(
+    {
+        "parser_config": {
+            "inline_html_styles": {
+                "sup": INLINE_STYLES.SUPERSCRIPT,
+                "sub": INLINE_STYLES.SUBSCRIPT,
+            },
         },
-    },
-})
+    }
+)
 content_state = importer.import_markdown("E = mc<sup>2</sup>")
 ```
 
@@ -199,11 +208,13 @@ For example, to demote all level-1 headings on import:
 ```python
 from draftjs_exporter import BLOCK_TYPES, MarkdownImporter
 
-importer = MarkdownImporter({
-    "filter_rules": [
-        {"type": "block", "match": BLOCK_TYPES.HEADER_ONE, "action": "demote"},
-    ],
-})
+importer = MarkdownImporter(
+    {
+        "filter_rules": [
+            {"type": "block", "match": BLOCK_TYPES.HEADER_ONE, "action": "demote"},
+        ],
+    }
+)
 ```
 
 Objects without a matching rule are kept. The filter always produces a valid ContentState: entity ranges and the entity map stay in sync, and list depths are re-normalized when items are removed.
@@ -213,9 +224,11 @@ Objects without a matching rule are kept. The filter always produces a valid Con
 ```python
 from draftjs_exporter import ContentStateFilter
 
-filter_ = ContentStateFilter([
-    {"type": "entity", "match": "LINK", "action": "remove"},
-])
+filter_ = ContentStateFilter(
+    [
+        {"type": "entity", "match": "LINK", "action": "remove"},
+    ]
+)
 filtered = filter_.apply(content_state)
 ```
 
@@ -237,9 +250,11 @@ except MarkdownParseError as e:
 The parser is referenced by dotted path in the importer config, so an alternative engine — for example one backed by a full CommonMark parser — can replace the built-in one:
 
 ```python
-importer = MarkdownImporter({
-    "parser": "my_project.markdown.MistuneParser",
-})
+importer = MarkdownImporter(
+    {
+        "parser": "my_project.markdown.MistuneParser",
+    }
+)
 ```
 
 A parser engine is a class accepting a config dict (or `None`) and exposing `parse(markdown: str) -> ContentState`. Filtering applies to the engine's output as usual.

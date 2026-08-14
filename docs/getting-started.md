@@ -17,17 +17,21 @@ from draftjs_exporter import HTML
 
 exporter = HTML({})
 
-html = exporter.render({
-    'entityMap': {},
-    'blocks': [{
-        'key': '6m5fh',
-        'text': 'Hello, world!',
-        'type': 'unstyled',
-        'depth': 0,
-        'inlineStyleRanges': [],
-        'entityRanges': []
-    }]
-})
+html = exporter.render(
+    {
+        "entityMap": {},
+        "blocks": [
+            {
+                "key": "6m5fh",
+                "text": "Hello, world!",
+                "type": "unstyled",
+                "depth": 0,
+                "inlineStyleRanges": [],
+                "entityRanges": [],
+            }
+        ],
+    }
+)
 
 print(html)
 ```
@@ -45,13 +49,17 @@ The exporter's codebase uses static type annotations, checked with mypy and ty. 
 ```python
 from draftjs_exporter import DOM, Element, Props
 
+
 def image(props: Props) -> Element:
-    return DOM.create_element('img', {
-        'src': props.get('src'),
-        'width': props.get('width'),
-        'height': props.get('height'),
-        'alt': props.get('alt'),
-    })
+    return DOM.create_element(
+        "img",
+        {
+            "src": props.get("src"),
+            "width": props.get("width"),
+            "height": props.get("height"),
+            "alt": props.get("alt"),
+        },
+    )
 ```
 
 See [Custom components](guides/custom-components.md) for the full component API.

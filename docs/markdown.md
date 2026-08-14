@@ -22,12 +22,14 @@ Different Markdown processors and style guides prefer different syntax for the s
 ```python
 from draftjs_exporter import HTML, build_markdown_config
 
-config = build_markdown_config({
-    "bold": "__",
-    "italic": "*",
-    "unordered_list_marker": "*",
-    "ordered_list_delimiter": ")",
-})
+config = build_markdown_config(
+    {
+        "bold": "__",
+        "italic": "*",
+        "unordered_list_marker": "*",
+        "ordered_list_delimiter": ")",
+    }
+)
 exporter = HTML(config)
 ```
 
@@ -58,10 +60,12 @@ def my_block_fallback(props):
     return md_block(["<!-- unknown --> ", props["children"]])
 
 
-config = build_markdown_config({
-    "block_fallback": my_block_fallback,
-    "style_fallback": None,
-})
+config = build_markdown_config(
+    {
+        "block_fallback": my_block_fallback,
+        "style_fallback": None,
+    }
+)
 ```
 
 In this example, unknown blocks are prefixed with an HTML comment, while unknown styles raise an error instead of falling back to plain text.
@@ -175,17 +179,21 @@ For example, block text that looks like Markdown syntax renders literally:
 from draftjs_exporter import HTML, MARKDOWN_CONFIG
 
 exporter = HTML(MARKDOWN_CONFIG)
-exporter.render({
-    "entityMap": {},
-    "blocks": [{
-        "key": "6m5fh",
-        "text": "# Not a heading, *not emphasis*, <b>not HTML</b>, &copy;",
-        "type": "unstyled",
-        "depth": 0,
-        "inlineStyleRanges": [],
-        "entityRanges": [],
-    }],
-})
+exporter.render(
+    {
+        "entityMap": {},
+        "blocks": [
+            {
+                "key": "6m5fh",
+                "text": "# Not a heading, *not emphasis*, <b>not HTML</b>, &copy;",
+                "type": "unstyled",
+                "depth": 0,
+                "inlineStyleRanges": [],
+                "entityRanges": [],
+            }
+        ],
+    }
+)
 # "\\# Not a heading, \\*not emphasis\\*, \\<b>not HTML\\</b>, &copy;\n\n"
 ```
 

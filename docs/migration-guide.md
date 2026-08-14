@@ -36,7 +36,7 @@ A new `string_compat` engine is available for maximum output stability. It produ
 
 ```python
 config = {
-    'engine': DOM.STRING_COMPAT,
+    "engine": DOM.STRING_COMPAT,
 }
 ```
 
@@ -54,12 +54,15 @@ The default `string` engine no longer sorts attributes alphabetically by name in
 
 ```python
 def image(props):
-    return DOM.create_element('img', {
-        'src': props.get('src'),
-        'width': props.get('width'),
-        'height': props.get('height'),
-        'alt': props.get('alt'),
-    })
+    return DOM.create_element(
+        "img",
+        {
+            "src": props.get("src"),
+            "width": props.get("width"),
+            "height": props.get("height"),
+            "alt": props.get("alt"),
+        },
+    )
 ```
 
 If you relied on alphabetical sorting, you can either reorder your `props` / `wrapper_props` / `create_element` calls as needed, or subclass the built-in `string` engine and override its `render_attrs` method to add back the sort:
@@ -77,16 +80,14 @@ If you relied on alphabetical sorting, you can either reorder your `props` / `wr
 The default `string` engine no longer escapes single and double quotes in HTML content (it still escapes quotes inside attributes). If you relied on this behavior, subclass the built-in `string` engine and override its `render_children` method to add back `quote=True`:
 
 ```python
-    @staticmethod
-    def render_children(children: Sequence[Union[HTML, Elt]]) -> HTML:
-        return "".join(
-            [
-                DOMString.render(c)
-                if isinstance(c, Elt)
-                else escape(c, quote=True)
-                for c in children
-            ]
-        )
+@staticmethod
+def render_children(children: Sequence[Union[HTML, Elt]]) -> HTML:
+    return "".join(
+        [
+            DOMString.render(c) if isinstance(c, Elt) else escape(c, quote=True)
+            for c in children
+        ]
+    )
 ```
 
 ### Inline style properties no longer sorted alphabetically
@@ -131,17 +132,18 @@ Class-based decorators are no longer supported. Decorator components now require
 # Before:
 class OrderedList:
     def render(self, props):
-        depth = props['block']['depth']
-        return DOM.create_element('ol', {
-            'class': f'list--depth-{depth}'
-        }, props['children'])
+        depth = props["block"]["depth"]
+        return DOM.create_element(
+            "ol", {"class": f"list--depth-{depth}"}, props["children"]
+        )
+
 
 # After:
 def ordered_list(props):
-    depth = props['block']['depth']
-    return DOM.create_element('ol', {
-        'class': f'list--depth-{depth}'
-    }, props['children'])
+    depth = props["block"]["depth"]
+    return DOM.create_element(
+        "ol", {"class": f"list--depth-{depth}"}, props["children"]
+    )
 ```
 
 If you were relying on the configuration capabilities of the class API, switch to composing components instead:
@@ -153,30 +155,41 @@ class Link:
         self.use_new_window = use_new_window
 
     def render(self, props):
-        link_props = {'href': props['url']}
+        link_props = {"href": props["url"]}
         if self.use_new_window:
-            link_props['target'] = '_blank'
-            link_props['rel'] = 'noreferrer noopener'
-        return DOM.create_element('a', link_props, props['children'])
+            link_props["target"] = "_blank"
+            link_props["rel"] = "noreferrer noopener"
+        return DOM.create_element("a", link_props, props["children"])
 
-# In the config:
+    # In the config:
     ENTITY_TYPES.LINK: Link(use_new_window=True)
+
 
 # After:
 def link(props):
-    return DOM.create_element('a', props, props['children'])
+    return DOM.create_element("a", props, props["children"])
+
 
 def same_window_link(props):
-    return DOM.create_element(link, {
-        'href': props['url'],
-    }, props['children'])
+    return DOM.create_element(
+        link,
+        {
+            "href": props["url"],
+        },
+        props["children"],
+    )
+
 
 def new_window_link(props):
-    return DOM.create_element(link, {
-        'href': props['url'],
-        'target': '_blank',
-        'rel': 'noreferrer noopener',
-    }, props['children'])
+    return DOM.create_element(
+        link,
+        {
+            "href": props["url"],
+            "target": "_blank",
+            "rel": "noreferrer noopener",
+        },
+        props["children"],
+    )
 ```
 
 Composite decorators also changed to a dict format with `strategy` and `component` keys, matching Draft.js:

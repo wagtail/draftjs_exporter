@@ -18,7 +18,7 @@ Then, use the `engine` attribute of the exporter config. The `DOM` class exposes
 
 ```python
 config = {
-    'engine': DOM.HTML5LIB,
+    "engine": DOM.HTML5LIB,
 }
 ```
 

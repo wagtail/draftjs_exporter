@@ -7,7 +7,16 @@ The exporter output is extensively configurable to cater for varied rich text re
 The configuration is a single dict passed to `HTML()`. It has four keys: `block_map`, `style_map`, `entity_decorators`, and `composite_decorators`. Each is optional and can be combined with the defaults the exporter provides.
 
 ```python
-from draftjs_exporter import BLOCK_MAP, BLOCK_TYPES, DOM, ENTITY_TYPES, INLINE_STYLES, STYLE_MAP, code_block, render_children
+from draftjs_exporter import (
+    BLOCK_MAP,
+    BLOCK_TYPES,
+    DOM,
+    ENTITY_TYPES,
+    INLINE_STYLES,
+    STYLE_MAP,
+    code_block,
+    render_children,
+)
 ```
 
 The exporter ships with `BLOCK_MAP` and `STYLE_MAP` — sensible defaults for common HTML elements. Extend them with `**` to start from the defaults, or build your own from scratch. The default `CODE` and `ATOMIC` entries use the reusable `code_block` and `render_children` components; import those when you want the same behavior in a custom map.
@@ -18,9 +27,9 @@ The exporter ships with `BLOCK_MAP` and `STYLE_MAP` — sensible defaults for co
 
 ```python
 config = {
-    'block_map': {
+    "block_map": {
         **BLOCK_MAP,
-        BLOCK_TYPES.HEADER_TWO: 'h2',
+        BLOCK_TYPES.HEADER_TWO: "h2",
     },
 }
 ```
@@ -57,10 +66,13 @@ BLOCK_TYPES.ORDERED_LIST_ITEM: {
 
 ```python
 config = {
-    'style_map': {
+    "style_map": {
         **STYLE_MAP,
-        'KBD': 'kbd',
-        'HIGHLIGHT': {'element': 'strong', 'props': {'style': {'textDecoration': 'underline'}}},
+        "KBD": "kbd",
+        "HIGHLIGHT": {
+            "element": "strong",
+            "props": {"style": {"textDecoration": "underline"}},
+        },
     },
 }
 ```
@@ -73,10 +85,10 @@ The `style` prop can be a string (rendered as-is) or a dict, in which case its p
 
 ```python
 config = {
-    'entity_decorators': {
+    "entity_decorators": {
         ENTITY_TYPES.IMAGE: image,
         ENTITY_TYPES.LINK: link,
-        ENTITY_TYPES.HORIZONTAL_RULE: lambda props: DOM.create_element('hr'),
+        ENTITY_TYPES.HORIZONTAL_RULE: lambda props: DOM.create_element("hr"),
         ENTITY_TYPES.EMBED: None,
     },
 }
@@ -90,10 +102,10 @@ Each entry is a dict with a `strategy` (compiled regex) and a `component` (a [cu
 
 ```python
 config = {
-    'composite_decorators': [
-        {'strategy': re.compile(r'\n'), 'component': br},
-        {'strategy': re.compile(r'#\w+'), 'component': hashtag},
-        {'strategy': LINKIFY_RE, 'component': linkify},
+    "composite_decorators": [
+        {"strategy": re.compile(r"\n"), "component": br},
+        {"strategy": re.compile(r"#\w+"), "component": hashtag},
+        {"strategy": LINKIFY_RE, "component": linkify},
     ],
 }
 ```
