@@ -299,20 +299,20 @@ For breaking changes and upgrade steps, see the [migration guide](https://wagtai
 - Add more defaults in the style map:
 
 ```python
-BOLD = 'strong'
-CODE = 'code'
-ITALIC = 'em'
-UNDERLINE = 'u'
-STRIKETHROUGH = 's'
-SUPERSCRIPT = 'sup'
-SUBSCRIPT = 'sub'
-MARK = 'mark'
-QUOTATION = 'q'
-SMALL = 'small'
-SAMPLE = 'samp'
-INSERT = 'ins'
-DELETE = 'del'
-KEYBOARD = 'kbd'
+BOLD = "strong"
+CODE = "code"
+ITALIC = "em"
+UNDERLINE = "u"
+STRIKETHROUGH = "s"
+SUPERSCRIPT = "sup"
+SUBSCRIPT = "sub"
+MARK = "mark"
+QUOTATION = "q"
+SMALL = "small"
+SAMPLE = "samp"
+INSERT = "ins"
+DELETE = "del"
+KEYBOARD = "kbd"
 ```
 
 - Add new `pre` block type.

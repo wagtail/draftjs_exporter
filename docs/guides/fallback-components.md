@@ -8,10 +8,10 @@ Add the following to the exporter config,
 
 ```python
 config = {
-    'block_map': {
+    "block_map": {
         **BLOCK_MAP,
         # Provide a fallback for block types.
-        BLOCK_TYPES.FALLBACK: block_fallback
+        BLOCK_TYPES.FALLBACK: block_fallback,
     },
 }
 ```
@@ -24,17 +24,19 @@ This fallback component can now control the exporter behavior when normal compon
 
 ```python
 def block_fallback(props):
-    type_ = props['block']['type']
+    type_ = props["block"]["type"]
 
-    if type_ == 'example-discard':
-        logging.warning(f'Missing config for "{type_}". Discarding block, keeping content.')
-        return props['children']
-    elif type_ == 'example-delete':
+    if type_ == "example-discard":
+        logging.warning(
+            f'Missing config for "{type_}". Discarding block, keeping content.'
+        )
+        return props["children"]
+    elif type_ == "example-delete":
         logging.error(f'Missing config for "{type_}". Deleting block.')
         return None
     else:
         logging.warning(f'Missing config for "{type_}". Using div instead.')
-        return DOM.create_element('div', {}, props['children'])
+        return DOM.create_element("div", {}, props["children"])
 ```
 
 See [`example.py`](https://github.com/wagtail/draftjs_exporter/blob/main/example.py) in the repository for more details.

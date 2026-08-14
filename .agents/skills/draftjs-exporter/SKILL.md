@@ -47,17 +47,21 @@ from draftjs_exporter import HTML
 
 exporter = HTML({})  # empty config = use default block/style/entity maps
 
-html = exporter.render({
-    "entityMap": {},
-    "blocks": [{
-        "key": "6m5fh",
-        "text": "Hello, world!",
-        "type": "unstyled",
-        "depth": 0,
-        "inlineStyleRanges": [],
-        "entityRanges": [],
-    }],
-})
+html = exporter.render(
+    {
+        "entityMap": {},
+        "blocks": [
+            {
+                "key": "6m5fh",
+                "text": "Hello, world!",
+                "type": "unstyled",
+                "depth": 0,
+                "inlineStyleRanges": [],
+                "entityRanges": [],
+            }
+        ],
+    }
+)
 ```
 
 Debug with real JSON: `echo '{"json": "contents"}' | python example.py -`. See [getting-started](https://wagtail.github.io/draftjs_exporter/getting-started/).
@@ -73,23 +77,36 @@ import re
 config = {
     "block_map": {
         **BLOCK_MAP,
-        BLOCK_TYPES.HEADER_TWO: "h2",                                  # string: tag name
-        BLOCK_TYPES.HEADER_THREE: {"element": "h3", "props": {"class": "u-text-center"}},
-        BLOCK_TYPES.UNORDERED_LIST_ITEM: {                             # wrapper for adjacent blocks
-            "element": "li", "wrapper": "ul", "wrapper_props": {"class": "bullet-list"},
+        BLOCK_TYPES.HEADER_TWO: "h2",  # string: tag name
+        BLOCK_TYPES.HEADER_THREE: {
+            "element": "h3",
+            "props": {"class": "u-text-center"},
+        },
+        BLOCK_TYPES.UNORDERED_LIST_ITEM: {  # wrapper for adjacent blocks
+            "element": "li",
+            "wrapper": "ul",
+            "wrapper_props": {"class": "bullet-list"},
         },
     },
     "style_map": {
         **STYLE_MAP,
         "KBD": "kbd",
-        "HIGHLIGHT": {"element": "strong", "props": {"style": {"textDecoration": "underline"}}},
+        "HIGHLIGHT": {
+            "element": "strong",
+            "props": {"style": {"textDecoration": "underline"}},
+        },
     },
     "entity_decorators": {
-        ENTITY_TYPES.LINK: lambda props: DOM.create_element("a", {"href": props["url"]}, props["children"]),
+        ENTITY_TYPES.LINK: lambda props: DOM.create_element(
+            "a", {"href": props["url"]}, props["children"]
+        ),
         ENTITY_TYPES.EMBED: None,  # None discards this entity type
     },
     "composite_decorators": [
-        {"strategy": re.compile(r"\n"), "component": br},              # text transformations by regex
+        {
+            "strategy": re.compile(r"\n"),
+            "component": br,
+        },  # text transformations by regex
     ],
     "engine": DOM.STRING,  # default; see Engines below
 }
@@ -117,12 +134,15 @@ from draftjs_exporter import DOM, Element, Props
 # Entity component: receives the entity's `data` dict as props.
 def image(props: Props) -> Element:
     """Render an image element from entity data."""
-    return DOM.create_element("img", {
-        "src": props.get("src"),
-        "width": props.get("width"),
-        "height": props.get("height"),
-        "alt": props.get("alt"),
-    })
+    return DOM.create_element(
+        "img",
+        {
+            "src": props.get("src"),
+            "width": props.get("width"),
+            "height": props.get("height"),
+            "alt": props.get("alt"),
+        },
+    )
 
 
 # Block component: receives `block` (Draft.js block object) and `children`.
@@ -172,11 +192,17 @@ Customize characters and fallbacks with `build_markdown_config`:
 ````python
 from draftjs_exporter import HTML, build_markdown_config
 
-config = build_markdown_config({
-    "bold": "__", "italic": "*", "unordered_list_marker": "*",
-    "ordered_list_delimiter": ")", "horizontal_rule": "---", "code_fence": "```",
-    "style_fallback": None,  # None disables fallback (raises instead)
-})
+config = build_markdown_config(
+    {
+        "bold": "__",
+        "italic": "*",
+        "unordered_list_marker": "*",
+        "ordered_list_delimiter": ")",
+        "horizontal_rule": "---",
+        "code_fence": "```",
+        "style_fallback": None,  # None disables fallback (raises instead)
+    }
+)
 exporter = HTML(config)
 ````
 
@@ -189,20 +215,24 @@ The Markdown importer (`MarkdownImporter`) parses Markdown back into Draft.js `C
 ```python
 from draftjs_exporter import BLOCK_TYPES, MarkdownImporter, scheme_resolver
 
-importer = MarkdownImporter({
-    "parser_config": {
-        # Disable constructs, or resolve internal URL schemes to typed entities.
-        "image_resolvers": [
-            scheme_resolver("wagtail", {"image": "IMAGE"}, coerce={"id": int}, label_key="alt"),
+importer = MarkdownImporter(
+    {
+        "parser_config": {
+            # Disable constructs, or resolve internal URL schemes to typed entities.
+            "image_resolvers": [
+                scheme_resolver(
+                    "wagtail", {"image": "IMAGE"}, coerce={"id": int}, label_key="alt"
+                ),
+            ],
+            # Whitelist inline HTML tags as styles (no Markdown equivalent).
+            "inline_html_styles": {"sup": "SUPERSCRIPT", "sub": "SUBSCRIPT"},
+        },
+        "filter_rules": [
+            # Declarative content policy: remove, keep, demote, or a callable.
+            {"type": "block", "match": BLOCK_TYPES.HEADER_ONE, "action": "demote"},
         ],
-        # Whitelist inline HTML tags as styles (no Markdown equivalent).
-        "inline_html_styles": {"sup": "SUPERSCRIPT", "sub": "SUBSCRIPT"},
-    },
-    "filter_rules": [
-        # Declarative content policy: remove, keep, demote, or a callable.
-        {"type": "block", "match": BLOCK_TYPES.HEADER_ONE, "action": "demote"},
-    ],
-})
+    }
+)
 content_state = importer.import_markdown(markdown)
 ```
 

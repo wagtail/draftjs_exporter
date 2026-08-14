@@ -16,12 +16,15 @@ Entity components render things like links, images, or embeds. They receive the 
 
 ```python
 def image(props):
-    return DOM.create_element('img', {
-        'src': props.get('src'),
-        'width': props.get('width'),
-        'height': props.get('height'),
-        'alt': props.get('alt'),
-    })
+    return DOM.create_element(
+        "img",
+        {
+            "src": props.get("src"),
+            "width": props.get("width"),
+            "height": props.get("height"),
+            "alt": props.get("alt"),
+        },
+    )
 ```
 
 Wire the component into your [configuration](../reference/configuration.md) under `entity_decorators`, keyed by the entity type it handles.
@@ -36,10 +39,10 @@ For example, to render a blockquote that uses the block's `cite` data:
 
 ```python
 def blockquote(props):
-    block_data = props['block']['data']
-    return DOM.create_element('blockquote', {
-        'cite': block_data.get('cite')
-    }, props['children'])
+    block_data = props["block"]["data"]
+    return DOM.create_element(
+        "blockquote", {"cite": block_data.get("cite")}, props["children"]
+    )
 ```
 
 Pass `props['children']` as the last argument to `DOM.create_element` so the block's content is displayed inside the element you create.
@@ -63,16 +66,18 @@ The following component renders a link with an optional icon. When an icon name 
 
 ```python
 def button(props):
-    href = props.get('href', '#')
-    icon_name = props.get('icon', None)
-    text = props.get('text', '')
+    href = props.get("href", "#")
+    icon_name = props.get("icon", None)
+    text = props.get("text", "")
 
-    return DOM.create_element('a', {
-        'class': 'icon-text' if icon_name else None,
-        'href': href,
-    },
-        DOM.create_element(icon, {'name': icon_name}) if icon_name else None,
-        DOM.create_element('span', {'class': 'icon-text'}, text) if icon_name else text,
+    return DOM.create_element(
+        "a",
+        {
+            "class": "icon-text" if icon_name else None,
+            "href": href,
+        },
+        DOM.create_element(icon, {"name": icon_name}) if icon_name else None,
+        DOM.create_element("span", {"class": "icon-text"}, text) if icon_name else text,
     )
 ```
 
