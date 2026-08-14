@@ -33,12 +33,21 @@ hooks = [
 ]
 
 [[repos]]
-repo = "https://github.com/astral-sh/ruff-pre-commit"
-rev = "v0.15.9"
-hooks = [{ id = "ruff-check", args = ["--fix"] }, { id = "ruff-format" }]
-
-[[repos]]
 repo = "local"
+
+[[repos.hooks]]
+id = "ruff-check"
+name = "ruff-check"
+entry = "uv run ruff check --fix"
+language = "system"
+types = ["python"]
+
+[[repos.hooks]]
+id = "ruff-format"
+name = "ruff-format"
+entry = "uv run ruff format"
+language = "system"
+types_or = ["python", "markdown"]
 
 [[repos.hooks]]
 id = "prettier"
