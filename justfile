@@ -75,10 +75,18 @@ build:
 publish: build
   uv publish
 
-# Run promptfoo evals for the draftjs-exporter skill.
+# Install the eval tooling globally, outside of package.json (per Node version).
+eval-init:
+  npm install -g promptfoo @opencode-ai/sdk
+
+# Run promptfoo evals for the draftjs-exporter skill. Needs `just eval-init`.
 eval *args="":
-  npx promptfoo@latest eval -c docs/prompts/draftjs_exporter_skills.yaml {{args}}
+  @command -v promptfoo >/dev/null || { echo 'promptfoo not found - run `just eval-init`'; exit 1; }
+  @command -v opencode >/dev/null || { echo 'opencode CLI not found - see https://opencode.ai/docs/'; exit 1; }
+  OPENCODE_CONFIG="$PWD/docs/prompts/opencode.json" \
+  PROMPTFOO_PYTHON="$PWD/.venv/bin/python" \
+  promptfoo eval -c docs/prompts/draftjs_exporter_skills.yaml {{args}}
 
 # Open the promptfoo viewer for the most recent eval results.
 eval-view:
-  npx promptfoo@latest view -y
+  promptfoo view -y

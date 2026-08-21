@@ -1,101 +1,227 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
 
-# Evals for the `draftjs-exporter` OpenCode agent skill
+# Evals for the `draftjs-exporter` agent skill
 # (`.agents/skills/draftjs-exporter/SKILL.md`).
 #
-# Three exporter problems, each run against a 2x2 matrix:
-#   - DeepSeek V4 Flash vs. Google Gemini 2.5 Pro
-#   - With the skill loaded into OpenCode's `skill` tool vs. without
+# The question the eval answers: does having the skill available change the work
+# the model produces? Every test runs twice against the same model, same working
+# directory, same tool surface — the only difference is whether OpenCode's
+# `skill` tool is available:
 #
-# With-skill rows assert `skill-used` (trigger discipline) plus correctness.
-# Without-skill rows assert correctness only, to surface what the base model
-# knows on its own. Comparing the two answers the underlying question: does
-# the skill materially help with this task, or has the model outgrown it?
+#   - baseline    — no skill tool. What the model knows about the library.
+#   - with-skill  — skill tool available, `draftjs-exporter` allowed.
 #
-# These are real `draftjs_exporter` adoption tasks, not skill-specific trivia.
-# They stay useful as a regression suite even if future model improvements
-# reduce the skill's relative value.
+# Most tests ask for a complete, runnable script and then actually run it
+# against the installed library (`graders/run_snippet.py`). A hallucinated API
+# fails there even when the prose around it reads well, which is exactly the
+# failure mode a reference skill is supposed to prevent. Two knowledge-only
+# gotchas are graded by rubric because they have no code answer.
 #
-# Required env vars (set before `just eval`):
-#   - DEEPSEEK_API_KEY            — DeepSeek API key.
+# Requires:
+#   - `just eval-init` — installs `promptfoo`, `@opencode-ai/sdk` and the
+#     OpenCode CLI globally. They stay out of package.json so contributors who
+#     never run evals don't pay for them; promptfoo resolves the SDK from the
+#     same global tree it lives in.
+#   - `just init` — the graders import `draftjs_exporter` from the project venv.
+#   - `SCW_SECRET_KEY` — Scaleway API key. Both the model under test and the
+#     rubric grader run on Scaleway Generative APIs.
 #
 # Run:
 #   just eval
-#   just eval-view   # open the dashboard for the latest run.
+#   just eval --repeat 3   # agent runs are noisy; repeat before trusting a delta
+#   just eval-view         # dashboard for the latest run
 
 prompts:
   - "{{prompt}}"
 
+# The OpenCode SDK provider takes its model list from OpenCode's own config, not
+# from promptfoo. `just eval` points `OPENCODE_CONFIG` at `opencode.json` next to
+# this file, which defines the `scaleway` provider and its base URL. The `apiKey`
+# below is what promptfoo's own "is this provider configured" check looks for.
+#
+# Three settings keep the comparison honest, and all three are shared by both
+# arms through the `&opencode` anchor:
+#
+#   - `tools: {"*": false}` strips every built-in tool _and_ any MCP server the
+#     person running the eval happens to have configured globally, so results do
+#     not depend on whose machine ran them. The `with-skill` arm adds back
+#     exactly one tool.
+#   - `custom_agent` replaces OpenCode's coding-agent system prompt. Without it,
+#     a toolless run in a repo working directory spends its turns narrating
+#     "let me look at the files" and never answers — that measures the harness,
+#     not the skill. It also pins temperature.
+#   - `permission.skill` denies every skill, then re-allows the one under test,
+#     so a globally-installed skill cannot answer for it. Order matters: a
+#     trailing `"*": deny` shadows the specific allow above it and hides
+#     everything.
+#
+# `working_dir` has to be the repo root — that is where OpenCode looks for
+# `.agents/skills/<name>/SKILL.md`.
 providers:
-  # DeepSeek no skill
   - id: opencode:sdk
-    label: deepseek-v4-flash (no skill)
-    config:
-      provider_id: deepseek
-      model: deepseek-v4-flash
-      apiKey: "{{ env.DEEPSEEK_API_KEY }}"
+    label: baseline
+    config: &opencode
+      provider_id: scaleway
+      model: deepseek-v4-flash-0731
+      apiKey: "{{ env.SCW_SECRET_KEY }}"
       working_dir: ../..
       tools:
-        skill: false
-        bash: false
-        edit: false
-        write: false
-        webfetch: false
-        read: false
-        grep: false
-        glob: false
-        list: false
-
-  # DeepSeek with skill
-  - id: opencode:sdk
-    label: deepseek-v4-flash (with skill)
-    config:
-      provider_id: deepseek
-      model: deepseek-v4-flash
-      apiKey: "{{ env.DEEPSEEK_API_KEY }}"
-      working_dir: ../..
-      tools:
-        skill: true
-        bash: false
-        edit: false
-        write: false
-        webfetch: false
-        read: false
-        grep: false
-        glob: false
-        list: false
+        "*": false
       permission:
-        skill: allow
         external_directory: deny
+      custom_agent: &agent
+        description: draftjs_exporter question answering
+        temperature: 0
+        steps: 6
+        prompt: >-
+          You are answering a developer's question about the `draftjs_exporter`
+          Python library. Answer from what you know, directly and concisely. You
+          have no access to the user's files. When the question asks for a
+          script, reply with one complete, runnable Python code block.
 
-tracing:
-  enabled: true
+  - id: opencode:sdk
+    label: with-skill
+    config:
+      <<: *opencode
+      tools:
+        "*": false
+        skill: true
+      permission:
+        skill:
+          "*": deny
+          draftjs-exporter: allow
+        external_directory: deny
+      custom_agent: *agent
+
+# Scaleway rate-limits tokens per minute. Above ~2 concurrent agent runs the
+# provider starts returning empty output on a 429 instead of an error, which
+# shows up as a mystery assertion failure.
+evaluateOptions:
+  maxConcurrency: 2
 
 defaultTest:
   options:
-    temperature: 0.3
+    # `expect_contains` is a list var read by the grader, not a matrix of test
+    # cases. Without this, promptfoo would fan each one out into several tests.
+    disableVarExpansion: true
+    # Rubric grading runs on Scaleway too, so the eval needs a single API key.
+    provider:
+      id: openai:chat:gpt-oss-120b
+      config:
+        apiBaseUrl: "https://api.scaleway.ai/v1"
+        apiKey: "{{ env.SCW_SECRET_KEY }}"
+        showThinking: false
+        temperature: 0
 
 tests:
-  - description: skills troubleshooting
+  # --- Tasks graded by running the answer -----------------------------------
+
+  - description: Wrap list items in a styled wrapper
     vars:
       prompt: >-
-        /draftjs-exporter how do you configure Markdown output to use different bullet symbols?
+        Using the `draftjs_exporter` Python library, write a complete runnable
+        script that renders this ContentState to HTML and prints it, with the
+        unordered list items wrapped in `<ul class="bullet-list">`:
+        {"entityMap": {}, "blocks": [{"key": "a", "text": "One", "type":
+        "unordered-list-item", "depth": 0, "inlineStyleRanges": [],
+        "entityRanges": []}, {"key": "b", "text": "Two", "type":
+        "unordered-list-item", "depth": 0, "inlineStyleRanges": [],
+        "entityRanges": []}]}
+      expect_stdout: '<ul class="bullet-list"><li>One</li><li>Two</li></ul>'
+    assert: &run_snippet
+      - type: python
+        value: file://graders/run_snippet.py
+
+  - description: Configure Markdown output characters
+    vars:
+      prompt: >-
+        Using the `draftjs_exporter` Python library, write a complete runnable
+        script that renders this ContentState to Markdown and prints it, using
+        `*` as the unordered list marker and `__` for bold:
+        {"entityMap": {}, "blocks": [{"key": "a", "text": "One", "type":
+        "unordered-list-item", "depth": 0, "inlineStyleRanges": [],
+        "entityRanges": []}, {"key": "b", "text": "Bold", "type": "unstyled",
+        "depth": 0, "inlineStyleRanges": [{"offset": 0, "length": 4, "style":
+        "BOLD"}], "entityRanges": []}]}
+      expect_contains:
+        - "* One"
+        - "__Bold__"
+    assert: *run_snippet
+
+  - description: Render a link entity with a custom component
+    vars:
+      prompt: >-
+        Using the `draftjs_exporter` Python library, write a complete runnable
+        script that renders this ContentState to HTML and prints it. LINK
+        entities must render as an `<a>` with the entity's `url` as `href` and
+        a `class="link"` attribute:
+        {"entityMap": {"0": {"type": "LINK", "mutability": "MUTABLE", "data":
+        {"url": "https://example.com"}}}, "blocks": [{"key": "a", "text":
+        "Hello", "type": "unstyled", "depth": 0, "inlineStyleRanges": [],
+        "entityRanges": [{"offset": 0, "length": 5, "key": 0}]}]}
+      expect_contains:
+        - "<a "
+        - 'href="https://example.com"'
+        - 'class="link"'
+        - ">Hello</a>"
+    assert: *run_snippet
+
+  - description: Keep content for an unmapped block type
+    vars:
+      prompt: >-
+        Using the `draftjs_exporter` Python library, write a complete runnable
+        script that renders this ContentState to HTML and prints it. My editor
+        emits custom block types I cannot enumerate ahead of time, so I can't
+        add every one of them to the block map. Whenever the exporter meets a
+        block type it has no mapping for, it should keep the block's text and
+        drop the wrapping element rather than fail:
+        {"entityMap": {}, "blocks": [{"key": "a", "text": "Odd", "type":
+        "my-custom-block", "depth": 0, "inlineStyleRanges": [],
+        "entityRanges": []}]}
+      expect_stdout: "Odd"
+    assert: *run_snippet
+
+  - description: Resolve an internal URL scheme on Markdown import
+    vars:
+      prompt: >-
+        Using the `draftjs_exporter` Python library, write a complete runnable
+        script that parses the Markdown `See [our page](wagtail://page?id=42).`
+        into Draft.js ContentState, turning `wagtail://page` URLs into `LINK`
+        entities whose data holds the page id as an integer. Print
+        `json.dumps(content_state["entityMap"], sort_keys=True)`.
+      expect_stdout: '{"0": {"data": {"id": 42}, "mutability": "MUTABLE", "type": "LINK"}}'
+    assert: *run_snippet
+
+  # --- Gotchas with no code answer, graded by rubric -------------------------
+
+  - description: Reserved entity props
+    vars:
+      prompt: >-
+        I'm writing a custom entity component for `draftjs_exporter` and the
+        `entity` key I put in my entity's `data` never reaches my function
+        intact — something replaces it. What is happening, which other `data`
+        keys behave the same way, and how do I work around it?
     assert:
-      - type: trajectory:step-count
-        value:
-          type: command
-          pattern: "*draftjs-exporter/SKILL.md*"
-          min: 1
-  # - description: Reserved props gotcha
-  #   vars:
-  #     prompt: >-
-  #       I'm writing a custom entity decorator in draftjs_exporter and
-  #       `props["entity"]` is being overwritten by the framework before my
-  #       function sees it. What's happening and how should I work around it?
-  #   assert:
-  #     - type: skill-used
-  #       value: draftjs-exporter
-  #     - type: llm-rubric
-  #       value: >-
-  #         The answer correctly identifies `entity` as a reserved key on the entity `props` dict that the framework replaces internally (`entity` becomes a dict with type/mutability).
-  #         The answer encourages picking different data keys.
+      - type: llm-rubric
+        value: >-
+          The answer identifies `entity` as a key the exporter reserves and
+          overwrites on the props passed to entity components (it becomes an
+          object describing the entity, with its type and mutability), and says
+          `children` is reserved the same way. It tells the user to rename their
+          data key rather than offering a way to keep using `entity`.
+
+  - description: Engine choice and HTML escaping
+    vars:
+      prompt: >-
+        My `draftjs_exporter` output contains raw HTML from user-entered text
+        and it is not being escaped. Which engine should I use, what do I need
+        to install, and what should I expect to change in my existing tests?
+    assert:
+      - type: llm-rubric
+        value: >-
+          The answer explains that the default `string` engine does not escape
+          HTML in text, and recommends switching to the `html5lib` or `lxml`
+          engine (installed via the matching package extra) for escaping. It
+          warns that engines are not byte-identical — naming at least one real
+          difference such as attribute ordering or quote escaping — so tests
+          comparing exact HTML will need updating.
