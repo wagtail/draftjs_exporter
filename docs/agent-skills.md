@@ -2,13 +2,6 @@
 
 Draft.js exporter ships [Agent Skills](https://agentskills.io/) that help users get better results with agentic coding. They’re published in multiple ways so you can reuse them easily with a wide range of tools.
 
-| Option                                                | What you get                                              | Best when                                                      |
-| ----------------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------- |
-| [Direct link to the skill](#direct-link-to-the-skill) | The `SKILL.md` file as a URL                              | You want to point one agent at the skill by hand               |
-| [Well Known Discovery](#well-known-discovery)         | An index listing the skill                                | Your agent supports the Agent Skills discovery format          |
-| [AI catalog](#ai-catalog)                             | A catalog entry describing the skill                      | Your tooling reads AI catalogs                                 |
-| [Library Skills](#library-skills)                     | A skill in your project that tracks the installed version | You use an Agent Skills-aware client and installed the library |
-
 ## Direct link to the skill
 
 Nice and simple - it’s here: <https://wagtail.github.io/draftjs_exporter/.well-known/agent-skills/draftjs-exporter/SKILL.md>.
