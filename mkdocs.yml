@@ -71,7 +71,7 @@ nav:
   - Markdown support: markdown.md
   - Markdown importer: markdown-importer.md
   - Migration guide: migration-guide.md
-  - Reusing the agent skill: agent-skill.md
+  - Agent skills: agent-skills.md
   - Guides:
       - Custom components: guides/custom-components.md
       - Fallback components: guides/fallback-components.md
