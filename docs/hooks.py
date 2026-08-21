@@ -30,11 +30,17 @@ CATALOG_FILENAME = ".well-known/ai-catalog.json"
 """Name of the AI catalog file, relative to the site directory."""
 
 HOST_DISPLAY_NAME = "Draft.js exporter"
-HOST_IDENTIFIER = "did:web:wagtail.github.io"
+# Path-based did:web for the GitHub Pages project site (not the org root).
+HOST_IDENTIFIER = "did:web:wagtail.github.io:draftjs_exporter"
 HOST_DOCUMENTATION_URL = "https://wagtail.github.io/draftjs_exporter/"
+HOST_URN_AUTHORITY = "wagtail.github.io:draftjs_exporter"
 SKILL_TYPE = "skill-md"
 SKILL_MIME = "application/agent-skills+md"
 SKILL_VERSION = "1.0.0"
+# Human-readable catalog titles keyed by skill directory name.
+SKILL_DISPLAY_NAMES = {
+    "draftjs-exporter": "Draft.js exporter",
+}
 
 
 # --- Helpers -----------------------------------------------------------------
@@ -114,10 +120,13 @@ def on_post_build(config: dict[str, Any], **kwargs: Any) -> None:
         # Parse frontmatter for metadata.
         frontmatter = _parse_frontmatter(skill_path.read_text(encoding="utf-8"))
         description = frontmatter.get("description", "")
+        display_name = SKILL_DISPLAY_NAMES.get(name, name)
         digest = _sha256(skill_path)
         updated_at = _iso_date(skill_path)
 
-        # Root-relative path within the site.
+        # Absolute URL for the AI catalog. Prefer a directory-relative URL in
+        # the agent-skills index so path-absolute `/.well-known/...` does not
+        # resolve against the GitHub Pages *origin* (missing /draftjs_exporter/).
         rel_path = f"{WELL_KNOWN_DIR}/{name}/SKILL.md"
         full_url = f"{site_root}/{rel_path}"
 
@@ -126,14 +135,14 @@ def on_post_build(config: dict[str, Any], **kwargs: Any) -> None:
                 "name": name,
                 "type": SKILL_TYPE,
                 "description": description,
-                "url": f"/{rel_path}",
+                "url": f"{name}/SKILL.md",
                 "digest": digest,
             }
         )
         catalog_entries.append(
             {
-                "identifier": f"urn:air:wagtail.github.io:skill:{name}",
-                "displayName": name,
+                "identifier": f"urn:air:{HOST_URN_AUTHORITY}:skill:{name}",
+                "displayName": display_name,
                 "type": SKILL_MIME,
                 "url": full_url,
                 "description": description,
