@@ -79,8 +79,14 @@ publish: build
 eval-init:
   npm install -g promptfoo @opencode-ai/sdk
 
+# Assemble the published-docs fixture the eval's docs arms read from.
+eval-docs: docs-build
+  rm -rf .eval-docs
+  mkdir -p .eval-docs
+  cp site/llms.txt site/llms-full.txt .eval-docs/
+
 # Run promptfoo evals for the draftjs-exporter skill. Needs `just eval-init`.
-eval *args="":
+eval *args="": eval-docs
   @command -v promptfoo >/dev/null || { echo 'promptfoo not found - run `just eval-init`'; exit 1; }
   @command -v opencode >/dev/null || { echo 'opencode CLI not found - see https://opencode.ai/docs/'; exit 1; }
   OPENCODE_CONFIG="$PWD/docs/prompts/opencode.json" \

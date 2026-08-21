@@ -95,3 +95,4 @@ example.html
 __pycache__
 .hypothesis
 site
+.eval-docs

@@ -44,7 +44,8 @@ def _extract_snippet(output: str) -> str | None:
     with `re` and `json` and prints the expected result, which would otherwise
     pass a stdout comparison without exercising the library at all.
     """
-    for block in CODE_BLOCK.findall(output):
+    blocks: list[str] = CODE_BLOCK.findall(output)
+    for block in blocks:
         if "draftjs_exporter" in block:
             return block.strip()
     return None

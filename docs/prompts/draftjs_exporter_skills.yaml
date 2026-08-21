@@ -1,21 +1,32 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
 
 # Evals for the `draftjs-exporter` agent skill
-# (`.agents/skills/draftjs-exporter/SKILL.md`).
+# (`.agents/skills/draftjs-exporter/SKILL.md`) and the published documentation.
 #
-# The question the eval answers: does having the skill available change the work
-# the model produces? Every test runs twice against the same model, same working
-# directory, same tool surface — the only difference is whether OpenCode's
-# `skill` tool is available:
+# Every test runs against four arms — a 2x2 over "can it load the skill" and
+# "can it read the docs" — so a run answers two questions at once: does the
+# skill beat the model's own knowledge, and does it still add anything once the
+# docs are readable?
 #
-#   - baseline    — no skill tool. What the model knows about the library.
-#   - with-skill  — skill tool available, `draftjs-exporter` allowed.
+#                 | no docs    | docs
+#   --------------|------------|-------------
+#   no skill      | baseline   | docs
+#   skill         | skill      | docs+skill
+#
+# The docs arms read `.eval-docs/`, a fixture holding the published `llms.txt`
+# and `llms-full.txt` (built by `just eval-docs`). Pointing them at `docs/` or
+# `site/` instead would leak this file — and its expected answers — to the model.
 #
 # Most tests ask for a complete, runnable script and then actually run it
 # against the installed library (`graders/run_snippet.py`). A hallucinated API
 # fails there even when the prose around it reads well, which is exactly the
-# failure mode a reference skill is supposed to prevent. Two knowledge-only
-# gotchas are graded by rubric because they have no code answer.
+# failure mode a reference is supposed to prevent. Knowledge-only gotchas are
+# graded by rubric because they have no code answer.
+#
+# Caveat worth keeping in mind when reading results: the skill arms differ from
+# the baseline by one tool, which is a controlled comparison. The docs arms also
+# add `read`/`grep`/`glob`/`list`, so a docs arm that loses may be losing on
+# retrieval rather than on documentation quality.
 #
 # Requires:
 #   - `just eval-init` — installs `promptfoo`, `@opencode-ai/sdk` and the
@@ -23,8 +34,8 @@
 #     never run evals don't pay for them; promptfoo resolves the SDK from the
 #     same global tree it lives in.
 #   - `just init` — the graders import `draftjs_exporter` from the project venv.
-#   - `SCW_SECRET_KEY` — Scaleway API key. Both the model under test and the
-#     rubric grader run on Scaleway Generative APIs.
+#   - `TENSORX_API_KEY` — both the model under test and the rubric grader run on
+#     TensorX.
 #
 # Run:
 #   just eval
@@ -36,66 +47,94 @@ prompts:
 
 # The OpenCode SDK provider takes its model list from OpenCode's own config, not
 # from promptfoo. `just eval` points `OPENCODE_CONFIG` at `opencode.json` next to
-# this file, which defines the `scaleway` provider and its base URL. The `apiKey`
+# this file, which defines the `tensorx` provider and its base URL. The `apiKey`
 # below is what promptfoo's own "is this provider configured" check looks for.
 #
-# Three settings keep the comparison honest, and all three are shared by both
-# arms through the `&opencode` anchor:
+# All four arms share `working_dir`, the system prompt and the model, and differ
+# only in which tools they get. Three settings keep that honest:
 #
 #   - `tools: {"*": false}` strips every built-in tool _and_ any MCP server the
 #     person running the eval happens to have configured globally, so results do
-#     not depend on whose machine ran them. The `with-skill` arm adds back
-#     exactly one tool.
+#     not depend on whose machine ran them. Each arm adds back only what it is
+#     meant to have.
 #   - `custom_agent` replaces OpenCode's coding-agent system prompt. Without it,
-#     a toolless run in a repo working directory spends its turns narrating
-#     "let me look at the files" and never answers — that measures the harness,
-#     not the skill. It also pins temperature.
+#     a toolless run spends its turns narrating "let me look at the files" and
+#     never answers — that measures the harness, not the reference material. It
+#     also pins temperature. The prompt is deliberately identical across arms and
+#     true of all of them.
 #   - `permission.skill` denies every skill, then re-allows the one under test,
 #     so a globally-installed skill cannot answer for it. Order matters: a
 #     trailing `"*": deny` shadows the specific allow above it and hides
 #     everything.
 #
-# `working_dir` has to be the repo root — that is where OpenCode looks for
-# `.agents/skills/<name>/SKILL.md`.
+# `working_dir` is the docs fixture rather than the repo root, so the docs arms
+# cannot read `draftjs_exporter/` source and outscore the docs on their behalf.
+# OpenCode still finds `.agents/skills/` by walking up to the git root, and
+# loading it is not blocked by `external_directory: deny`.
 providers:
   - id: opencode:sdk
     label: baseline
     config: &opencode
-      provider_id: scaleway
-      model: deepseek-v4-flash-0731
-      apiKey: "{{ env.SCW_SECRET_KEY }}"
-      working_dir: ../..
+      provider_id: tensorx
+      model: deepseek/deepseek-v4-flash-0731
+      apiKey: "{{ env.TENSORX_API_KEY }}"
+      working_dir: ../../.eval-docs
       tools:
         "*": false
-      permission:
+      permission: &closed
         external_directory: deny
-      custom_agent: &agent
+      custom_agent:
         description: draftjs_exporter question answering
         temperature: 0
-        steps: 6
+        # High enough that a docs arm can search, read and still answer. At 8,
+        # a sixth of all runs died mid-search on "maximum steps reached", which
+        # penalised precisely the arms that have something to search.
+        steps: 20
         prompt: >-
           You are answering a developer's question about the `draftjs_exporter`
-          Python library. Answer from what you know, directly and concisely. You
-          have no access to the user's files. When the question asks for a
-          script, reply with one complete, runnable Python code block.
+          Python library. Answer directly and concisely, using what you know plus
+          whatever tools and reference material you have — if you have neither,
+          answer from memory rather than asking for file access. Reference
+          documentation, when you can read it, is in your working directory. When
+          the question asks for a script, reply with one complete, runnable
+          Python code block.
 
   - id: opencode:sdk
-    label: with-skill
+    label: skill
     config:
       <<: *opencode
       tools:
         "*": false
         skill: true
-      permission:
+      permission: &skills_allowed
         skill:
           "*": deny
           draftjs-exporter: allow
         external_directory: deny
-      custom_agent: *agent
 
-# Scaleway rate-limits tokens per minute. Above ~2 concurrent agent runs the
-# provider starts returning empty output on a 429 instead of an error, which
-# shows up as a mystery assertion failure.
+  - id: opencode:sdk
+    label: docs
+    config:
+      <<: *opencode
+      tools: &docs_tools
+        "*": false
+        read: true
+        grep: true
+        glob: true
+        list: true
+      permission: *closed
+
+  - id: opencode:sdk
+    label: docs+skill
+    config:
+      <<: *opencode
+      tools:
+        <<: *docs_tools
+        skill: true
+      permission: *skills_allowed
+
+# Agent runs are token-heavy, and a provider rate limit surfaces as empty output
+# rather than an error — a mystery assertion failure. Keep concurrency low.
 evaluateOptions:
   maxConcurrency: 2
 
@@ -104,14 +143,30 @@ defaultTest:
     # `expect_contains` is a list var read by the grader, not a matrix of test
     # cases. Without this, promptfoo would fan each one out into several tests.
     disableVarExpansion: true
-    # Rubric grading runs on Scaleway too, so the eval needs a single API key.
+    # Rubric grading runs on TensorX too, so the eval needs a single API key. A
+    # different model family from the one under test, so it is not grading itself.
     provider:
-      id: openai:chat:gpt-oss-120b
+      id: openai:chat:z-ai/glm-5.2
       config:
-        apiBaseUrl: "https://api.scaleway.ai/v1"
-        apiKey: "{{ env.SCW_SECRET_KEY }}"
-        showThinking: false
+        apiBaseUrl: "https://api.tensorx.ai/v1"
+        apiKey: "{{ env.TENSORX_API_KEY }}"
         temperature: 0
+        max_tokens: 4096
+        # Without this the grader occasionally answers in prose and promptfoo
+        # fails the test with "Could not extract JSON". It still happens for a
+        # small share of runs, so treat a lone rubric failure as noise until
+        # `--repeat` reproduces it.
+        response_format:
+          type: json_object
+  # An OpenCode provider error — a rate limit, a dropped connection — comes back
+  # as empty output rather than an error, and would otherwise be graded as if the
+  # model had answered badly. Name it so it cannot be mistaken for a result.
+  assert:
+    - type: javascript
+      value: |
+        return (output || '').trim().length > 0
+          ? { pass: true, score: 1, reason: 'Provider returned output' }
+          : { pass: false, score: 0, reason: 'EMPTY RESPONSE — provider error, not a model failure. Re-run this row.' };
 
 tests:
   # --- Tasks graded by running the answer -----------------------------------
@@ -191,6 +246,48 @@ tests:
         `json.dumps(content_state["entityMap"], sort_keys=True)`.
       expect_stdout: '{"0": {"data": {"id": 42}, "mutability": "MUTABLE", "type": "LINK"}}'
     assert: *run_snippet
+
+  # --- Designed for the docs comparison -------------------------------------
+  #
+  # These two need more than one part of the reference to answer. The migration
+  # one is the sharper probe: the skill only links to the migration guide, so a
+  # skill arm that passes it is answering from memory, and a docs arm that fails
+  # it means the published docs are not carrying their weight.
+
+  - description: Combine a composite decorator with a style fallback
+    vars:
+      prompt: >-
+        Using the `draftjs_exporter` Python library, write a complete runnable
+        script that renders this ContentState to HTML and prints it. Newlines
+        inside block text must render as `<br>` elements, and inline styles that
+        are not in the default style map must render their text with no
+        surrounding element instead of failing:
+        {"entityMap": {}, "blocks": [{"key": "a", "text": "Line one\nLine two",
+        "type": "unstyled", "depth": 0, "inlineStyleRanges": [],
+        "entityRanges": []}, {"key": "b", "text": "Odd", "type": "unstyled",
+        "depth": 0, "inlineStyleRanges": [{"offset": 0, "length": 3, "style":
+        "TINY"}], "entityRanges": []}]}
+      expect_stdout: "<p>Line one<br/>Line two</p><p>Odd</p>"
+    assert: *run_snippet
+
+  - description: Upgrade notes across major versions
+    vars:
+      prompt: >-
+        We are pinned to `draftjs_exporter` 5.2.0 and want to move to 7.x. Walk
+        me through what breaks along the way — rendered output, dependencies,
+        and anything that would make our existing test suite fail.
+    assert:
+      - type: llm-rubric
+        value: >-
+          The answer covers all three of these, and is not contradicted by
+          anything else it says: (1) v6 changed nested inline style output to
+          emit fewer redundant tags, so tests comparing exact HTML break;
+          (2) v7 made the Markdown exporter escape user text and link
+          destinations, so tests comparing exact Markdown break; (3) v6 dropped
+          support for some Python versions (3.7, 3.8 and 3.9) or raised the
+          minimum `lxml` version to 4.6.5. Mentioning `string_compat` as a way
+          to pin older `string` engine output counts towards (1) only if the
+          output change itself is described.
 
   # --- Gotchas with no code answer, graded by rubric -------------------------
 
