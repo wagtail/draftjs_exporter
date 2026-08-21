@@ -1,7 +1,9 @@
 """MkDocs build hooks for agent skill discovery files.
 
-Copies ``.agents/skills/*/SKILL.md`` files into the built site under
-``.well-known/agent-skills/`` and generates two discovery catalogs:
+Copies the library skills bundled with the package (under the package's
+``draftjs_exporter/.agents/skills/*/SKILL.md`` — the same files that ship in the
+wheel for Library Skills) into the built site under ``.well-known/agent-skills/``
+and generates two discovery catalogs:
 
 - ``.well-known/agent-skills/index.json`` – the agent skills discovery format.
 - ``.well-known/ai-catalog.json`` – the AI catalog format.
@@ -20,8 +22,8 @@ import yaml
 
 # --- Constants ---------------------------------------------------------------
 
-SKILLS_DIR = Path(__file__).parent.parent / ".agents" / "skills"
-"""Where skill source files live in the repo."""
+SKILLS_DIR = Path(__file__).parent.parent / "draftjs_exporter" / ".agents" / "skills"
+"""Canonical skill source files, bundled with the published package."""
 
 WELL_KNOWN_DIR = ".well-known/agent-skills"
 """Output directory for skills, relative to the site directory."""

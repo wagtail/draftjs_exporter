@@ -14,5 +14,8 @@
         "baseURL": "https://api.tensorx.ai/v1"
       }
     }
+  },
+  "skills": {
+    "paths": ["../draftjs_exporter/.agents/skills"]
   }
 }
