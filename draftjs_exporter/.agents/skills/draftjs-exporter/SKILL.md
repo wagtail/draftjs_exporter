@@ -118,7 +118,7 @@ See [configuration reference](https://wagtail.github.io/draftjs_exporter/configu
 
 ### Conventions
 
-- **Extend `BLOCK_MAP` and `STYLE_MAP` with `**`** spread instead of rebuilding from scratch — they cover the common Draft.js types and styles.
+- **Extend `BLOCK_MAP` and `STYLE_MAP` with `**` spread instead of rebuilding from scratch — they cover the common Draft.js types and styles.
 - **Use `BLOCK_TYPES` / `INLINE_STYLES` / `ENTITY_TYPES` constants** instead of raw strings, so renames surface as test failures. They also expose `FALLBACK`.
 - **Pick a component function only when you need block data, depth, or children composition.** A plain string or dict covers most cases.
 - **Stick with the default `string` engine** unless you need HTML sanitization (`html5lib`/`lxml`).
