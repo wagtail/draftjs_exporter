@@ -4,5 +4,7 @@ venv
 coverage_html_report
 .pytest_cache
 .mypy_cache
+.grimp_cache
+.import_linter_cache
 example.html
 example.md
