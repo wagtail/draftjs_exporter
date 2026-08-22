@@ -11,11 +11,18 @@ from typing import cast
 import memray
 from markov_draftjs import get_content_sample
 
-from draftjs_exporter.constants import BLOCK_TYPES, ENTITY_TYPES
-from draftjs_exporter.defaults import BLOCK_MAP, STYLE_MAP
-from draftjs_exporter.dom import DOM
-from draftjs_exporter.html import HTML, ExporterConfig
-from draftjs_exporter.types import ContentState, Element, Props
+from draftjs_exporter import (
+    BLOCK_MAP,
+    BLOCK_TYPES,
+    DOM,
+    ENTITY_TYPES,
+    HTML,
+    STYLE_MAP,
+    ContentState,
+    Element,
+    ExporterConfig,
+    Props,
+)
 from example import br, entity_fallback, image, list_item, ordered_list
 
 parser = argparse.ArgumentParser(description="Run the draftjs_exporter benchmark.")

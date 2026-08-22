@@ -24,6 +24,9 @@ from draftjs_exporter.defaults import STYLE_MAP as STYLE_MAP
 from draftjs_exporter.defaults import code_block as code_block
 from draftjs_exporter.defaults import render_children as render_children
 from draftjs_exporter.dom import DOM as DOM
+from draftjs_exporter.entity_state import (
+    ExporterEntityException as ExporterEntityException,
+)
 from draftjs_exporter.error import MarkdownParseError as MarkdownParseError
 from draftjs_exporter.html import HTML as HTML
 from draftjs_exporter.html import ExporterConfig as ExporterConfig
@@ -46,6 +49,7 @@ from draftjs_exporter.markdown.entities import md_link as md_link
 from draftjs_exporter.markdown.entities import (
     md_make_horizontal_rule as md_make_horizontal_rule,
 )
+from draftjs_exporter.markdown.escape import escape_text as md_escape_text
 from draftjs_exporter.markdown.fallbacks import md_block_fallback as md_block_fallback
 from draftjs_exporter.markdown.fallbacks import md_entity_fallback as md_entity_fallback
 from draftjs_exporter.markdown.fallbacks import md_style_fallback as md_style_fallback
@@ -95,6 +99,7 @@ __all__ = [
     "ExporterConfig",
     "ContentState",
     "DOM",
+    "ExporterEntityException",
     # Configs
     "HTML_CONFIG",
     "MARKDOWN_CONFIG",
@@ -123,6 +128,7 @@ __all__ = [
     "md_ol",
     "md_prefixed_block",
     "md_style_fallback",
+    "md_escape_text",
     "md_ul",
     # Importer
     "MarkdownImporter",
