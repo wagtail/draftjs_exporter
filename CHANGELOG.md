@@ -4,6 +4,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- Re-export `md_escape_text` and `md_escape_link_destination` from the package root.
+
+### Changed
+
+- Rename the Markdown escaping helpers for user text (`escape_text` → `md_escape_text`) and for link destinations (`escape_link_destination` → `md_escape_link_destination`). This is a breaking change within the experimental Markdown support; import them from `draftjs_exporter` under their new names.
+
 ## [v7.1.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v7.1.0)
 
 ### Added
