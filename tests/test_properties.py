@@ -24,14 +24,20 @@ from bs4 import BeautifulSoup
 from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
-from draftjs_exporter.constants import BLOCK_TYPES, ENTITY_TYPES, INLINE_STYLES
-from draftjs_exporter.contentstate_filter import ContentStateFilter
-from draftjs_exporter.defaults import BLOCK_MAP, STYLE_MAP
-from draftjs_exporter.dom import DOM
-from draftjs_exporter.html import HTML, ExporterConfig
-from draftjs_exporter.markdown import CONFIG as MARKDOWN_CONFIG
-from draftjs_exporter.markdown.escape import escape_text
-from draftjs_exporter.markdown_importer import MarkdownImporter
+from draftjs_exporter import (
+    BLOCK_MAP,
+    BLOCK_TYPES,
+    DOM,
+    ENTITY_TYPES,
+    HTML,
+    INLINE_STYLES,
+    MARKDOWN_CONFIG,
+    STYLE_MAP,
+    ContentStateFilter,
+    ExporterConfig,
+    MarkdownImporter,
+    md_escape_text,
+)
 from tests.strategies import (
     content_states,
     dangerous_content_states,
@@ -183,12 +189,12 @@ class TestMarkdownEscapingInvariants(unittest.TestCase):
 
     @given(escapable_text)
     def test_escape_text_never_raises(self, text):
-        escape_text(text, at_line_start=True)
-        escape_text(text, at_line_start=False)
+        md_escape_text(text, at_line_start=True)
+        md_escape_text(text, at_line_start=False)
 
     @given(escapable_text)
     def test_no_unescaped_angle_bracket(self, text):
-        escaped = escape_text(text, at_line_start=True)
+        escaped = md_escape_text(text, at_line_start=True)
         self.assertIsNone(re.search(r"(?<!\\)<", escaped))
 
     @given(escapable_text)
@@ -196,12 +202,12 @@ class TestMarkdownEscapingInvariants(unittest.TestCase):
         # Escaping may add backslashes but never alters the line endings
         # themselves: \n, \r\n, and lone \r all survive verbatim, in order.
         endings = re.compile(r"\r\n|\r|\n")
-        escaped = escape_text(text, at_line_start=True)
+        escaped = md_escape_text(text, at_line_start=True)
         self.assertEqual(endings.findall(escaped), endings.findall(text))
 
     @given(st.sampled_from("#-+>=|~").map(lambda c: c + "x"))
     def test_line_start_char_always_escaped(self, text):
-        self.assertTrue(escape_text(text, at_line_start=True).startswith("\\"))
+        self.assertTrue(md_escape_text(text, at_line_start=True).startswith("\\"))
 
     @given(
         st.tuples(
@@ -210,14 +216,14 @@ class TestMarkdownEscapingInvariants(unittest.TestCase):
         ).map(lambda t: t[0] + t[1] + "x")
     )
     def test_line_start_char_after_spaces_always_escaped(self, text):
-        escaped = escape_text(text, at_line_start=True)
+        escaped = md_escape_text(text, at_line_start=True)
         self.assertTrue(escaped.lstrip(" ").startswith("\\"))
 
     @given(st.from_regex(r"\d{1,9}[.)]x", fullmatch=True))
     def test_ordered_list_marker_always_escaped(self, text):
         m = re.match(r"(\d{1,9})([.)])", text)
         assert m is not None
-        escaped = escape_text(text, at_line_start=True)
+        escaped = md_escape_text(text, at_line_start=True)
         self.assertTrue(escaped.startswith(f"{m.group(1)}\\{m.group(2)}"))
 
 

@@ -25,6 +25,7 @@ lint:
   uv run ruff format --check
   uv run mypy draftjs_exporter tests
   uv run ty check
+  uv run lint-imports
 
 # Format project files.
 format *paths=".":

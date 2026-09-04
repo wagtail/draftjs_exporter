@@ -3,9 +3,12 @@ import os
 import unittest
 from typing import Any
 
-from draftjs_exporter.markdown_importer import ImporterConfig, MarkdownImporter
-from draftjs_exporter.markdown_parser import scheme_resolver
-from draftjs_exporter.types import ContentState
+from draftjs_exporter import (
+    ContentState,
+    ImporterConfig,
+    MarkdownImporter,
+    scheme_resolver,
+)
 
 fixtures_path = os.path.join(os.path.dirname(__file__), "test_exports.json")
 with open(fixtures_path) as f:

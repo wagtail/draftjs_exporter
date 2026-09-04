@@ -9,7 +9,7 @@ from draftjs_exporter.options import Options, OptionsMap
 from draftjs_exporter.types import Block, Element, Entity, EntityKey, EntityMap
 
 
-class EntityException(ExporterException):
+class ExporterEntityException(ExporterException):
     """Raised when entity state manipulation is invalid or an entity is missing."""
 
 
@@ -45,7 +45,7 @@ class EntityState:
             command: The command to apply.
 
         Raises:
-            EntityException: If a stop command does not match the most recent start.
+            ExporterEntityException: If a stop command does not match the most recent start.
         """
         match command.name:
             case "start_entity":
@@ -53,7 +53,9 @@ class EntityState:
             case "stop_entity":
                 expected = self.entity_stack[-1]
                 if command.data != expected:
-                    raise EntityException(f"Expected {expected}, got {command.data}")
+                    raise ExporterEntityException(
+                        f"Expected {expected}, got {command.data}"
+                    )
 
                 self.completed_entity = self.entity_stack.pop()
 
@@ -83,12 +85,12 @@ class EntityState:
             The entity record.
 
         Raises:
-            EntityException: If the key is missing from the entity map.
+            ExporterEntityException: If the key is missing from the entity map.
         """
         details = self.entity_map.get(entity_key)
 
         if details is None:
-            raise EntityException(
+            raise ExporterEntityException(
                 f'Entity "{entity_key}" does not exist in the entityMap'
             )
 

@@ -223,10 +223,10 @@ def mention(props: Props) -> Element:
 Use `md_mark_safe(markup, block_prefix=True)` for prefixes after which nested blocks can start (list markers, blockquote `> `), so text following them still gets line-start escaping. The escaping functions are also available directly for lower-level needs:
 
 ```python
-from draftjs_exporter.markdown.escape import escape_link_destination, escape_text
+from draftjs_exporter import md_escape_link_destination, md_escape_text
 
-escape_text("# Not a heading", at_line_start=True)  # "\\# Not a heading"
-escape_link_destination("https://example.com/a(b)")  # "https://example.com/a\\(b\\)"
+md_escape_text("# Not a heading", at_line_start=True)  # "\\# Not a heading"
+md_escape_link_destination("https://example.com/a(b)")  # "https://example.com/a\\(b\\)"
 ```
 
 Limitations:
