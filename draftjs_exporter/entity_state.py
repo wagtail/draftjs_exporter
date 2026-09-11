@@ -13,6 +13,10 @@ class ExporterEntityException(ExporterException):
     """Raised when entity state manipulation is invalid or an entity is missing."""
 
 
+EntityException = ExporterEntityException
+"""Compatibility alias for ExporterEntityException."""
+
+
 class EntityState:
     """Track active entities for the current block and render their wrappers."""
 
