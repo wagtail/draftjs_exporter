@@ -6,7 +6,7 @@ from draftjs_exporter.engines.base import Attr, DOMEngine
 from draftjs_exporter.markdown.escape import (
     code_block_fence,
     code_span_delimiters,
-    escape_text,
+    md_escape_text,
 )
 from draftjs_exporter.types import HTML, Tag
 
@@ -160,7 +160,7 @@ class DOMMarkdown(DOMEngine):
                 elif rendered:
                     at_line_start = rendered.endswith(("\n", "\r"))
             else:
-                out.append(escape_text(c, at_line_start))
+                out.append(md_escape_text(c, at_line_start))
                 if c:
                     at_line_start = c.endswith(("\n", "\r"))
         return "".join(out)

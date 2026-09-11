@@ -48,6 +48,7 @@ html5lib = ["beautifulsoup4>=4.4.1,<5", "html5lib>=0.999,<2"]
 [dependency-groups]
 dev = [
   "hypothesis>=6.100.0",
+  "import-linter>=2.0",
   "mypy==2.3.1",
   "pytest>=7.4.3",
   "pytest-cov>=4.1.0",
@@ -119,6 +120,50 @@ convention = "google"
   "S324", # Any hashlib usage is allowed in tests, no need to use a secure hash functions only
   "D",    # Docstrings are not required in tests
 ]
+
+[tool.importlinter]
+root_packages = ["draftjs_exporter", "tests"]
+
+[[tool.importlinter.contracts]]
+name = "Importer modules do not import exporter modules"
+type = "forbidden"
+source_modules = [
+    "draftjs_exporter.contentstate_filter",
+    "draftjs_exporter.markdown_importer",
+    "draftjs_exporter.markdown_parser",
+]
+forbidden_modules = [
+    "draftjs_exporter.composite_decorators",
+    "draftjs_exporter.defaults",
+    "draftjs_exporter.dom",
+    "draftjs_exporter.entity_state",
+    "draftjs_exporter.html",
+    "draftjs_exporter.markdown",
+    "draftjs_exporter.options",
+    "draftjs_exporter.style_state",
+    "draftjs_exporter.wrapper_state",
+]
+
+[[tool.importlinter.contracts]]
+# Full-output integration tests should consume the library through its public
+# root API (`from draftjs_exporter import ...`) rather than reaching into
+# internal modules. `draftjs_exporter.*` matches child modules only, so the
+# root package itself remains importable. `allow_indirect_imports` is required
+# because the public root API itself transitively uses those internal modules;
+# only *direct* imports of internal modules are forbidden. Note: import-linter
+# only analyzes packages, so loose top-level scripts (example.py, benchmark.py)
+# can't be tracked here; they follow the same "root imports only" convention
+# by hand.
+name = "Full-output integration tests use only the public root API"
+type = "forbidden"
+allow_indirect_imports = true
+source_modules = [
+    "tests.test_output",
+    "tests.test_exports",
+    "tests.test_imports",
+    "tests.test_properties",
+]
+forbidden_modules = ["draftjs_exporter.*"]
 
 [tool.mypy]
 python_version = "3.10"

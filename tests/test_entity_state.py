@@ -2,7 +2,11 @@ import unittest
 
 from draftjs_exporter.command import Command
 from draftjs_exporter.dom import DOM
-from draftjs_exporter.entity_state import EntityException, EntityState
+from draftjs_exporter.entity_state import (
+    EntityException,
+    EntityState,
+    ExporterEntityException,
+)
 from draftjs_exporter.options import Options
 from draftjs_exporter.types import Block, ConfigMap, EntityMap
 from tests.test_entities import link
@@ -28,6 +32,9 @@ class TestEntityState(unittest.TestCase):
     def test_init(self):
         self.assertIsInstance(self.entity_state, EntityState)
 
+    def test_entity_exception_alias(self):
+        self.assertIs(EntityException, ExporterEntityException)
+
     def test_apply_start_entity(self):
         self.assertEqual(len(self.entity_state.entity_stack), 0)
         self.entity_state.apply(Command("start_entity", 0, "0"))
@@ -40,7 +47,7 @@ class TestEntityState(unittest.TestCase):
         self.assertEqual(len(self.entity_state.entity_stack), 0)
 
     def test_apply_raises(self):
-        with self.assertRaises(EntityException):
+        with self.assertRaises(ExporterEntityException):
             self.entity_state.apply(Command("start_entity", 0, "0"))
             self.entity_state.apply(Command("stop_entity", 0, "1"))
 
@@ -62,7 +69,7 @@ class TestEntityState(unittest.TestCase):
         )
 
     def test_get_entity_details_raises(self):
-        with self.assertRaises(EntityException):
+        with self.assertRaises(ExporterEntityException):
             self.entity_state.get_entity_details("1")
 
     def test_render_entities_unstyled(self):

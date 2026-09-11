@@ -59,7 +59,7 @@ LINE_ENDING = re.compile(r"(\r\n|\r|\n)")
 """Matches a single CommonMark line ending (``\\r\\n``, ``\\r``, or ``\\n``)."""
 
 
-def escape_text(text: str, at_line_start: bool = False) -> str:
+def md_escape_text(text: str, at_line_start: bool = False) -> str:
     r"""Escape Markdown metacharacters in user-controlled text.
 
     Applies CommonMark backslash escapes. Line-start-sensitive characters
@@ -136,7 +136,7 @@ def _escape_underscores(line: str) -> str:
     return UNDERSCORE_RUN.sub(replace, line)
 
 
-def escape_link_destination(url: str) -> str:
+def md_escape_link_destination(url: str) -> str:
     """Escape a URL for use as an inline link destination inside ``](…)``.
 
     Backslash-escapes backslashes and parentheses (which would otherwise

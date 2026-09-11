@@ -1,7 +1,7 @@
 """Low-level helper components for inline and block Markdown fragments."""
 
 from draftjs_exporter.dom import DOM
-from draftjs_exporter.markdown.escape import escape_link_destination
+from draftjs_exporter.markdown.escape import md_escape_link_destination
 from draftjs_exporter.types import Element
 
 
@@ -35,7 +35,7 @@ def md_link_destination(url: str) -> Element:
     Returns:
         An element rendering the escaped URL without further escaping.
     """
-    return md_mark_safe(escape_link_destination(url))
+    return md_mark_safe(md_escape_link_destination(url))
 
 
 def md_inline(children: list[str | Element]) -> Element:

@@ -51,7 +51,7 @@ Out of scope. Depends entirely on the integrating application.
 
 ### Repudiation
 
-The library does no logging and keeps no audit trail. Those can be added by implementers. Exceptions (`EntityException`, `WrapperException`, etc.) carry entity keys and, indirectly, fragments of the input; applications that surface these messages to end users (like via debug pages) could leak content that should not be exposed. Treat exporter exceptions as internal diagnostics and avoid exposing raw exception messages in production error pages.
+The library does no logging and keeps no audit trail. Those can be added by implementers. Exceptions (`ExporterEntityException`, `WrapperException`, etc.) carry entity keys and, indirectly, fragments of the input; applications that surface these messages to end users (like via debug pages) could leak content that should not be exposed. Treat exporter exceptions as internal diagnostics and avoid exposing raw exception messages in production error pages.
 
 ### Information disclosure
 

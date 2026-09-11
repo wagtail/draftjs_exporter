@@ -1,10 +1,15 @@
 import unittest
 
-from draftjs_exporter.constants import BLOCK_TYPES, ENTITY_TYPES, INLINE_STYLES
-from draftjs_exporter.defaults import BLOCK_MAP
-from draftjs_exporter.dom import DOM
-from draftjs_exporter.entity_state import EntityException
-from draftjs_exporter.html import HTML, ExporterConfig
+from draftjs_exporter import (
+    BLOCK_MAP,
+    BLOCK_TYPES,
+    DOM,
+    ENTITY_TYPES,
+    HTML,
+    INLINE_STYLES,
+    ExporterConfig,
+    ExporterEntityException,
+)
 from example import blockquote
 from tests.test_composite_decorators import (
     BR_DECORATOR,
@@ -263,7 +268,7 @@ class TestOutput(unittest.TestCase):
         )
 
     def test_render_with_entities_crossing_raises(self):
-        with self.assertRaises(EntityException):
+        with self.assertRaises(ExporterEntityException):
             self.exporter.render(
                 {
                     "entityMap": {

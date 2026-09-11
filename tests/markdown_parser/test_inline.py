@@ -277,7 +277,7 @@ class TestLinks(unittest.TestCase):
         self.assertEqual(builder.entity_map["0"]["type"], "LINK")
 
     def test_link_destination_unescapes_parens(self):
-        # Round-trips the exporter's escape_link_destination output.
+        # Round-trips the exporter's md_escape_link_destination output.
         parser, builder = parse_with_builder()
         text, _, _ = parser.parse(r"[a](https://example.com/a\(b\))")
         self.assertEqual(text, "a")

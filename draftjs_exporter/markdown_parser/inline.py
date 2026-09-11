@@ -385,7 +385,7 @@ class InlineParser:
     def _unescape_destination(url: str) -> str:
         """Unescape backslash escapes in an inline link destination.
 
-        Mirrors the exporter's ``escape_link_destination``: backslash
+        Mirrors the exporter's ``md_escape_link_destination``: backslash
         before ASCII punctuation yields the punctuation, a backslash
         before any other character is kept literal. Percent-encoded
         bytes (whitespace and control characters the exporter encoded

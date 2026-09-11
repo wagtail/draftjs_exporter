@@ -5,12 +5,17 @@ import unittest
 from collections.abc import Callable
 from pstats import Stats
 
-from draftjs_exporter.constants import BLOCK_TYPES, ENTITY_TYPES
-from draftjs_exporter.defaults import BLOCK_MAP, STYLE_MAP
-from draftjs_exporter.dom import DOM
-from draftjs_exporter.html import HTML, ExporterConfig
-from draftjs_exporter.markdown import CONFIG as MARKDOWN_CONFIG
-from draftjs_exporter.types import ContentState
+from draftjs_exporter import (
+    BLOCK_MAP,
+    BLOCK_TYPES,
+    DOM,
+    ENTITY_TYPES,
+    HTML,
+    MARKDOWN_CONFIG,
+    STYLE_MAP,
+    ContentState,
+    ExporterConfig,
+)
 from tests.test_composite_decorators import (
     BR_DECORATOR,
     HASHTAG_DECORATOR,
