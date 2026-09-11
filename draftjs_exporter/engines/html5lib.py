@@ -2,16 +2,13 @@
 
 import re
 
+from bs4 import BeautifulSoup
+
 from draftjs_exporter.engines.base import Attr, DOMEngine
 from draftjs_exporter.types import HTML, Element, Tag
 
-try:
-    from bs4 import BeautifulSoup
-
-    # Cache empty soup so we can create tags in isolation without the performance overhead.
-    soup = BeautifulSoup("", "html5lib")
-except ImportError:
-    pass
+# Cache empty soup so we can create tags in isolation without the performance overhead.
+soup = BeautifulSoup("", "html5lib")
 
 RENDER_RE = re.compile(r"</?(fragment|body|html|head)>")
 RENDER_DEBUG_RE = re.compile(r"</?(body|html|head)>")

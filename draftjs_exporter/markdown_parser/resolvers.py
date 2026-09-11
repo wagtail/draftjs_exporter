@@ -109,7 +109,7 @@ def scheme_resolver(
     Returns:
         A resolver that defers (returns None) for non-matching URLs.
     """
-    converters = coerce if coerce is not None else {}
+    converters: dict[str, Callable[[str], Any]] = coerce if coerce is not None else {}
 
     def resolver(url: str, label: str) -> EntityResolution | None:
         parsed = urlparse(url)

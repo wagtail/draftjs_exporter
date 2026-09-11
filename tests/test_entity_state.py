@@ -1,4 +1,5 @@
 import unittest
+from typing import cast
 
 from draftjs_exporter.command import Command
 from draftjs_exporter.dom import DOM
@@ -19,7 +20,11 @@ entity_map: EntityMap = {
         "mutability": "MUTABLE",
         "data": {"url": "http://example.com"},
     },
-    "2": {"type": "LINK", "data": {"url": "http://test.com"}},
+    "2": {
+        "type": "LINK",
+        "mutability": "MUTABLE",
+        "data": {"url": "http://test.com"},
+    },
 }
 
 
@@ -145,12 +150,19 @@ class TestEntityState(unittest.TestCase):
         entity_state.render_entities("Test text", blocks[0], blocks, DOM._dom())
 
     def test_render_entities_data_no_mutability(self):
+        # Entities without mutability are tolerated at runtime, and their
+        # props are rendered with a mutability of None. The cast bypasses
+        # the required `mutability` key to exercise that leniency.
+        entity_map_no_mutability = cast(  # ty: ignore[disjoint-cast]
+            EntityMap, {"2": {"type": "LINK", "data": {"url": "http://test.com"}}}
+        )
+
         def component(props):
             self.assertEqual(props["entity"]["mutability"], None)
             return None
 
         entity_state = EntityState(
-            Options.map_entities({"LINK": component}), entity_map
+            Options.map_entities({"LINK": component}), entity_map_no_mutability
         )
 
         entity_state.apply(Command("start_entity", 0, "2"))

@@ -288,16 +288,16 @@ if __name__ == "__main__":
         {
             **MARKDOWN_CONFIG,
             "style_map": {
-                **MARKDOWN_CONFIG["style_map"],
+                **MARKDOWN_CONFIG.get("style_map", {}),
                 INLINE_STYLES.FALLBACK: style_fallback,
             },
             "entity_decorators": {
-                **MARKDOWN_CONFIG["entity_decorators"],
+                **MARKDOWN_CONFIG.get("entity_decorators", {}),
                 ENTITY_TYPES.EMBED: None,
                 ENTITY_TYPES.FALLBACK: entity_fallback,
             },
             "block_map": {
-                **MARKDOWN_CONFIG["block_map"],
+                **MARKDOWN_CONFIG.get("block_map", {}),
                 BLOCK_TYPES.FALLBACK: block_fallback,
             },
             "composite_decorators": [

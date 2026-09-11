@@ -4,7 +4,7 @@
 
 ## Features
 
-This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html), and [measures performance](https://thib.me/python-memory-profiling-for-the-draft-js-exporter) and [code coverage](https://coveralls.io/github/wagtail/draftjs_exporter). Code is checked with [mypy](https://mypy.readthedocs.io/en/latest/index.html).
+This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html), and [measures performance](https://thib.me/python-memory-profiling-for-the-draft-js-exporter) and [code coverage](https://coveralls.io/github/wagtail/draftjs_exporter). The package is fully typed.
 
 - Extensive configuration of the generated HTML.
 - Default, extensible block & inline style maps for common HTML elements.

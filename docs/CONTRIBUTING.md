@@ -29,7 +29,8 @@ just init
 
 - `just help`: See what commands are available.
 - `just init`: Install dependencies and initialise for development.
-- `just lint`: Lint the project. Accepts optional paths to scope to, e.g. `just lint draftjs_exporter/dom.py`.
+- `just lint`: Lint the project, including all four type checkers.
+- `just verify-types`: Report the type completeness of the public API with `pyright --verifytypes`.
 - `just format *paths="."`: Format project files.
 - `just test *args`: Test the project or a specific file (like `just test tests/test_dom.py`).
 - `just test-watch *args`: Restarts the tests whenever a file changes.
@@ -78,7 +79,7 @@ We follow [PEP 8](https://peps.python.org/pep-0008/) for Python code style, enfo
 - **Python**: formatted with `ruff format`, linted with `ruff check`. Configuration in `pyproject.toml`.
 - **Other files**: formatted with `prettier` (see `prettier.config.js`).
 - **Indentation**: 4 spaces, no tabs.
-- **Type annotations**: required on all production code, checked by `mypy` with strict settings and by `ty` (experimental).
+- **Type annotations**: required on all production code, checked by `mypy`, `ty`, `pyright`, and `pyrefly` (see [Static typing](#static-typing)).
 - **Naming**: `snake_case` for functions, methods, and variables; `PascalCase` for classes; `UPPER_CASE` for constants. Test modules follow `test_*.py`, test functions `test_*`, test classes `Test*`.
 - **Performance**: core classes should use `__slots__` to reduce memory overhead.
 - **Imports**: organized automatically by `ruff` (isort rules in `pyproject.toml`).
@@ -155,7 +156,7 @@ Automated tests are crucial for the quality assurance of this project. We use a 
 2. Make your changes, following the coding style and testing guidelines above.
 3. Run `just lint` and `just test` locally to verify everything passes.
 4. Open a pull request with a clear description of what the change does and why. Include relevant test evidence (commands and their output) and links to related issues.
-5. CI will run linting (ruff, mypy, ty, prettier), benchmarks, test coverage, and the compatibility test suite. All checks must pass before merging.
+5. CI will run linting (ruff, mypy, ty, pyright, pyrefly, prettier), benchmarks, test coverage, and the compatibility test suite. All checks must pass before merging.
 6. Squash merge when approved. Keep the commit message concise, in the imperative mood, and using Sentence case (no Title Case).
 
 ## Releases
@@ -189,4 +190,15 @@ env PYTHON_CONFIGURE_OPTS='--enable-optimizations --with-lto' PYTHON_CFLAGS='-ma
 
 ### Static typing
 
-All exporter code should pass static type checking by [mypy](https://mypy.readthedocs.io/en/latest/index.html), with as strict of a configuration as possible, and tentatively also pass type checks with the [ty](https://docs.astral.sh/ty/) checker.
+All Python code is type-checked by four checkers, and all four must pass in CI. They implement the Python typing spec independently, so they disagree in useful ways: each catches issues the others miss, and staying compatible with all of them keeps our typing idiomatic rather than checker-specific. See [pyrefly's type checker comparison](https://pyrefly.org/en/docs/compare/) for an overview of how the tools differ.
+
+| Checker                                         | Role in this project                                                                                                                                           | Configured in     |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| [mypy](https://mypy.readthedocs.io/)            | Reference checker, with a near-strict configuration.                                                                                                           | `[tool.mypy]`     |
+| [ty](https://docs.astral.sh/ty/)                | Fast checker from the Ruff team, plus opt-in soundness rules like `unsound-return-statement`.                                                                  | `[tool.ty.rules]` |
+| [pyright](https://microsoft.github.io/pyright/) | Cross-module checks mypy lacks, like required-key TypedDict access. Also reports the type completeness of the public API (`just verify-types`, informational). | `[tool.pyright]`  |
+| [pyrefly](https://pyrefly.org/)                 | Meta's checker, configured to mirror mypy's annotation requirements.                                                                                           | `[tool.pyrefly]`  |
+
+Annotations are required on all production code. Test code is exempt from annotation requirements, but is still checked: each checker's configuration holds a `tests` exception for this. Configuration lives in `pyproject.toml`, next to the other tooling, and `just lint` runs all four checkers.
+
+The public API is intentionally not 100% type-complete: `Element` is a `TypeAlias` of `Any` so that all DOM engines can be used interchangeably. Use `just verify-types` to review the current type completeness score.

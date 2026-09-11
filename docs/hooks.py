@@ -75,7 +75,7 @@ def _read_version() -> str:
     init = Path(__file__).parent.parent / "draftjs_exporter" / "__init__.py"
     for line in init.read_text().splitlines():
         if line.startswith("__version__"):
-            return str(line.split("=", 1)[1].strip().strip('"').strip("'"))
+            return line.split("=", 1)[1].strip().strip('"').strip("'")
     return SKILL_VERSION
 
 

@@ -92,6 +92,7 @@ config: ExporterConfig = {
 exporter = HTML(config)
 
 # markov_draftjs has slightly different type declarations.
+# ty: ignore[disjoint-cast]
 content_states = cast(list[ContentState], get_content_sample())
 
 print(f"Exporting {len(content_states)} ContentStates {args.runs} times")  # noqa: T201

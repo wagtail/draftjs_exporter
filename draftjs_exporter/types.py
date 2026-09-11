@@ -92,7 +92,7 @@ Mutability: TypeAlias = Literal["MUTABLE", "IMMUTABLE", "SEGMENTED"]
 """Draft.js entity mutability setting."""
 
 
-class Entity(TypedDict, total=False):
+class Entity(TypedDict):
     """Draft.js entity data referenced by entity ranges."""
 
     type: str

@@ -4,7 +4,7 @@
 
 ## Project structure & module organization
 
-Source code lives in `draftjs_exporter/`. Tests are in `tests/`. Contributor and user docs are in `docs/`. Type-checking stubs live in `stubs/`. The root also contains `example.py` and `benchmark.py` for local runs and performance checks.
+Source code lives in `draftjs_exporter/`. Tests are in `tests/`. Contributor and user docs are in `docs/`. The root also contains `example.py` and `benchmark.py` for local runs and performance checks.
 
 See [docs/CONTRIBUTING.md#project-architecture](docs/CONTRIBUTING.md#project-architecture) for the full architecture walkthrough.
 
@@ -22,8 +22,7 @@ See [docs/CONTRIBUTING.md#commands](docs/CONTRIBUTING.md#commands) for the full 
 
 - `uv` for dependency management
 - `ruff` for linting and formatting
-- `mypy` for type checking
-- `ty` for additional type checking (experimental)
+- `mypy`, `ty`, `pyright`, and `pyrefly` for type checking (all four must pass – see the Static typing section in CONTRIBUTING.md)
 - `uv` for package publication
 - `GitHub Actions` for continuous integration
 - `pytest` for unit tests
@@ -34,7 +33,7 @@ See [docs/CONTRIBUTING.md#commands](docs/CONTRIBUTING.md#commands) for the full 
 See [docs/CONTRIBUTING.md#coding-style--conventions](docs/CONTRIBUTING.md#coding-style--conventions) for the full guide. Quick points:
 
 - Python uses 4-space indentation, [PEP 8](https://peps.python.org/pep-0008/) style, enforced with `ruff`.
-- Type annotations required on production code (checked by mypy, ty). Test code is exempt.
+- Type annotations required on production code (checked by mypy, ty, pyright, pyrefly). Test code is exempt from annotation requirements but still checked.
 - Formatting: `ruff format` for Python, `prettier` for all other files.
 - Test modules follow `test_*.py`, with test functions named `test_*`, test classes `Test*`.
 - Core classes must use `__slots__`.

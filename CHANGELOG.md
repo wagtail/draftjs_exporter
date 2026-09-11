@@ -7,11 +7,17 @@
 ### Added
 
 - Re-export `md_escape_text` and `md_escape_link_destination` from the package root.
+- Check the codebase with the `pyright` and `pyrefly` type checkers in addition to `mypy` and `ty`. All four run in `just lint` and CI.
+- Add a `just verify-types` recipe reporting the type completeness of the public API with `pyright --verifytypes`.
 
 ### Changed
 
 - Rename `EntityException` to `ExporterEntityException`, keeping `EntityException` as a compatibility alias.
 - Rename the Markdown escaping helpers for user text (`escape_text` → `md_escape_text`) and for link destinations (`escape_link_destination` → `md_escape_link_destination`). This is a breaking change within the experimental Markdown support; import them from `draftjs_exporter` under their new names.
+- Tighten static typing across the board: stricter `mypy` checks (`extra_checks`, `strict_equality_for_none`, additional error codes), opt-in soundness rules for `ty` (`unsound-assignment`, `unsound-return-statement`, `unsound-yield`, `disjoint-cast`), and pyright's `standard` checking mode project-wide.
+- Require the `type`, `data`, and `mutability` keys in the `Entity` TypedDict, matching the Draft.js format. Entities without `mutability` are still tolerated at runtime, and rendered with a mutability of `None`.
+- Import `BeautifulSoup` unconditionally in the html5lib engine, consistent with the other engines. This is not a behavior change: engines are imported lazily, and using the html5lib engine without BeautifulSoup installed now fails with a clear import error rather than a `NameError` at render time.
+- Annotate inferred-`Any` attributes and empty containers in `WrapperState` and the Markdown resolvers, and document return types of `__init__` methods in the string and Markdown engines.
 
 ## [v7.1.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v7.1.0)
 
