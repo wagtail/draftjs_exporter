@@ -43,6 +43,20 @@ class TestEntities(unittest.TestCase):
             "![](a%20b.png)\n\n",
         )
 
+    def test_image_missing_src(self):
+        self.assertEqual(DOM.render(md_image({})), "![]()\n\n")
+
+    def test_image_src_none(self):
+        self.assertEqual(DOM.render(md_image({"src": None})), "![]()\n\n")
+
+    def test_link_missing_url(self):
+        self.assertEqual(DOM.render(md_link({"children": "test"})), "[test]()")
+
+    def test_link_url_none(self):
+        self.assertEqual(
+            DOM.render(md_link({"url": None, "children": "test"})), "[test]()"
+        )
+
     def test_make_horizontal_rule_stars(self):
         self.assertEqual(DOM.render(md_make_horizontal_rule("***")({})), "***\n\n")
 

@@ -26,11 +26,12 @@ def md_mark_safe(markup: str, block_prefix: bool = False) -> Element:
     )
 
 
-def md_link_destination(url: str) -> Element:
+def md_link_destination(url: str | None) -> Element:
     """Create an element holding a link or image URL for ``](…)``.
 
     Parameters:
-        url: The URL to escape and emit.
+        url: The URL to escape and emit, or ``None`` when the destination
+            is absent.
 
     Returns:
         An element rendering the escaped URL without further escaping.

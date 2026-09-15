@@ -136,22 +136,24 @@ def _escape_underscores(line: str) -> str:
     return UNDERSCORE_RUN.sub(replace, line)
 
 
-def md_escape_link_destination(url: str) -> str:
+def md_escape_link_destination(url: str | None) -> str:
     """Escape a URL for use as an inline link destination inside ``](…)``.
 
     Backslash-escapes backslashes and parentheses (which would otherwise
     break out of the destination), and percent-encodes ASCII whitespace and
-    control characters, which inline destinations may not contain. URL
-    scheme validation is out of scope: it is the integrator's
-    responsibility (see ``docs/SECURITY.md``).
+    control characters, which inline destinations may not contain. Missing
+    destinations (``None``) are rendered as empty, so links and images
+    without a URL produce ``[…]()`` rather than an error. URL scheme
+    validation is out of scope: it is the integrator's responsibility
+    (see ``docs/SECURITY.md``).
 
     Parameters:
-        url: The URL to escape.
+        url: The URL to escape, or ``None`` when the destination is absent.
 
     Returns:
         The escaped destination.
     """
-    escaped = url.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+    escaped = (url or "").replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
     return "".join(
         char if char > " " and char != "\x7f" else f"%{ord(char):02X}"
         for char in escaped

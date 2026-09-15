@@ -164,6 +164,12 @@ class TestEscapeLinkDestination(unittest.TestCase):
     def test_non_ascii_unchanged(self):
         self.assertEqual(md_escape_link_destination("/café"), "/café")
 
+    def test_none_renders_empty(self):
+        self.assertEqual(md_escape_link_destination(None), "")
+
+    def test_empty_string_unchanged(self):
+        self.assertEqual(md_escape_link_destination(""), "")
+
 
 class TestCodeSpanDelimiters(unittest.TestCase):
     def test_plain_content(self):

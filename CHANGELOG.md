@@ -11,6 +11,7 @@
 ### Fixed
 
 - Require the `type`, `data`, and `mutability` keys in the `Entity` TypedDict, matching the Draft.js format. Entities without `mutability` are still tolerated at runtime, and rendered with a mutability of `None`.
+- Markdown links and images no longer require a `url` or `src`: missing or `None` destinations render as `[text]()` and `![alt]()` instead of raising an error.
 
 ### Changed
 

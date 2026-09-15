@@ -253,6 +253,49 @@ class TestMarkdownEscaping(unittest.TestCase):
             "![a\\]b](x.png)\n\n",
         )
 
+    def test_link_url_none(self):
+        self.assertEqual(
+            self.render(
+                "click",
+                entity_ranges=[{"offset": 0, "length": 5, "key": 0}],
+                entity_map={
+                    "0": {
+                        "type": "LINK",
+                        "mutability": "MUTABLE",
+                        "data": {"url": None},
+                    }
+                },
+            ),
+            "[click]()\n\n",
+        )
+
+    def test_link_url_missing(self):
+        self.assertEqual(
+            self.render(
+                "click",
+                entity_ranges=[{"offset": 0, "length": 5, "key": 0}],
+                entity_map={"0": {"type": "LINK", "mutability": "MUTABLE", "data": {}}},
+            ),
+            "[click]()\n\n",
+        )
+
+    def test_image_src_none(self):
+        self.assertEqual(
+            self.render(
+                " ",
+                type_="atomic",
+                entity_ranges=[{"offset": 0, "length": 1, "key": 0}],
+                entity_map={
+                    "0": {
+                        "type": "IMAGE",
+                        "mutability": "IMMUTABLE",
+                        "data": {"src": None},
+                    }
+                },
+            ),
+            "![]()\n\n",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
