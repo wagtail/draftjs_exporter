@@ -5,6 +5,9 @@ branch = True
 source = draftjs_exporter
 
 [report]
+# Fail the test run (and CI) when coverage is below 100%.
+fail_under = 100
+
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Have to re-enable the standard pragma

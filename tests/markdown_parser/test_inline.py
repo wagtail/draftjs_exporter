@@ -123,6 +123,20 @@ class TestCodeSpans(unittest.TestCase):
         self.assertEqual(text, "``a")
         self.assertEqual(styles, [])
 
+    def test_escaped_backtick_does_not_close_span(self):
+        # A backslash-escaped backtick is skipped when looking for the
+        # closer, so the span only ends on a matching unescaped run.
+        text, styles, _ = make_parser().parse("`a\\`b`")
+        self.assertEqual(text, "a\\`b")
+        self.assertEqual(styles, [{"offset": 0, "length": 4, "style": "CODE"}])
+
+    def test_trailing_backslash_cannot_start_escape(self):
+        # A backslash at the very end has nothing to escape, so the
+        # opener stays unmatched and remains literal.
+        text, styles, _ = make_parser().parse("`a\\")
+        self.assertEqual(text, "`a\\")
+        self.assertEqual(styles, [])
+
 
 class TestHardBreaks(unittest.TestCase):
     def test_two_spaces_before_newline_are_stripped(self):
