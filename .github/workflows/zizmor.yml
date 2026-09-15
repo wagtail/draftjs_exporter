@@ -10,7 +10,7 @@ permissions: {}
 
 jobs:
   zizmor:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04-arm
     permissions:
       # Required for upload-sarif (used by zizmor-action) to upload SARIF files.
       security-events: write

@@ -13,7 +13,7 @@ on:
   pull_request:
 jobs:
   test:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-26.04-arm
     env:
       # Run property-based tests with more examples in CI than locally.
       HYPOTHESIS_PROFILE: ci
@@ -55,7 +55,7 @@ jobs:
           include-hidden-files: true
   test_compatibility:
     needs: test
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-26.04-arm
     env:
       HYPOTHESIS_PROFILE: ci
     strategy:
@@ -83,7 +83,7 @@ jobs:
       - run: just test
   test_lower_bound:
     needs: test
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-26.04-arm
     env:
       HYPOTHESIS_PROFILE: ci
     steps:
@@ -99,7 +99,7 @@ jobs:
   test_experimental:
     # Ad-hoc job to test experimental support without having to adjust all of our project for compatibility.
     needs: test
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-26.04-arm
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -113,7 +113,7 @@ jobs:
       - run: uv run --no-group dev --with 'beautifulsoup4>=4.4.1,<5, html5lib==1.1' python -X dev example.py
   deploy_site:
     needs: test
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-26.04-arm
     permissions:
       pages: write # to deploy to Pages
       id-token: write # to verify the deployment originates from an appropriate sourceq
