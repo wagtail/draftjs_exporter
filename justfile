@@ -23,9 +23,17 @@ init: clean-pyc
 lint:
   uv run ruff check
   uv run ruff format --check
-  uv run mypy draftjs_exporter tests
+  uv run mypy .
   uv run ty check
+  uv run pyright
+  uv run pyrefly check
   uv run lint-imports
+
+# Check the type completeness of the public API. Informational: the score
+# depends on how much of the API uses precise types, not on correctness.
+# Exits with an error while the score is below 100%.
+verify-types:
+  uv run pyright --verifytypes draftjs_exporter --ignoreexternal
 
 # Format project files.
 format *paths=".":

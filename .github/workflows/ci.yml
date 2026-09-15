@@ -29,8 +29,14 @@ jobs:
       - run: uv sync --dev
       - run: uv run ruff check --output-format=github .
       - run: uv run ruff format --check
-      - run: uv run mypy draftjs_exporter tests
+      - run: uv run mypy .
       - run: uv run ty check --output-format=github .
+      - run: uv run pyright
+      - run: uv run pyrefly check --output-format=github
+      # Informational: reports the type completeness of the public API, which is
+      # intentionally below 100% (engine-agnostic DOM types are `Any`).
+      - run: uv run pyright --verifytypes draftjs_exporter --ignoreexternal
+        continue-on-error: true
       - run: uv run lint-imports
       - run: just benchmark 10
       - run: just build

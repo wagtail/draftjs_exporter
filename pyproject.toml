@@ -50,6 +50,8 @@ dev = [
   "hypothesis>=6.100.0",
   "import-linter>=2.0",
   "mypy==2.3.1",
+  "pyrefly>=1.3.0,<2",
+  "pyright>=1.1.414,<2",
   "pytest>=7.4.3",
   "pytest-cov>=4.1.0",
   "pytest-memray>=1.7.0",
@@ -167,6 +169,8 @@ forbidden_modules = ["draftjs_exporter.*"]
 
 [tool.mypy]
 python_version = "3.10"
+# Skip gitignored directories (site/, .venv/, ...) when discovering files to check.
+exclude_gitignore = true
 # https://mypy.readthedocs.io/en/latest/config_file.html
 #### Additional opt-in checks of mypy.
 # Disallows usage of types that come from unfollowed imports (anything imported from an unfollowed import is automatically given a type of Any).
@@ -208,8 +212,37 @@ warn_unreachable = true
 
 # Prohibit equality checks, identity checks, and container checks between non-overlapping types.
 strict_equality = true
+# Extend the above to checks involving None.
+strict_equality_for_none = true
+# Enable additional checks that are technically correct but may be impractical in real code.
+extra_checks = true
 # Prevent automatic re-export of names imported from other modules to avoid accidental API exposure.
 no_implicit_reexport = true
+# Warn about unused '[mypy-<pattern>]' or '[[tool.mypy.overrides]]' config sections.
+warn_unused_configs = true
+
+# Additional opt-in error codes.
+enable_error_code = [
+  # Flag "type: ignore" comments without an error code.
+  "ignore-without-code",
+  # Flag methods overriding a parent method without the @override decorator.
+  # TODO Enable once we depend on typing_extensions for Python 3.10 support.
+  # "explicit-override",
+  # Flag use of a deprecated feature.
+  "deprecated",
+  # Flag use of variables that may be undefined in some code paths.
+  "possibly-undefined",
+  # Flag boolean checks on types that are always truthy or always falsy.
+  "truthy-bool",
+  # Flag conditions and expressions that are always true or always false.
+  "redundant-expr",
+  # Flag redundant annotations of the self or cls parameter.
+  "redundant-self",
+  # Flag overrides of a mutable attribute with an immutable type, or vice versa.
+  "mutable-override",
+  # Flag use of typing.reveal_type without importing it.
+  "unimported-reveal",
+]
 
 [[tool.mypy.overrides]]
 module = "tests.*"
@@ -217,3 +250,54 @@ module = "tests.*"
 disallow_untyped_defs = false
 # disallow_incomplete_defs = false
 # warn_no_return = false
+
+[tool.ty.rules]
+# Opt-in soundness checks, disabled by default in ty.
+# See https://docs.astral.sh/ty/reference/rules/.
+# Casting to a type with no possible overlap is likely a mistake.
+disjoint-cast = "error"
+# Flag assignments, returns, and yields of `Any` values where a precise type is declared.
+unsound-assignment = "error"
+unsound-return-statement = "error"
+unsound-yield = "error"
+
+[tool.pyright]
+# https://microsoft.github.io/pyright/#/configuration
+pythonVersion = "3.10"
+# "standard" adds cross-module checks mypy lacks, like TypedDict required-key access.
+typeCheckingMode = "standard"
+# Generated output of the docs build, also gitignored. Unlike ty and pyrefly,
+# pyright does not respect .gitignore on its own.
+exclude = ["site"]
+executionEnvironments = [
+  # Test code may access optional Draft.js keys directly, like anywhere else in tests.
+  { root = "tests", reportTypedDictNotRequiredAccess = "none" },
+]
+
+[tool.pyrefly]
+# https://pyrefly.org/en/docs/configuration/
+python-version = "3.10"
+# Flag reassignment of ALL_CAPS constants.
+treat-all-caps-as-final = true
+
+[tool.pyrefly.errors]
+# Enforce annotations on production code, like `disallow_untyped_defs` in mypy.
+implicit-any = true
+unannotated-return = true
+# Flag TypedDict key accesses that may raise a KeyError, like pyright does.
+not-required-key-access = true
+# Additional checks, all currently passing.
+# Flag stale "# pyrefly: ignore" comments.
+unused-ignore = true
+# Flag instantiation of abstract classes with unimplemented methods.
+direct-abstract-base-instantiation = true
+
+[[tool.pyrefly.sub-config]]
+# Test code is exempt from the annotation requirements of production code,
+# but is still checked, like with the mypy overrides above.
+matches = "tests/**"
+
+[tool.pyrefly.sub-config.errors]
+implicit-any = false
+unannotated-return = false
+not-required-key-access = false

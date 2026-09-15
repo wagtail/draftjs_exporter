@@ -127,11 +127,10 @@ class EntityState:
                 ENTITY_TYPES.FALLBACK,
             )
             props = entity_details["data"].copy()
+            # Entities without mutability are tolerated at runtime, rendered as None.
             props["entity"] = {
                 "type": entity_details["type"],
-                "mutability": entity_details["mutability"]
-                if "mutability" in entity_details
-                else None,
+                "mutability": entity_details.get("mutability"),
                 "block": block,
                 "blocks": blocks,
                 "entity_range": {"key": self.completed_entity},

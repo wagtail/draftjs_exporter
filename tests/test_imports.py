@@ -1,7 +1,7 @@
 import json
 import os
 import unittest
-from typing import Any
+from typing import Any, cast
 
 from draftjs_exporter import (
     ContentState,
@@ -112,7 +112,9 @@ def build_fixture_importer(fixture: dict[str, Any]) -> MarkdownImporter:
                 )
             ],
         }
-    return MarkdownImporter(ImporterConfig(**config))
+    # Cast needed: the config is arbitrary fixture JSON, and mypy's
+    # extra_checks rejects unpacking it into a TypedDict with optional keys.
+    return MarkdownImporter(cast(ImporterConfig, config))
 
 
 class TestRoundTrip(unittest.TestCase):

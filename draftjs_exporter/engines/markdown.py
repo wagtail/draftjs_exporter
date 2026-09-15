@@ -40,7 +40,7 @@ class Elt:
 
     __slots__ = ("type", "attr", "children", "markup")
 
-    def __init__(self, type_: Tag, attr: Attr | None, markup: HTML = ""):
+    def __init__(self, type_: Tag, attr: Attr | None, markup: HTML = "") -> None:
         """Initialize a new element.
 
         Parameters:

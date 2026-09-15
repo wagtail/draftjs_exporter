@@ -44,7 +44,7 @@ You can also run an example by downloading this repository and then using `pytho
 
 ## Type annotations
 
-The exporter's codebase uses static type annotations, checked with mypy and ty. Reusable types are made available so you can annotate your own components:
+The exporter's codebase uses static type annotations throughout, and is type-checked in CI. Reusable types are made available so you can annotate your own components:
 
 ```python
 from draftjs_exporter import DOM, Element, Props

@@ -1,5 +1,7 @@
 """Build block-level elements and manage nesting of wrapper elements."""
 
+from typing import Any
+
 from draftjs_exporter.constants import BLOCK_TYPES
 from draftjs_exporter.dom import DOM
 from draftjs_exporter.engines.base import DOMEngine
@@ -20,7 +22,9 @@ class Wrapper:
             options: Block options defining the wrapper element, or None for a placeholder.
         """
         self.depth = depth
-        self.last_child = None
+        self.last_child: Element | None = None
+        self.type: RenderableType
+        self.props: Props | None
 
         if options:
             self.type = options.wrapper
@@ -233,11 +237,12 @@ class WrapperState:
                     # If there is no content in the current wrapper, we need
                     # to add an intermediary node.
                     props = dict(options.props)
-                    props["block"] = {
+                    block: dict[str, Any] = {
                         "type": options.type,
                         "depth": depth,
                         "data": {},
                     }
+                    props["block"] = block
                     props["blocks"] = self.blocks
 
                     wrapper_parent = DOM.create_element(options.element, props, "")

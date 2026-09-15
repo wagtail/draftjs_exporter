@@ -49,7 +49,7 @@ def apply_decorators(
     text: str,
     block: Block,
     blocks: list[Block],
-) -> Generator[str, None, None]:
+) -> Generator[str | Element, None, None]:
     """Yield decorated text segments and decorator elements for a block.
 
     Parameters:

@@ -96,14 +96,14 @@ class ExportsTestMeta(type):
     See http://stackoverflow.com/a/20870875/1798491
     """
 
-    pr: cProfile.Profile = None  # type: ignore
+    pr: cProfile.Profile = None  # type: ignore[assignment]  # ty: ignore[invalid-assignment]
 
     def __new__(mcs, name, bases, tests):
         engine_key = name.replace("TestExports", "").lower()
         engine_path = ENGINE_MAP.get(engine_key, DOM.STRING)
         exporter = HTML(make_config(engine_path))
 
-        def gen_test(content: ContentState, html: str) -> Callable[[None], None]:
+        def gen_test(content: ContentState, html: str) -> Callable[..., None]:
             def test(self):
                 self.assertEqual(exporter.render(content), html)
 

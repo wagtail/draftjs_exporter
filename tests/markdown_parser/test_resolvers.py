@@ -3,6 +3,7 @@
 import unittest
 
 from draftjs_exporter.markdown_parser.resolvers import (
+    EntityResolution,
     default_image_resolver,
     default_link_resolver,
     resolve,
@@ -41,11 +42,11 @@ class TestResolve(unittest.TestCase):
     def test_first_match_wins(self):
         calls = []
 
-        def first(url, label):
+        def first(url: str, label: str) -> EntityResolution:
             calls.append("first")
             return {"type": "DOCUMENT", "data": {"id": 1}}
 
-        def second(url, label):
+        def second(url: str, label: str) -> EntityResolution:
             calls.append("second")
             return {"type": "LINK", "data": {}}
 
@@ -54,7 +55,7 @@ class TestResolve(unittest.TestCase):
         self.assertEqual(calls, ["first"])
 
     def test_none_defers_to_next(self):
-        def defer(url, label):
+        def defer(url: str, label: str) -> EntityResolution | None:
             return None
 
         result = resolve([defer], "/x", "lbl", default_link_resolver)

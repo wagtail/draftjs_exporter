@@ -26,7 +26,7 @@ import re
 import subprocess
 import sys
 import tempfile
-from typing import Any
+from typing import Any, cast
 
 CODE_BLOCK = re.compile(r"```(?:python|py)?\s*\n(.*?)```", re.DOTALL)
 TIMEOUT_SECONDS = 30
@@ -44,7 +44,8 @@ def _extract_snippet(output: str) -> str | None:
     with `re` and `json` and prints the expected result, which would otherwise
     pass a stdout comparison without exercising the library at all.
     """
-    blocks: list[str] = CODE_BLOCK.findall(output)
+    # The pattern has a single capture group, so `findall` returns plain strings.
+    blocks: list[str] = cast("list[str]", CODE_BLOCK.findall(output))
     for block in blocks:
         if "draftjs_exporter" in block:
             return block.strip()
