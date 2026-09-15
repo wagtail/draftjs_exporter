@@ -13,7 +13,8 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-26.04-arm
+    # CodeQL CLI does not support linux/arm64 yet.
+    runs-on: ubuntu-latest
     permissions:
       security-events: write
     steps:
