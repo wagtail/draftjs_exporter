@@ -24,8 +24,10 @@ jobs:
           enable-cache: false
       - run: uv build
       # Smoke tests with ready-to-publish package.
-      - run: uv run --isolated --no-project --with dist/*.whl pytest
-      - run: uv run --isolated --no-project --with dist/*.tar.gz pytest
+      # --no-project skips the dev dependency group, so pytest and the test
+      # dependencies have to be installed explicitly.
+      - run: uv run --isolated --no-project --with dist/*.whl --with 'pytest, hypothesis, lxml, beautifulsoup4, html5lib' pytest
+      - run: uv run --isolated --no-project --with dist/*.tar.gz --with 'pytest, hypothesis, lxml, beautifulsoup4, html5lib' pytest
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           path: ./dist
