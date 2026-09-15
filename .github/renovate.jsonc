@@ -16,11 +16,13 @@
 
   "minimumReleaseAge": "7 days",
 
+  "dependencyDashboard": false,
+
   // Periodically refresh uv.lock to catch transitive dependency updates.
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true,
-    "schedule": ["before 6am on monday"],
+    "schedule": ["* * 3,22 * *"],
   },
 
   "packageRules": [
