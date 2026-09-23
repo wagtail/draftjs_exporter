@@ -125,7 +125,7 @@ jobs:
           done
 
       - name: Run OpenCodeReview
-        uses: alibaba/open-code-review@1f5caf4d5b7d5324c6e4c836c971136e4010192e # v1.12.1
+        uses: alibaba/open-code-review@71ed3a288df6435f240b7194f19041b4fcc4ab7d # v1.12.3
         with:
           llm_url: ${{ secrets.OCR_LLM_URL }}
           llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
