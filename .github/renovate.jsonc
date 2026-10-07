@@ -7,8 +7,8 @@
     "helpers:pinGitHubActionDigests",
   ],
 
-  // Run about bi-weekly.
-  "schedule": ["* * 3,22 * *"],
+  // Run once a month.
+  "schedule": ["* * 22 * *"],
   "timezone": "Etc/UTC",
   "prConcurrentLimit": 10,
 
