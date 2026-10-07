@@ -22,7 +22,7 @@
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true,
-    "schedule": ["* * 3,22 * *"],
+    "schedule": ["* * 22 * *"],
   },
 
   "packageRules": [
