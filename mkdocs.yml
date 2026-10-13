@@ -52,6 +52,7 @@ plugins:
           - getting-started.md
           - content-state.md
           - markdown.md
+          - markdown-importer.md
           - migration-guide.md
         Guides:
           - guides/custom-components.md

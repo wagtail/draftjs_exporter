@@ -251,6 +251,8 @@ exporter = HTML({
 })
 ```
 
+In current versions, the `engine` value is a dotted import path, exposed as `DOM.STRING`, `DOM.HTML5LIB`, `DOM.LXML` and `DOM.STRING_COMPAT`. The short name `'string'` raises `ImportError`.
+
 The new engine is faster than both `html5lib` and `lxml`, and outputs functionally identical HTML. Its only drawback is that `DOM.parse_html()` provides no safeguards against malformed or unescaped HTML, whereas `lxml` or `html5lib` sanitize the input. See [Alternative engines](guides/alternative-engines.md) for details.
 
 ## Upgrading to v0.9.0

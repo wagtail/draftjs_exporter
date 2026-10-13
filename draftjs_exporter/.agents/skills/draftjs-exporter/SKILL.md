@@ -156,6 +156,28 @@ def blockquote(props: Props) -> Element:
 
 Compose by passing extra positional children to `DOM.create_element(type, props, *children)`. Children can be strings, DOM elements, other components, or `None` (renders nothing). Pass `props["children"]` as the last argument so the block's content renders inside the wrapping element. See [custom components](https://wagtail.github.io/draftjs_exporter/custom-components/).
 
+### Component props and return values
+
+| Component for                | `props` contains                                                                                                 |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Entity (`entity_decorators`) | the entity's `data` keys, plus `children` and `entity` (`type`, `mutability`, `block`, `blocks`, `entity_range`) |
+| Block (`block_map`)          | `block`, `blocks`, `children`                                                                                    |
+| Inline style (`style_map`)   | `block`, `blocks`, `children`, `inline_style_range`                                                              |
+
+The style name is `props["inline_style_range"]["style"]`; there is no `props["style"]`. Fallback components receive the same props as a regular component of the same kind.
+
+```python
+def style_fallback(props: Props) -> Element:
+    name = props["inline_style_range"]["style"]
+    return DOM.create_element("span", {"class": name.lower()}, props["children"])
+
+
+def trusted_markup(props: Props) -> Element:
+    return DOM.parse_html(props["markup"])  # one argument, output unescaped
+```
+
+`DOM.create_element` with `None` as the type returns an empty fragment and ignores its children. To group children without a wrapping tag, use `DOM.create_element("fragment", {}, child_a, child_b)`. `ENTITY_TYPES` only has `LINK`, `DOCUMENT`, `IMAGE`, `EMBED`, `HORIZONTAL_RULE` and `FALLBACK`; key any other entity type by its raw string.
+
 ### Fallbacks
 
 Each map accepts a `FALLBACK` key (`BLOCK_TYPES.FALLBACK`, `INLINE_STYLES.FALLBACK`, `ENTITY_TYPES.FALLBACK`) triggered when the exporter hits a type with no explicit mapping. A fallback can return `props["children"]` (keep content, drop wrapper), `None` (remove entirely), or any DOM element (alternative rendering). Useful during development and migrations. See [fallback components](https://wagtail.github.io/draftjs_exporter/fallback-components/).
@@ -166,9 +188,9 @@ Engines are pluggable serialization strategies selected at runtime via the `engi
 
 | Constant            | Extra install                                          | Notes                                             |
 | ------------------- | ------------------------------------------------------ | ------------------------------------------------- |
-| `DOM.STRING`        | none (default)                                         | Fast, dependency-free, no text escaping           |
-| `DOM.HTML5LIB`      | `pip install draftjs_exporter[html5lib]`               | Escapes/sanitizes HTML                            |
-| `DOM.LXML`          | `pip install draftjs_exporter[lxml]` + libxml2/libxslt | Escapes/sanitizes, alphabetical attrs             |
+| `DOM.STRING`        | none (default)                                         | Fast, dependency-free, `parse_html` unsanitized   |
+| `DOM.HTML5LIB`      | `pip install draftjs_exporter[html5lib]`               | `parse_html` parses and normalizes markup         |
+| `DOM.LXML`          | `pip install draftjs_exporter[lxml]` + libxml2/libxslt | Same as `html5lib`, alphabetical attrs            |
 | `DOM.STRING_COMPAT` | none                                                   | Byte-identical to first release of `string`       |
 | `DOM.MARKDOWN`      | none                                                   | Produces Markdown — use `MARKDOWN_CONFIG` instead |
 
@@ -206,6 +228,34 @@ config = build_markdown_config(
 exporter = HTML(config)
 ````
 
+`MARKDOWN_CONFIG` is a regular config dict (`block_map`, `style_map`, `entity_decorators`, `engine`): extend its maps with `**` to change one type and keep the rest. In Markdown components, plain strings are escaped as user text (a returned `"**"` is output as `\*\*`), and a tag name such as `"span"` is output as literal `<span>` HTML. Emit Markdown syntax with these helpers:
+
+- `md_inline_style(mark)` is a factory: it returns a style component wrapping children in `mark` on both sides.
+- `md_mark_safe(markup)` returns an element rendered verbatim, unescaped.
+- `md_inline(children)` takes a single list and returns a fragment without a wrapper.
+
+```python
+from draftjs_exporter import (
+    HTML,
+    MARKDOWN_CONFIG,
+    md_inline,
+    md_inline_style,
+    md_mark_safe,
+)
+
+
+def footnote(props):
+    # Replaces the covered text: props["children"] is not used.
+    return md_inline([md_mark_safe("[^"), props["ref"], md_mark_safe("]")])
+
+
+config = {
+    **MARKDOWN_CONFIG,
+    "style_map": {**MARKDOWN_CONFIG["style_map"], "SPOILER": md_inline_style("||")},
+    "entity_decorators": {**MARKDOWN_CONFIG["entity_decorators"], "FOOTNOTE": footnote},
+}
+```
+
 All defaults produce valid [CommonMark](https://commonmark.org/). The exporter [escapes](https://wagtail.github.io/draftjs_exporter/markdown/#escaping) user text so it renders literally rather than as Markdown syntax. Limitations: no underline/subscript/reference-style links/tables; partial bold/italic overlap can produce markers strict parsers reject. See [Markdown support](https://wagtail.github.io/draftjs_exporter/markdown/).
 
 ### Importer
@@ -230,18 +280,32 @@ importer = MarkdownImporter(
         "filter_rules": [
             # Declarative content policy: remove, keep, demote, or a callable.
             {"type": "block", "match": BLOCK_TYPES.HEADER_ONE, "action": "demote"},
+            {"type": "inline_style", "match": "UNDERLINE", "action": "remove"},
+            {
+                "type": "block",
+                "match": BLOCK_TYPES.CODE,
+                "action": lambda block: {**block, "type": BLOCK_TYPES.UNSTYLED},
+            },
         ],
     }
 )
 content_state = importer.import_markdown(markdown)
 ```
 
+Filter rules:
+
+- `type` is `"block"`, `"inline_style"`, or `"entity"`. `match` is the block type, style name, or entity type.
+- `"remove"` deletes the match: the whole block, the style range (text stays), or the entity (text stays).
+- `"demote"` only applies to `header-one` through `header-five` blocks, and raises for anything else. Change other block types with a callable.
+- A callable receives the matched object and returns its replacement, or `None` to remove it: a block or entity dict for `"block"` / `"entity"` rules, the style name for `"inline_style"` rules.
+- `ContentStateFilter(rules).apply(content_state)` applies the same rules to any ContentState, without Markdown.
+
 See [Markdown importer](https://wagtail.github.io/draftjs_exporter/markdown-importer/). The importer inverts the exporter's text escaping and sized code-span delimiters on round-trip; see [Known round-trip limitations](https://wagtail.github.io/draftjs_exporter/markdown-importer/#known-round-trip-limitations) for the remaining gaps.
 
 ## Common gotchas
 
 1. **`entity` and `children` are reserved `props` keys.** The exporter overrides them — `entity` becomes a dict with `type`/`mutability`, and `children` becomes the already-rendered content. Pick entity `data` keys that avoid them; there is no workaround. See [entity props override](https://wagtail.github.io/draftjs_exporter/troubleshooting/#entity-props-override).
-2. **`string` engine does not escape HTML outside attributes.** Use `html5lib`/`lxml` if you need escaping/sanitization. `DOM.parse_html` also provides no sanitization.
+2. **Every engine escapes text.** A string returned by a component, or passed as a child to `DOM.create_element`, renders as text with `<`, `>` and `&` escaped, including with the default `string` engine. To output trusted markup unescaped, return `DOM.parse_html(markup)`. It takes exactly one argument. With the `string` engine it does no sanitization; use `html5lib`/`lxml` if you need that.
 3. **Engine output is not byte-identical across engines.** Switching engines produces real differences (attribute order, quote escaping, self-closing tags, attribute-name validation). Update snapshot tests when changing `engine`.
 4. **Overlapping inline styles render with minimum tags** (e.g. `<strong>Bold <em>Italic</em></strong>` rather than reopening `<strong>`). Semantically equivalent but breaks tests asserting exact strings.
 5. **`style` props accept a dict** (camelCase keys) converted to a CSS string. Properties keep insertion order — not sorted alphabetically. Pass `style` as a string for byte-stable output.
@@ -262,7 +326,7 @@ All imported from `draftjs_exporter` directly:
 - **Markdown components**: `md_block`, `md_inline`, `md_mark_safe`, `md_link_destination`, `md_link`, `md_image`, `md_prefixed_block`, `md_make_ul` / `md_ul`, `md_make_ol` / `md_ol`, `md_list_wrapper`, `md_code_element` / `md_code_wrapper`, `md_inline_style`, `md_code_span`, `md_horizontal_rule` / `md_make_horizontal_rule`, `md_*_fallback`.
 - **Importer**: `MarkdownImporter(config).import_markdown(markdown)` — converts Markdown to ContentState. Config keys: `parser` (dotted path), `parser_config` (feature toggles, `link_resolvers`/`image_resolvers`, `inline_html_styles`), `filter_rules`.
 - **Parser**: `MarkdownParser(config).parse(markdown)`, `ParserConfig`, `scheme_resolver(scheme, type_map, coerce, label_key, mutability)`, `EntityResolver`, `EntityResolution`.
-- **Filter**: `ContentStateFilter(rules).apply(content_state)`, `FilterRule` (`type`/`match`/`action`; actions `remove`/`keep`/`demote`/callable).
+- **Filter**: `ContentStateFilter(rules).apply(content_state)`, `FilterRule` (`type`: `block`/`inline_style`/`entity`; `match`; `action`: `remove`/`keep`/`demote`/callable).
 - **Errors**: `MarkdownParseError` (with `.line` and `.message`).
 - **Type aliases**: `Props`, `Element`, `Component`, `ContentState`, `Block`, `Entity`, `EntityMap`, `EntityRange`, `InlineStyleRange`, `RenderableConfig`, `ExporterConfig`, plus internals (`CompositeDecorators`, `ConfigMap`, `Decorator`, `EntityKey`, `Mutability`, `RenderableType`, `Tag`).
 - **`DOMEngine`** — abstract base for custom engines. Import from `draftjs_exporter.engines.base` (not re-exported at top level).

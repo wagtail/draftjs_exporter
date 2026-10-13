@@ -50,8 +50,9 @@ content_state = {
         },
     ],
     # The entity map holds the data for every entity referenced from blocks.
+    # Keys are strings, as in JSON: a range's integer `key` 0 points to entry "0".
     "entityMap": {
-        0: {
+        "0": {
             "type": "LINK",
             # MUTABLE entities can be edited in place (like a link on text).
             "mutability": "MUTABLE",
