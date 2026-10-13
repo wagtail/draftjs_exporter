@@ -106,6 +106,10 @@ ignore = ["E501"]
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
+"docs/prompts/graders/*" = [
+  "T20", # Evals print their results
+  "D103", # Assertion helpers read better without repeating the annotation
+]
 "tests/*" = [
   "S101", # Assert allowed in tests
   "S105", # Hardcoded password assignments allowed in tests

@@ -1,0 +1,183 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+# Skill uplift on OpenCode: does the `draftjs-exporter` agent skill
+# (`draftjs_exporter/.agents/skills/draftjs-exporter/SKILL.md`) or the published
+# documentation help a Neuralwatt model write working `draftjs_exporter` code?
+#
+# Same 2x2 as `draftjs_exporter_skills_claude.yaml` — baseline, skill, docs,
+# docs+skill — run through the OpenCode SDK provider instead of the Claude Agent
+# SDK, sharing its case set (`draftjs_exporter_skills_claude_tests.yaml`) and
+# grader (`graders/run_snippet.py`). Every case is graded by running the answer
+# against the installed library; there is no LLM judge for script cases. The
+# two rubric cases reuse `llm-rubric`, graded by a Neuralwatt model — a
+# different family from most models under test, but not all.
+#
+# The arms read fixtures built by `just eval-opencode-fixtures`, kept outside
+# the repository so that no arm can read the library source, this file, or the
+# reference answers next to it. OpenCode discovers skills in
+# `.agents/skills/` (scanning the working directory and its parents), so the
+# layout mirrors the Claude fixtures with that one path changed:
+#
+#   empty/       nothing
+#   skill/       .agents/skills/draftjs-exporter/SKILL.md
+#   docs/        llms.txt, llms-full.txt
+#   docs-skill/  both
+#
+# Unlike the Claude eval, the skill arms pass the skill through an allow-list
+# on the `skill` tool rather than a settings loader: `tools: {"*": false,
+# skill: true}` hides every built-in tool but the skill loader, and
+# `permission.skill` denies every skill then re-allows the one under test, so
+# a globally-installed skill cannot answer for it. Order matters: a trailing
+# `"*": deny` would shadow the specific allow above it.
+#
+# Each provider entry spawns its own OpenCode server. `custom_agent` replaces
+# the coding-agent system prompt (the same prompt text as the Claude eval), and
+# `tools`/`permission` on the agent pin what it can call — on the OpenCode SDK,
+# tool access is enforced through the agent's permission rules, so both keys
+# are set together.
+#
+# Reading results: 35 cases at one repeat has a noise floor of about +/-17
+# points on a pass rate, +/-10 at three. Compare arms on the same model, and use
+# `--repeat 3` before acting on a gap smaller than that.
+#
+# Requires:
+#   - `just eval-init` — installs `promptfoo` globally and the
+#     `@opencode-ai/sdk` into `node_modules` without saving it to package.json.
+#     promptfoo resolves the SDK from the project tree; a later `npm install`
+#     prunes it.
+#   - `just init` — the grader imports `draftjs_exporter` from the project venv.
+#   - A Neuralwatt API key, passed to the just recipe (the model-specific key
+#     from `~/dev/.keys.yml` for recorded runs, or `$NEURALWATT_API_KEY` to
+#     trial). promptfoo injects it into the spawned OpenCode server.
+#
+# Run:
+#   just eval-opencode                                     # DeepSeek V4.1 Flash
+#   just eval-opencode glm-5.3-flash                       # another model
+#   just eval-opencode deepseek-v4.1-flash sk-… --repeat 3
+#   just eval-claude-check                 # no model calls: validate the cases
+#   just eval-view                         # dashboard for the latest run
+
+description: draftjs-exporter skill uplift on OpenCode (Neuralwatt)
+
+prompts:
+  - "{{prompt}}"
+
+# All four arms share the model, the API key and the system prompt, and differ
+# only in their working directory and tools.
+providers:
+  - id: opencode:sdk
+    label: baseline
+    config: &opencode
+      provider_id: neuralwatt
+      model: "{{ env.EVAL_OPENCODE_MODEL }}"
+      apiKey: "{{ env.EVAL_OPENCODE_KEY }}"
+      working_dir: "{{ env.EVAL_OPENCODE_FIXTURES }}/empty"
+      custom_agent: &agent
+        description: draftjs_exporter question answering
+        temperature: 0
+        # High enough that a docs arm can search, read and still answer. The
+        # OpenCode eval on TensorX found 8 too low: a sixth of runs died
+        # mid-search on "maximum steps reached".
+        steps: 20
+        # Identical across arms and true of all of them. Same text as the
+        # Claude eval's `custom_system_prompt`.
+        prompt: >-
+          You are answering a developer's question about the `draftjs_exporter`
+          Python library. Answer directly and concisely, using what you know plus
+          whatever tools and reference material you have — if you have neither,
+          answer from memory rather than asking for file access. Reference
+          documentation, when you can read it, is in your working directory. When
+          the question asks for a script, reply with one complete, runnable
+          Python code block.
+        tools: &closed_tools
+          "*": false
+        permission: &closed_permission
+          # Skills are hidden by denying the loader outright, so the skill
+          # description never reaches the system prompt.
+          skill:
+            "*": deny
+          external_directory: deny
+
+  - id: opencode:sdk
+    label: skill
+    config:
+      <<: *opencode
+      working_dir: "{{ env.EVAL_OPENCODE_FIXTURES }}/skill"
+      custom_agent:
+        <<: *agent
+        tools: &skill_tools
+          "*": false
+          skill: true
+        permission: &skill_permission
+          skill:
+            "*": deny
+            draftjs-exporter: allow
+          external_directory: deny
+
+  - id: opencode:sdk
+    label: docs
+    config:
+      <<: *opencode
+      working_dir: "{{ env.EVAL_OPENCODE_FIXTURES }}/docs"
+      custom_agent:
+        <<: *agent
+        tools: &docs_tools
+          "*": false
+          read: true
+          grep: true
+          glob: true
+          list: true
+        permission: *closed_permission
+
+  - id: opencode:sdk
+    label: docs+skill
+    config:
+      <<: *opencode
+      working_dir: "{{ env.EVAL_OPENCODE_FIXTURES }}/docs-skill"
+      custom_agent:
+        <<: *agent
+        tools:
+          <<: *docs_tools
+          skill: true
+        permission: *skill_permission
+
+# Four arms, each an OpenCode server. Agent runs are token-heavy, and a
+# provider rate limit surfaces as empty output rather than an error.
+evaluateOptions:
+  maxConcurrency: 4
+
+defaultTest:
+  options:
+    # `expect_contains` is a list var read by the grader, not a matrix of test
+    # cases. Without this, promptfoo would fan each one out into several tests.
+    disableVarExpansion: true
+    # Rubric grading runs on Neuralwatt too, so the eval needs a single API
+    # key. A different model family from the one under test where possible, so
+    # it is not grading itself; treat a lone rubric failure as noise until
+    # `--repeat` reproduces it.
+    provider:
+      id: openai:chat:deepseek-v4.1-flash
+      config:
+        apiBaseUrl: "https://api.neuralwatt.com/v1"
+        apiKey: "{{ env.EVAL_OPENCODE_KEY }}"
+        temperature: 0
+        max_tokens: 4096
+        # Without this the grader occasionally answers in prose and promptfoo
+        # fails the test with "Could not extract JSON".
+        response_format:
+          type: json_object
+  # An OpenCode provider error — a rate limit, a dropped connection — comes back
+  # as empty output rather than an error, and would otherwise be graded as if the
+  # model had answered badly. So does a reasoning model that spends its whole
+  # output budget thinking and never writes the answer. Name both: re-run the
+  # former, accept the latter as a model failure.
+  assert:
+    - type: javascript
+      value: |
+        return (output || '').trim().length > 0
+          ? { pass: true, score: 1, reason: 'Provider returned output' }
+          : { pass: false, score: 0, reason: 'EMPTY OUTPUT — provider error (re-run) or reasoning ran out of output tokens before answering.' };
+    - type: python
+      value: file://graders/run_snippet.py
+
+tests: file://draftjs_exporter_skills_claude_tests.yaml

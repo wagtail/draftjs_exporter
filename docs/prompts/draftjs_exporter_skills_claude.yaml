@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+# Skill uplift on Claude: does the `draftjs-exporter` agent skill
+# (`draftjs_exporter/.agents/skills/draftjs-exporter/SKILL.md`) or the published
+# documentation help a Claude model write working `draftjs_exporter` code?
+#
+# Same 2x2 as `draftjs_exporter_skills.yaml` — baseline, skill, docs, docs+skill
+# — run through the Claude Agent SDK (the Claude Code harness) instead of
+# OpenCode, with a larger case set. Every case is graded by running the answer
+# against the installed library; there is no LLM judge.
+#
+# The arms read fixtures built by `just eval-claude-fixtures`, kept outside the
+# repository so that no arm can read the library source, this file, or the
+# reference answers next to it:
+#
+#   empty/       nothing
+#   skill/       .claude/skills/draftjs-exporter/SKILL.md
+#   docs/        llms.txt, llms-full.txt
+#   docs-skill/  both
+#
+# Reading results: 35 cases at one repeat has a noise floor of about +/-17
+# points on a pass rate, +/-10 at three. Compare arms on the same model, and use
+# `--repeat 3` before acting on a gap smaller than that.
+#
+# Requires:
+#   - `just eval-init` — installs `promptfoo` globally and
+#     `@anthropic-ai/claude-agent-sdk` into `node_modules` without saving it to
+#     package.json. promptfoo only resolves that SDK from the project tree, and
+#     a later `npm install` prunes it.
+#   - `just init` — the grader imports `draftjs_exporter` from the project venv.
+#   - `ANTHROPIC_API_KEY`, or a local Claude Code login (`apiKeyRequired: false`
+#     below lets promptfoo fall back to it).
+#
+# Run:
+#   just eval-claude                       # Claude Sonnet 5.5
+#   just eval-claude claude-haiku-5-5      # another model
+#   just eval-claude claude-sonnet-5-5 --repeat 3
+#   just eval-claude-check                 # no model calls: validate the cases
+#   just eval-view                         # dashboard for the latest run
+
+description: draftjs-exporter skill uplift on Claude
+
+prompts:
+  - "{{prompt}}"
+
+# All four arms share the model and the system prompt, and differ only in their
+# working directory and tools:
+#
+#   - `tools` and `custom_allowed_tools` list exactly what an arm may call, so a
+#     run does not depend on the Claude Code defaults.
+#   - `setting_sources` is empty unless the arm has the skill, so user-level
+#     settings, skills and memory files never reach the model. The skill arms
+#     load `project` settings only, from their fixture directory.
+#   - `custom_system_prompt` replaces the Claude Code system prompt with the one
+#     the OpenCode eval uses.
+providers:
+  - id: anthropic:claude-agent-sdk
+    label: baseline
+    config: &claude
+      model: "{{ env.EVAL_CLAUDE_MODEL }}"
+      apiKeyRequired: false
+      working_dir: "{{ env.EVAL_CLAUDE_FIXTURES }}/empty"
+      max_turns: 20
+      tools: []
+      custom_allowed_tools: []
+      setting_sources: []
+      custom_system_prompt: >-
+        You are answering a developer's question about the `draftjs_exporter`
+        Python library. Answer directly and concisely, using what you know plus
+        whatever tools and reference material you have — if you have neither,
+        answer from memory rather than asking for file access. Reference
+        documentation, when you can read it, is in your working directory. When
+        the question asks for a script, reply with one complete, runnable
+        Python code block.
+
+  - id: anthropic:claude-agent-sdk
+    label: skill
+    config:
+      <<: *claude
+      working_dir: "{{ env.EVAL_CLAUDE_FIXTURES }}/skill"
+      tools: &skill_tools [Skill]
+      custom_allowed_tools: *skill_tools
+      setting_sources: &project [project]
+      skills: &skills [draftjs-exporter]
+
+  - id: anthropic:claude-agent-sdk
+    label: docs
+    config:
+      <<: *claude
+      working_dir: "{{ env.EVAL_CLAUDE_FIXTURES }}/docs"
+      tools: &docs_tools [Read, Grep, Glob]
+      custom_allowed_tools: *docs_tools
+
+  - id: anthropic:claude-agent-sdk
+    label: docs+skill
+    config:
+      <<: *claude
+      working_dir: "{{ env.EVAL_CLAUDE_FIXTURES }}/docs-skill"
+      tools: &all_tools [Read, Grep, Glob, Skill]
+      custom_allowed_tools: *all_tools
+      setting_sources: *project
+      skills: *skills
+
+evaluateOptions:
+  maxConcurrency: 4
+
+defaultTest:
+  options:
+    # `expect_contains` is a list var read by the grader, not a matrix of test
+    # cases. Without this, promptfoo would fan each one out into several tests.
+    disableVarExpansion: true
+  assert:
+    # A provider failure can come back as empty output. Name it so it cannot be
+    # mistaken for a wrong answer.
+    - type: javascript
+      value: "(output || '').trim().length > 0"
+    - type: python
+      value: file://graders/run_snippet.py
+
+tests: file://draftjs_exporter_skills_claude_tests.yaml

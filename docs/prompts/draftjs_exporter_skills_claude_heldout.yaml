@@ -1,0 +1,356 @@
+# Held-out cases for the Claude skill eval, in the format of
+# `draftjs_exporter_skills_claude_tests.yaml`. They are not part of the default
+# run: keep them out of sight when tuning the skill or the docs against the main
+# cases, then run them to check that a gain carries over to unseen prompts.
+
+- description: h01-quote-and-code-props
+  metadata:
+    area: html-config
+    source: heldout
+  vars:
+    prompt:
+      'Using the `draftjs_exporter` Python library, write a complete runnable script that renders
+      this ContentState to HTML and prints it. Blockquotes must render as `<blockquote class="pull">`,
+      and the `CODE` inline style as `<code class="snippet">`: {"entityMap": {}, "blocks": [{"key": "k0",
+      "text": "Run make now", "type": "blockquote", "depth": 0, "inlineStyleRanges": [{"offset": 4, "length":
+      4, "style": "CODE"}], "entityRanges": []}, {"key": "k1", "text": "Done", "type": "unstyled", "depth":
+      0, "inlineStyleRanges": [], "entityRanges": []}]}'
+    expect_stdout: <blockquote class="pull">Run <code class="snippet">make</code> now</blockquote><p>Done</p>
+    reference: 'import json
+
+      import re
+
+      from draftjs_exporter import *
+
+      from draftjs_exporter import HTML, DOM
+
+
+      content_state = json.loads(r''''''{"entityMap": {}, "blocks": [{"key": "k0", "text": "Run make now",
+      "type": "blockquote", "depth": 0, "inlineStyleRanges": [{"offset": 4, "length": 4, "style": "CODE"}],
+      "entityRanges": []}, {"key": "k1", "text": "Done", "type": "unstyled", "depth": 0, "inlineStyleRanges":
+      [], "entityRanges": []}]}'''''')
+
+
+      print(HTML({"block_map": {**BLOCK_MAP, BLOCK_TYPES.BLOCKQUOTE: {"element": "blockquote", "props":
+      {"class": "pull"}}}, "style_map": {**STYLE_MAP, INLINE_STYLES.CODE: {"element": "code", "props":
+      {"class": "snippet"}}}}).render(content_state))'
+- description: h02-heading-id-from-text
+  metadata:
+    area: components
+    source: heldout
+  vars:
+    prompt:
+      'Using the `draftjs_exporter` Python library, write a complete runnable script that renders
+      this ContentState to HTML and prints it. Each `header-two` block must render as an `<h2>` whose
+      `id` attribute is the block''s text lowercased with spaces replaced by hyphens: {"entityMap": {},
+      "blocks": [{"key": "k0", "text": "Getting started", "type": "header-two", "depth": 0, "inlineStyleRanges":
+      [], "entityRanges": []}, {"key": "k1", "text": "Read on.", "type": "unstyled", "depth": 0, "inlineStyleRanges":
+      [], "entityRanges": []}]}'
+    expect_stdout: <h2 id="getting-started">Getting started</h2><p>Read on.</p>
+    reference:
+      "import json\nimport re\nfrom draftjs_exporter import *\nfrom draftjs_exporter import HTML,\
+      \ DOM\n\ncontent_state = json.loads(r'''{\"entityMap\": {}, \"blocks\": [{\"key\": \"k0\", \"text\"\
+      : \"Getting started\", \"type\": \"header-two\", \"depth\": 0, \"inlineStyleRanges\": [], \"entityRanges\"\
+      : []}, {\"key\": \"k1\", \"text\": \"Read on.\", \"type\": \"unstyled\", \"depth\": 0, \"inlineStyleRanges\"\
+      : [], \"entityRanges\": []}]}''')\n\ndef heading(props):\n    return DOM.create_element(\"h2\",\
+      \ {\"id\": props[\"block\"][\"text\"].lower().replace(\" \", \"-\")}, props[\"children\"])\n\nprint(HTML({\"\
+      block_map\": {**BLOCK_MAP, BLOCK_TYPES.HEADER_TWO: heading}}).render(content_state))"
+- description: h03-image-entity
+  metadata:
+    area: components
+    source: heldout
+  vars:
+    prompt:
+      'Using the `draftjs_exporter` Python library, write a complete runnable script that renders
+      this ContentState to HTML and prints it. `IMAGE` entities must render as an `<img>` with the entity''s
+      `src` and `alt` data as attributes, inside a `<figure>` element: {"entityMap": {"0": {"type": "IMAGE",
+      "mutability": "IMMUTABLE", "data": {"src": "/media/cat.png", "alt": "A cat"}}}, "blocks": [{"key":
+      "k0", "text": " ", "type": "atomic", "depth": 0, "inlineStyleRanges": [], "entityRanges": [{"offset":
+      0, "length": 1, "key": 0}]}]}'
+    expect_contains:
+      - "<figure><img "
+      - src="/media/cat.png"
+      - alt="A cat"
+      - </figure>
+    reference:
+      "import json\nimport re\nfrom draftjs_exporter import *\nfrom draftjs_exporter import HTML,\
+      \ DOM\n\ncontent_state = json.loads(r'''{\"entityMap\": {\"0\": {\"type\": \"IMAGE\", \"mutability\"\
+      : \"IMMUTABLE\", \"data\": {\"src\": \"/media/cat.png\", \"alt\": \"A cat\"}}}, \"blocks\": [{\"\
+      key\": \"k0\", \"text\": \" \", \"type\": \"atomic\", \"depth\": 0, \"inlineStyleRanges\": [], \"\
+      entityRanges\": [{\"offset\": 0, \"length\": 1, \"key\": 0}]}]}''')\n\ndef image(props):\n    return\
+      \ DOM.create_element(\"figure\", {}, DOM.create_element(\"img\", {\"src\": props[\"src\"], \"alt\"\
+      : props[\"alt\"]}))\n\nprint(HTML({\"entity_decorators\": {ENTITY_TYPES.IMAGE: image}}).render(content_state))"
+- description: h04-autolink-urls
+  metadata:
+    area: components
+    source: heldout
+  vars:
+    prompt:
+      'Using the `draftjs_exporter` Python library, write a complete runnable script that renders
+      this ContentState to HTML and prints it. Any `https://` URL typed in the text (a run of non-whitespace
+      characters starting with `https://`) must render as an `<a>` whose `href` is the URL and whose content
+      is the URL: {"entityMap": {}, "blocks": [{"key": "k0", "text": "See https://example.com/docs for
+      more", "type": "unstyled", "depth": 0, "inlineStyleRanges": [], "entityRanges": []}]}'
+    expect_stdout: <p>See <a href="https://example.com/docs">https://example.com/docs</a> for more</p>
+    reference:
+      "import json\nimport re\nfrom draftjs_exporter import *\nfrom draftjs_exporter import HTML,\
+      \ DOM\n\ncontent_state = json.loads(r'''{\"entityMap\": {}, \"blocks\": [{\"key\": \"k0\", \"text\"\
+      : \"See https://example.com/docs for more\", \"type\": \"unstyled\", \"depth\": 0, \"inlineStyleRanges\"\
+      : [], \"entityRanges\": []}]}''')\n\ndef link(props):\n    return DOM.create_element(\"a\", {\"\
+      href\": props[\"children\"]}, props[\"children\"])\n\nprint(HTML({\"composite_decorators\": [{\"\
+      strategy\": re.compile(r\"https://\\S+\"), \"component\": link}]}).render(content_state))"
+- description: h05-block-fallback-type
+  metadata:
+    area: fallbacks
+    source: heldout
+  vars:
+    prompt:
+      'Using the `draftjs_exporter` Python library, write a complete runnable script that renders
+      this ContentState to HTML and prints it. Block types the exporter has no mapping for must render
+      as a `<div>` with a `data-block-type` attribute holding the block''s type, keeping the block''s
+      text: {"entityMap": {}, "blocks": [{"key": "k0", "text": "Heads up", "type": "callout", "depth":
+      0, "inlineStyleRanges": [], "entityRanges": []}, {"key": "k1", "text": "Normal", "type": "unstyled",
+      "depth": 0, "inlineStyleRanges": [], "entityRanges": []}]}'
+    expect_stdout: <div data-block-type="callout">Heads up</div><p>Normal</p>
+    reference:
+      "import json\nimport re\nfrom draftjs_exporter import *\nfrom draftjs_exporter import HTML,\
+      \ DOM\n\ncontent_state = json.loads(r'''{\"entityMap\": {}, \"blocks\": [{\"key\": \"k0\", \"text\"\
+      : \"Heads up\", \"type\": \"callout\", \"depth\": 0, \"inlineStyleRanges\": [], \"entityRanges\"\
+      : []}, {\"key\": \"k1\", \"text\": \"Normal\", \"type\": \"unstyled\", \"depth\": 0, \"inlineStyleRanges\"\
+      : [], \"entityRanges\": []}]}''')\n\ndef fallback(props):\n    return DOM.create_element(\"div\"\
+      , {\"data-block-type\": props[\"block\"][\"type\"]}, props[\"children\"])\n\nprint(HTML({\"block_map\"\
+      : {**BLOCK_MAP, BLOCK_TYPES.FALLBACK: fallback}}).render(content_state))"
+- description: h06-entity-fallback-remove
+  metadata:
+    area: fallbacks
+    source: heldout
+  vars:
+    prompt:
+      'Using the `draftjs_exporter` Python library, write a complete runnable script that renders
+      this ContentState to HTML and prints it. Entities of a type the exporter has no component for must
+      be removed from the output entirely, including the text they cover: {"entityMap": {"0": {"type":
+      "WIDGET", "mutability": "IMMUTABLE", "data": {"id": 4}}}, "blocks": [{"key": "k0", "text": "Price:
+      [widget] today", "type": "unstyled", "depth": 0, "inlineStyleRanges": [], "entityRanges": [{"offset":
+      7, "length": 8, "key": 0}]}]}'
+    expect_stdout: "<p>Price:  today</p>"
+    reference: 'import json
+
+      import re
+
+      from draftjs_exporter import *
+
+      from draftjs_exporter import HTML, DOM
+
+
+      content_state = json.loads(r''''''{"entityMap": {"0": {"type": "WIDGET", "mutability": "IMMUTABLE",
+      "data": {"id": 4}}}, "blocks": [{"key": "k0", "text": "Price: [widget] today", "type": "unstyled",
+      "depth": 0, "inlineStyleRanges": [], "entityRanges": [{"offset": 7, "length": 8, "key": 0}]}]}'''''')
+
+
+      print(HTML({"entity_decorators": {ENTITY_TYPES.FALLBACK: lambda props: None}}).render(content_state))'
+- description: h07-md-ordered-and-italic
+  metadata:
+    area: markdown-export
+    source: heldout
+  vars:
+    prompt:
+      'Using the `draftjs_exporter` Python library, write a complete runnable script that renders
+      this ContentState to Markdown and prints it, using `)` after ordered list numbers and `*` for italic:
+      {"entityMap": {}, "blocks": [{"key": "k0", "text": "First", "type": "ordered-list-item", "depth":
+      0, "inlineStyleRanges": [], "entityRanges": []}, {"key": "k1", "text": "Second", "type": "ordered-list-item",
+      "depth": 0, "inlineStyleRanges": [], "entityRanges": []}, {"key": "k2", "text": "Very nice", "type":
+      "unstyled", "depth": 0, "inlineStyleRanges": [{"offset": 5, "length": 4, "style": "ITALIC"}], "entityRanges":
+      []}]}'
+    expect_contains:
+      - 1) First
+      - 2) Second
+      - Very *nice*
+    reference: 'import json
+
+      import re
+
+      from draftjs_exporter import *
+
+      from draftjs_exporter import HTML, DOM
+
+
+      content_state = json.loads(r''''''{"entityMap": {}, "blocks": [{"key": "k0", "text": "First", "type":
+      "ordered-list-item", "depth": 0, "inlineStyleRanges": [], "entityRanges": []}, {"key": "k1", "text":
+      "Second", "type": "ordered-list-item", "depth": 0, "inlineStyleRanges": [], "entityRanges": []},
+      {"key": "k2", "text": "Very nice", "type": "unstyled", "depth": 0, "inlineStyleRanges": [{"offset":
+      5, "length": 4, "style": "ITALIC"}], "entityRanges": []}]}'''''')
+
+
+      print(HTML(build_markdown_config({"ordered_list_delimiter": ")", "italic": "*"})).render(content_state))'
+- description: h08-md-code-fence
+  metadata:
+    area: markdown-export
+    source: heldout
+  vars:
+    prompt:
+      'Using the `draftjs_exporter` Python library, write a complete runnable script that renders
+      this ContentState to Markdown and prints it, using `~~~` fences for code blocks and `__` for bold:
+      {"entityMap": {}, "blocks": [{"key": "k0", "text": "Install", "type": "header-two", "depth": 0,
+      "inlineStyleRanges": [], "entityRanges": []}, {"key": "k1", "text": "pip install x", "type": "code-block",
+      "depth": 0, "inlineStyleRanges": [], "entityRanges": []}, {"key": "k2", "text": "Then go", "type":
+      "unstyled", "depth": 0, "inlineStyleRanges": [{"offset": 5, "length": 2, "style": "BOLD"}], "entityRanges":
+      []}]}'
+    expect_contains:
+      - "## Install"
+      - "~~~
+
+        pip install x
+
+        ~~~"
+      - Then __go__
+    reference: 'import json
+
+      import re
+
+      from draftjs_exporter import *
+
+      from draftjs_exporter import HTML, DOM
+
+
+      content_state = json.loads(r''''''{"entityMap": {}, "blocks": [{"key": "k0", "text": "Install",
+      "type": "header-two", "depth": 0, "inlineStyleRanges": [], "entityRanges": []}, {"key": "k1", "text":
+      "pip install x", "type": "code-block", "depth": 0, "inlineStyleRanges": [], "entityRanges": []},
+      {"key": "k2", "text": "Then go", "type": "unstyled", "depth": 0, "inlineStyleRanges": [{"offset":
+      5, "length": 2, "style": "BOLD"}], "entityRanges": []}]}'''''')
+
+
+      print(HTML(build_markdown_config({"code_fence": "~~~", "bold": "__"})).render(content_state))'
+- description: h09-import-link-resolver
+  metadata:
+    area: markdown-import
+    source: heldout
+  vars:
+    prompt:
+      'Using the `draftjs_exporter` Python library, write a complete runnable script that parses
+      the Markdown below into Draft.js ContentState. Links with a `wagtail://page` URL must become `LINK`
+      entities whose data holds the page id as an integer; nothing else goes in the data. Print `json.dumps(content_state["entityMap"],
+      sort_keys=True)`.
+
+
+      Markdown:
+
+
+      ~~~markdown
+
+      Go to [the home page](wagtail://page?id=3) now
+
+      ~~~'
+    expect_stdout: '{"0": {"data": {"id": 3}, "mutability": "MUTABLE", "type": "LINK"}}'
+    reference: 'import json
+
+      from draftjs_exporter import *
+
+      markdown = ''Go to [the home page](wagtail://page?id=3) now''
+
+      content_state = MarkdownImporter({"parser_config": {"link_resolvers": [scheme_resolver("wagtail",
+      {"page": "LINK"}, coerce={"id": int})]}}).import_markdown(markdown)
+
+      print(json.dumps(content_state["entityMap"], sort_keys=True))'
+- description: h10-import-remove-style
+  metadata:
+    area: markdown-import
+    source: heldout
+  vars:
+    prompt:
+      'Using the `draftjs_exporter` Python library, write a complete runnable script that parses
+      the Markdown below into Draft.js ContentState. This field does not allow italics: `ITALIC` inline
+      styles must be dropped on import, keeping the text and the other styles. Print `json.dumps([content_state["blocks"][0]["text"],
+      content_state["blocks"][0]["inlineStyleRanges"]], sort_keys=True)`.
+
+
+      Markdown:
+
+
+      ~~~markdown
+
+      _old_ and **new**
+
+      ~~~'
+    expect_stdout: '["old and new", [{"length": 3, "offset": 8, "style": "BOLD"}]]'
+    reference: 'import json
+
+      from draftjs_exporter import *
+
+      markdown = ''_old_ and **new**''
+
+      content_state = MarkdownImporter({"filter_rules": [{"type": "inline_style", "match": "ITALIC", "action":
+      "remove"}]}).import_markdown(markdown)
+
+      print(json.dumps([content_state["blocks"][0]["text"], content_state["blocks"][0]["inlineStyleRanges"]],
+      sort_keys=True))'
+- description: h11-import-retype-list
+  metadata:
+    area: markdown-import
+    source: heldout
+  vars:
+    prompt:
+      'Using the `draftjs_exporter` Python library, write a complete runnable script that parses
+      the Markdown below into Draft.js ContentState. Numbered lists are not supported in this field: ordered
+      list items must be imported as unordered list items, keeping their text. Print `json.dumps([[b["type"],
+      b["text"]] for b in content_state["blocks"]])`.
+
+
+      Markdown:
+
+
+      ~~~markdown
+
+      1. one
+
+      2. two
+
+
+      end
+
+      ~~~'
+    expect_stdout: '[["unordered-list-item", "one"], ["unordered-list-item", "two"], ["unstyled", "end"]]'
+    reference: 'import json
+
+      from draftjs_exporter import *
+
+      markdown = ''1. one\n2. two\n\nend''
+
+      content_state = MarkdownImporter({"filter_rules": [{"type": "block", "match": BLOCK_TYPES.ORDERED_LIST_ITEM,
+      "action": lambda b: {**b, "type": BLOCK_TYPES.UNORDERED_LIST_ITEM}}]}).import_markdown(markdown)
+
+      print(json.dumps([[b["type"], b["text"]] for b in content_state["blocks"]]))'
+- description: h12-markdown-to-html
+  metadata:
+    area: markdown-import
+    source: heldout
+  vars:
+    prompt:
+      "Using the `draftjs_exporter` Python library, write a complete runnable script that converts
+      the Markdown below to HTML with the library, by parsing it into Draft.js ContentState and then rendering
+      that with the default HTML settings. Print the HTML.
+
+
+      Markdown:
+
+
+      ~~~markdown
+
+      ## Hi
+
+
+      Some **bold** text
+
+
+      - a
+
+      - b
+
+      ~~~"
+    expect_stdout: <h2>Hi</h2><p>Some <strong>bold</strong> text</p><ul><li>a</li><li>b</li></ul>
+    reference: 'import json
+
+      from draftjs_exporter import *
+
+      markdown = ''## Hi\n\nSome **bold** text\n\n- a\n- b''
+
+      print(HTML({}).render(MarkdownImporter({}).import_markdown(markdown)))'
