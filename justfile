@@ -55,7 +55,7 @@ test-coverage *args:
 
 # Compatibility-focused test suite.
 test-compatibility *args:
-  uv run --isolated --python 3.10 --with 'beautifulsoup4==4.7.1, html5lib==1.1, lxml==4.6.5, pytest-xdist' pytest -n auto {{args}}
+  uv run --isolated --python 3.11 --with 'beautifulsoup4==4.7.1, html5lib==1.1, lxml==4.9.4, pytest-xdist' pytest -n auto {{args}}
 
 # Restarts the example whenever a file changes.
 dev:

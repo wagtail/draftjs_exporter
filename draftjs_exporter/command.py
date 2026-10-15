@@ -38,7 +38,7 @@ class Command:
         Returns:
             A list of start_entity and stop_entity commands.
         """
-        commands: list["Command"] = []
+        commands: list[Command] = []
         for r in block.get("entityRanges", []):
             # Entity key is an integer in entity ranges, while a string in the entity map.
             data = str(r["key"])
@@ -59,7 +59,7 @@ class Command:
         Returns:
             A list of start_inline_style and stop_inline_style commands.
         """
-        commands: list["Command"] = []
+        commands: list[Command] = []
         for r in block.get("inlineStyleRanges", []):
             data = r["style"]
             start = r["offset"]

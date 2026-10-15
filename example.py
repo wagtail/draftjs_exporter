@@ -252,7 +252,7 @@ if __name__ == "__main__":
     exporter = Exporter(config)
 
     # Use file/STDIN input if provided, otherwise run the built-in demo.
-    with open(args.infile, "r", encoding="utf-8") as f:
+    with open(args.infile, encoding="utf-8") as f:
         content_state: ContentState = json.load(f)
 
     # --- HTML export ---

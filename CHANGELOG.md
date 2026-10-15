@@ -20,6 +20,8 @@
 ### Changed
 
 - Accept short names of the built-in engines in the `engine` config and `DOM.use()` / `DOM.engine()`: `"string"`, `"string_compat"`, `"html5lib"`, `"lxml"`, and `"markdown"`. Dotted import paths keep working for custom engines; unknown names still raise `ImportError`.
+- Raise the minimum supported Python version to 3.11: Python 3.10 is no longer supported, and Python 3.15 is now officially supported.
+- Raise the lower bound of the optional `lxml` dependency to `>=4.9.4`, the first release with pre-built wheels for Python 3.11 onwards.
 - Rename `EntityException` to `ExporterEntityException`, keeping `EntityException` as a compatibility alias.
 - Rename the Markdown escaping helpers for user text (`escape_text` → `md_escape_text`) and for link destinations (`escape_link_destination` → `md_escape_link_destination`). This is a breaking change within the experimental Markdown support; import them from `draftjs_exporter` under their new names.
 - Using the html5lib engine without BeautifulSoup installed now fails with a clear import error rather than a `NameError` at render time.
@@ -32,6 +34,7 @@
 
 ### Maintenance
 
+- Enable `ruff`'s `UP` (pyupgrade) rules, and adopt the newer syntax they flag (unquoted annotations, `datetime.UTC`).
 - Check the codebase with the `pyright` and `pyrefly` type checkers in addition to `mypy` and `ty`. See the full [static typing rationale](https://wagtail.github.io/draftjs_exporter/CONTRIBUTING/#static-typing).
 - Add a `just verify-types` recipe reporting the type completeness of the public API with `pyright --verifytypes`.
 - Tighten static typing across the board: stricter `mypy` checks (`extra_checks`, `strict_equality_for_none`, additional error codes), opt-in soundness rules for `ty` (`unsound-assignment`, `unsound-return-statement`, `unsound-yield`, `disjoint-cast`), and pyright's `standard` checking mode project-wide.

@@ -69,8 +69,10 @@ class DOM_LXML(DOMEngine):
             elt: The parent element.
             child: The child element or text to append.
         """
-        # Compatibility with lxml below 6.0.0 on Python 3.10. Revert once we drop support for Python 3.10.
-        # if isinstance(child, etree.Element):
+        # Compat: lxml below 6.0.0 has no `etree.Element` class, only a
+        # Cython function, so the `etree.Element | str` annotation above
+        # would raise a TypeError when evaluated eagerly, on Python 3.11
+        # through 3.13. Revert once the lxml extra requires 6.0.0.
         if hasattr(child, "tag"):
             elt.append(child)
         else:

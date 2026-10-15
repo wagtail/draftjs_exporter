@@ -1,7 +1,9 @@
 import unittest
+from typing import cast
 
 from draftjs_exporter.error import ConfigException
 from draftjs_exporter.options import Options
+from draftjs_exporter.types import ConfigMap, RenderableConfig
 
 
 class TestOptions(unittest.TestCase):
@@ -68,8 +70,11 @@ class TestOptions(unittest.TestCase):
             Options.create({"header-one": "h1"}, "header-two", "fallback")
 
     def test_create_raises_missing_element(self):
+        # Configs without an element are rejected at runtime. The cast
+        # bypasses the required `element` key to exercise that validation.
+        kind_map: ConfigMap = {"header-one": cast(RenderableConfig, {})}
         with self.assertRaises(ConfigException):
-            Options.create({"header-one": {}}, "header-one", "fallback")
+            Options.create(kind_map, "header-one", "fallback")
 
     def test_map_works(self):
         self.assertEqual(
