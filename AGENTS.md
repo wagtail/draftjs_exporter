@@ -8,6 +8,16 @@ Source code lives in `draftjs_exporter/`. Tests are in `tests/`. Contributor and
 
 See [docs/CONTRIBUTING.md#project-architecture](docs/CONTRIBUTING.md#project-architecture) for the full architecture walkthrough.
 
+## Design goals
+
+See the [ContentState contract](docs/contributing/architecture.md#contentstate-contract) for the full list. Quick points:
+
+- A block only has to be a mapping; missing `type`, `depth`, `text`, ranges, or `data` fall back to documented defaults, and unknown keys are ignored.
+- Unknown block, style, or entity types go through the `*_FALLBACK` components. With no fallback configured, rendering raises `ConfigException` on purpose – that is a configuration mistake, not bad input.
+- Never silently drop content: text reaches the output unless a configured fallback component discards it.
+- Do not add tolerance for input a Draft.js editor could not plausibly produce; narrow the test strategy instead.
+- Wrongly typed values (`"depth": "1"`), blocks that are not mappings, and unbounded size or depth are out of contract – the caller validates at the boundary.
+
 ## Development commands
 
 See [docs/CONTRIBUTING.md#commands](docs/CONTRIBUTING.md#commands) for the full list. Key recipes:

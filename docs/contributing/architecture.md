@@ -46,6 +46,44 @@ The core flow lives in `HTML.render()` and proceeds as follows:
 5. **Wrapper resolution** – `wrapper_state.element_for()` resolves each block to a DOM element, managing nesting of wrapper elements (e.g. `<ul>`/`<ol>` for list items) based on block depth.
 6. **Final rendering** – All block elements are appended to the document fragment, then `DOM.render()` serialises the virtual DOM tree to the output string (HTML or Markdown).
 
+## ContentState contract
+
+`ContentState` is often deserialized from a database or an API rather than produced by the editor in front of you, so the exporter draws a line between input it renders around and input it refuses. Integrators need to know which side of that line their content falls on.
+
+### What we tolerate
+
+A block only has to be a mapping. Every other key has a default, and unknown keys are ignored, so content written by a newer Draft.js does not break an older exporter:
+
+| Key                 | When it is missing                      |
+| ------------------- | --------------------------------------- |
+| `type`              | Rendered as `unstyled`                  |
+| `depth`             | Treated as `0`                          |
+| `text`              | Treated as `""`                         |
+| `inlineStyleRanges` | Treated as `[]`                         |
+| `entityRanges`      | Treated as `[]`                         |
+| `key`               | Only used for Markdown list lookups     |
+| `data`              | Only read by components that ask for it |
+
+`blocks` and `entityMap` themselves may be missing, and style or entity ranges running past the end of `text` are clipped rather than rejected. A Markdown list item without a key renders as plain text, since numbering and indentation are looked up by key.
+
+### What we refuse
+
+- **Unmapped values.** A block, style, or entity type with no mapping is looked up at `BLOCK_TYPES.FALLBACK`, `INLINE_STYLES.FALLBACK`, or `ENTITY_TYPES.FALLBACK`. When no fallback is configured, rendering raises `ConfigException`; that is a configuration mistake rather than bad input. See [Fallback components](../guides/fallback-components.md).
+- **Dangling references.** An entity range pointing at a key that is not in `entityMap` raises `ExporterEntityException`. An unresolvable reference has no sensible rendering, so we report it instead of guessing.
+
+### What we do not defend against
+
+- **Wrongly typed values.** `"depth": "1"` raises `TypeError` from the depth comparisons, and a block that is not a mapping raises `AttributeError`.
+- **Unbounded input.** Nesting creates one wrapper element per depth level, and the whole document is rendered at once. Enforce size and depth limits upstream of the exporter.
+- **Adversarial content.** Escaping is the exporter's job, but URL schemes, CSS, and markup emitted by a custom component are the integrator's. See [SECURITY.md](../SECURITY.md).
+
+### Design goals
+
+- **Tolerate missing data.** Render what is there rather than raising.
+- **Never silently drop content.** A block's text reaches the output unless a configured fallback component explicitly discards it.
+- **Report only what cannot be rendered.** Configuration mistakes and dangling references.
+- **Do not grow tolerance to match tests.** When a property-based test generates input a Draft.js editor could not plausibly produce, narrow the strategy rather than loosening the exporter. See the [test strategy](test-strategy.md#property-based-tests).
+
 ## Engine system
 
 The exporter uses a **Strategy pattern** for output generation. All engines implement the `DOMEngine` interface (five static methods: `create_tag`, `parse_html`, `append_child`, `render`, `render_debug`). The `DOM` class delegates to the active engine, selected at runtime via dotted-path strings stored as class constants (`DOM.STRING`, `DOM.HTML5LIB`, `DOM.LXML`, `DOM.MARKDOWN`, `DOM.STRING_COMPAT`). Engine selection is thread-safe through a `ContextVar`.

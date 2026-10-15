@@ -76,14 +76,16 @@ The following table shows every Draft.js content type the Markdown exporter hand
 
 ### Block types
 
-| Draft.js block type               | Markdown output                                      |
-| --------------------------------- | ---------------------------------------------------- |
-| `unstyled`                        | Plain text followed by a blank line                  |
-| `header-one` through `header-six` | `# ` through `###### ` prefix                        |
-| `blockquote`                      | `> ` prefix                                          |
-| `unordered-list-item`             | `- ` prefix, with `  ` indent per depth level        |
-| `ordered-list-item`               | `1. `, `2. `, etc., with `  ` indent per depth level |
-| `code-block`                      | Wrapped in ` ``` ` fences                            |
+| Draft.js block type               | Markdown output                                |
+| --------------------------------- | ---------------------------------------------- |
+| `unstyled`                        | Plain text followed by a blank line            |
+| `header-one` through `header-six` | `# ` through `###### ` prefix                  |
+| `blockquote`                      | `> ` prefix; consecutive quotes merge          |
+| `unordered-list-item`             | `- ` prefix, indented per nesting level        |
+| `ordered-list-item`               | `1. `, `2. `, etc., indented per nesting level |
+| `code-block`                      | Wrapped in ` ``` ` fences                      |
+
+Nested list items are indented to the content column of the item they are nested under, which depends on that item's marker width (`- `, `1. `, `10. `). Ordered items continue numbering across nested lists of other types. Consecutive blockquote blocks — one per paragraph in Draft.js — render as a single blockquote, separated by an empty quote line (`>`), rather than a blank line, which would end the quote.
 
 ### Inline styles
 
@@ -93,6 +95,8 @@ The following table shows every Draft.js content type the Markdown exporter hand
 | `ITALIC`        | `_text_`        |
 | `CODE`          | `` `text` ``    |
 | `STRIKETHROUGH` | `~text~`        |
+
+Styles that span a link or entity are rendered per text segment. Spaces at the edges of each segment are moved outside the delimiters, so `<b>bold <a>link</a> more</b>` renders as `**bold** [**link**](…) **more**`, not `**bold **[**link**](…)** more**`. The same applies to link text.
 
 ### Entities
 
@@ -104,7 +108,7 @@ The following table shows every Draft.js content type the Markdown exporter hand
 
 ## Low-level API
 
-For cases where `build_markdown_config` is not flexible enough, you can build a config dict manually from the individual component functions. This is the same approach used by the default `CONFIG` and `build_markdown_config` internally. All Markdown helpers are re-exported from the package root with an `md_` prefix:
+For cases where `build_markdown_config` is not flexible enough, you can build a config dict manually from the individual component functions. This is the same approach used by the default `CONFIG` and `build_markdown_config` internally. All Markdown helpers are re-exported from the package root with an `md_` prefix. List items are built with `md_make_list_item(marker, delimiter)`; `md_make_ul` and `md_make_ol` are shortcuts for the most common cases.
 
 ```python
 from draftjs_exporter import (
@@ -113,6 +117,7 @@ from draftjs_exporter import (
     ENTITY_TYPES,
     INLINE_STYLES,
     STYLE_MAP as HTML_STYLE_MAP,
+    md_blockquote,
     md_code_element,
     md_code_span,
     md_code_wrapper,
@@ -141,7 +146,7 @@ config = {
             "element": md_ol,
             "wrapper": md_list_wrapper,
         },
-        BLOCK_TYPES.BLOCKQUOTE: md_prefixed_block("> ", block_prefix=True),
+        BLOCK_TYPES.BLOCKQUOTE: md_blockquote,
         BLOCK_TYPES.CODE: {
             "element": md_code_element,
             "wrapper": md_code_wrapper,

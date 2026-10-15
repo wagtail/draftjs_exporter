@@ -126,7 +126,7 @@
       "lxml": "<p><strong>Bold <em>Italic</em></strong></p>",
       "string": "<p><strong>Bold <em>Italic</em></strong></p>",
       "string_compat": "<p><strong>Bold <em>Italic</em></strong></p>",
-      "markdown": "**Bold ****_Italic_**\n\n"
+      "markdown": "**Bold** **_Italic_**\n\n"
     },
     "content_state": {
       "entityMap": {},
@@ -162,18 +162,18 @@
           "inlineStyleRanges": [
             {
               "offset": 0,
-              "length": 5,
+              "length": 4,
+              "style": "BOLD"
+            },
+            {
+              "offset": 5,
+              "length": 6,
               "style": "BOLD"
             },
             {
               "offset": 5,
               "length": 6,
               "style": "ITALIC"
-            },
-            {
-              "offset": 5,
-              "length": 6,
-              "style": "BOLD"
             }
           ],
           "entityRanges": []
@@ -689,7 +689,7 @@
       "lxml": "<h2>Title 2</h2><h3>Title 3</h3><h4>Title 4</h4><h5>Title 5</h5><blockquote>Blockquote</blockquote><ul class=\"bullet-list\"><li>List item<ul class=\"bullet-list\"><li>Nested list item</li></ul></li></ul><ol><li>Ordered item <strong>(bold)</strong><ol><li>Nested ordered item <em>(italic)</em></li></ol></li></ol>",
       "string": "<h2>Title 2</h2><h3>Title 3</h3><h4>Title 4</h4><h5>Title 5</h5><blockquote>Blockquote</blockquote><ul class=\"bullet-list\"><li>List item<ul class=\"bullet-list\"><li>Nested list item</li></ul></li></ul><ol><li>Ordered item <strong>(bold)</strong><ol><li>Nested ordered item <em>(italic)</em></li></ol></li></ol>",
       "string_compat": "<h2>Title 2</h2><h3>Title 3</h3><h4>Title 4</h4><h5>Title 5</h5><blockquote>Blockquote</blockquote><ul class=\"bullet-list\"><li>List item<ul class=\"bullet-list\"><li>Nested list item</li></ul></li></ul><ol><li>Ordered item <strong>(bold)</strong><ol><li>Nested ordered item <em>(italic)</em></li></ol></li></ol>",
-      "markdown": "## Title 2\n\n### Title 3\n\n#### Title 4\n\n##### Title 5\n\n> Blockquote\n\n- List item\n  - Nested list item\n\n1. Ordered item **(bold)**\n  1. Nested ordered item _(italic)_\n\n"
+      "markdown": "## Title 2\n\n### Title 3\n\n#### Title 4\n\n##### Title 5\n\n> Blockquote\n\n- List item\n  - Nested list item\n\n1. Ordered item **(bold)**\n   1. Nested ordered item _(italic)_\n\n"
     },
     "content_state": {
       "entityMap": {},
@@ -975,19 +975,19 @@
         }
       ],
       "entityMap": {
-        "1": {
-          "type": "LINK",
-          "mutability": "MUTABLE",
-          "data": {
-            "url": "https://github.com/icelab/draft-js-ast-exporter"
-          }
-        },
         "0": {
           "type": "IMAGE",
           "mutability": "IMMUTABLE",
           "data": {
             "src": "http://placekitten.com/500/300",
             "alt": ""
+          }
+        },
+        "1": {
+          "type": "LINK",
+          "mutability": "MUTABLE",
+          "data": {
+            "url": "https://github.com/icelab/draft-js-ast-exporter"
           }
         }
       }
@@ -1087,7 +1087,7 @@
       "lxml": "<h2>draftjs_exporter is an HTML exporter for <a href=\"https://github.com/facebook/draft-js\">Draft.js</a> content</h2><blockquote>Try it out by \"running\" this file!</blockquote><h3>Features 📝🍸</h3><p>The exporter aims to provide sensible defaults from basic block types and inline styles to HTML, that can easily be customised when required. For more advanced scenarios, an API is provided (mimicking React's <a href=\"https://facebook.github.io/react/docs/top-level-api.html#react.createelement\"><code>createElement</code></a>) to create custom rendering components of arbitrary complexity.</p><hr><p>Here are some features worth highlighting:</p><ul class=\"bullet-list\"><li>Convert line breaks to <code>&lt;br&gt;</code><br>elements.</li><li>Automatic conversion of entity data to HTML attributes (int &amp; boolean to string, <a href=\"https://facebook.github.io/react/docs/jsx-in-depth.html\"><code>style object</code> to <code>style string</code></a>).</li><li>Wrapped blocks (<code>&lt;li&gt; </code>elements go inside <code>&lt;ul&gt;</code> or <code>&lt;ol&gt;</code>).<ul class=\"bullet-list\"><li>With arbitrary nesting.<ul class=\"bullet-list\"><li>Common text styles: <strong>Bold</strong>, <em>Italic</em>, <u>Underline</u>, <code>Monospace</code>, <s>Strikethrough.</s> <kbd>cmd + b</kbd></li><li><s>Overlapping </s><strong><s>te</s><em>xt</em></strong><em> styles. </em><strong style=\"text-decoration: underline;\">Custom styles</strong> too!<ul class=\"bullet-list\"><li><span class=\"hashtag\">#hashtag</span> support via <a href=\"https://github.com/wagtail/draftjs_exporter/pull/17\">#CompositeDecorators</a>.<ul class=\"bullet-list\"><li>Linkify URLs too! <a href=\"http://example.com/\">http://example.com/</a></li></ul></li></ul></li><li>Depth can go back and forth, it works fiiine (1)</li></ul></li><li>Depth can go back and forth, it works fiiine (2)<ul class=\"bullet-list\"><li>Depth can go back and forth, it works fiiine (3)</li></ul></li><li>Depth can go back and forth, it works fiiine (4)</li></ul></li><li>Depth can go back and forth, it works fiiine (5)</li></ul><img src=\"https://placekitten.com/g/300/200\" width=\"300\" height=\"200\" alt=\"Test image alt text\"><h3>For developers 🚀</h3><ol><li>Import the library</li><li>Define your configuration</li><li>Go!<ol><li>Optionally, define your custom components.</li></ol></li></ol><pre><code>def Blockquote(props):\n    block_data = props['block']['data']\n    return DOM.create_element('blockquote', {\n        'cite': block_data.get('cite')\n    }, props['children'])\n</code></pre><p>Voilà!</p>",
       "string": "<h2>draftjs_exporter is an HTML exporter for <a href=\"https://github.com/facebook/draft-js\">Draft.js</a> content</h2><blockquote>Try it out by \"running\" this file!</blockquote><h3>Features 📝🍸</h3><p>The exporter aims to provide sensible defaults from basic block types and inline styles to HTML, that can easily be customised when required. For more advanced scenarios, an API is provided (mimicking React's <a href=\"https://facebook.github.io/react/docs/top-level-api.html#react.createelement\"><code>createElement</code></a>) to create custom rendering components of arbitrary complexity.</p><hr/><p>Here are some features worth highlighting:</p><ul class=\"bullet-list\"><li>Convert line breaks to <code>&lt;br&gt;</code><br/>elements.</li><li>Automatic conversion of entity data to HTML attributes (int &amp; boolean to string, <a href=\"https://facebook.github.io/react/docs/jsx-in-depth.html\"><code>style object</code> to <code>style string</code></a>).</li><li>Wrapped blocks (<code>&lt;li&gt; </code>elements go inside <code>&lt;ul&gt;</code> or <code>&lt;ol&gt;</code>).<ul class=\"bullet-list\"><li>With arbitrary nesting.<ul class=\"bullet-list\"><li>Common text styles: <strong>Bold</strong>, <em>Italic</em>, <u>Underline</u>, <code>Monospace</code>, <s>Strikethrough.</s> <kbd>cmd + b</kbd></li><li><s>Overlapping </s><strong><s>te</s><em>xt</em></strong><em> styles. </em><strong style=\"text-decoration: underline;\">Custom styles</strong> too!<ul class=\"bullet-list\"><li><span class=\"hashtag\">#hashtag</span> support via <a href=\"https://github.com/wagtail/draftjs_exporter/pull/17\">#CompositeDecorators</a>.<ul class=\"bullet-list\"><li>Linkify URLs too! <a href=\"http://example.com/\">http://example.com/</a></li></ul></li></ul></li><li>Depth can go back and forth, it works fiiine (1)</li></ul></li><li>Depth can go back and forth, it works fiiine (2)<ul class=\"bullet-list\"><li>Depth can go back and forth, it works fiiine (3)</li></ul></li><li>Depth can go back and forth, it works fiiine (4)</li></ul></li><li>Depth can go back and forth, it works fiiine (5)</li></ul><img src=\"https://placekitten.com/g/300/200\" width=\"300\" height=\"200\" alt=\"Test image alt text\"/><h3>For developers 🚀</h3><ol><li>Import the library</li><li>Define your configuration</li><li>Go!<ol><li>Optionally, define your custom components.</li></ol></li></ol><pre><code>def Blockquote(props):\n    block_data = props['block']['data']\n    return DOM.create_element('blockquote', {\n        'cite': block_data.get('cite')\n    }, props['children'])\n</code></pre><p>Voilà!</p>",
       "string_compat": "<h2>draftjs_exporter is an HTML exporter for <a href=\"https://github.com/facebook/draft-js\">Draft.js</a> content</h2><blockquote>Try it out by &quot;running&quot; this file!</blockquote><h3>Features 📝🍸</h3><p>The exporter aims to provide sensible defaults from basic block types and inline styles to HTML, that can easily be customised when required. For more advanced scenarios, an API is provided (mimicking React&#x27;s <a href=\"https://facebook.github.io/react/docs/top-level-api.html#react.createelement\"><code>createElement</code></a>) to create custom rendering components of arbitrary complexity.</p><hr/><p>Here are some features worth highlighting:</p><ul class=\"bullet-list\"><li>Convert line breaks to <code>&lt;br&gt;</code><br/>elements.</li><li>Automatic conversion of entity data to HTML attributes (int &amp; boolean to string, <a href=\"https://facebook.github.io/react/docs/jsx-in-depth.html\"><code>style object</code> to <code>style string</code></a>).</li><li>Wrapped blocks (<code>&lt;li&gt; </code>elements go inside <code>&lt;ul&gt;</code> or <code>&lt;ol&gt;</code>).<ul class=\"bullet-list\"><li>With arbitrary nesting.<ul class=\"bullet-list\"><li>Common text styles: <strong>Bold</strong>, <em>Italic</em>, <u>Underline</u>, <code>Monospace</code>, <s>Strikethrough.</s> <kbd>cmd + b</kbd></li><li><s>Overlapping </s><strong><s>te</s><em>xt</em></strong><em> styles. </em><strong style=\"text-decoration: underline;\">Custom styles</strong> too!<ul class=\"bullet-list\"><li><span class=\"hashtag\">#hashtag</span> support via <a href=\"https://github.com/wagtail/draftjs_exporter/pull/17\">#CompositeDecorators</a>.<ul class=\"bullet-list\"><li>Linkify URLs too! <a href=\"http://example.com/\">http://example.com/</a></li></ul></li></ul></li><li>Depth can go back and forth, it works fiiine (1)</li></ul></li><li>Depth can go back and forth, it works fiiine (2)<ul class=\"bullet-list\"><li>Depth can go back and forth, it works fiiine (3)</li></ul></li><li>Depth can go back and forth, it works fiiine (4)</li></ul></li><li>Depth can go back and forth, it works fiiine (5)</li></ul><img alt=\"Test image alt text\" height=\"200\" src=\"https://placekitten.com/g/300/200\" width=\"300\"/><h3>For developers 🚀</h3><ol><li>Import the library</li><li>Define your configuration</li><li>Go!<ol><li>Optionally, define your custom components.</li></ol></li></ol><pre><code>def Blockquote(props):\n    block_data = props[&#x27;block&#x27;][&#x27;data&#x27;]\n    return DOM.create_element(&#x27;blockquote&#x27;, {\n        &#x27;cite&#x27;: block_data.get(&#x27;cite&#x27;)\n    }, props[&#x27;children&#x27;])\n</code></pre><p>Voilà!</p>",
-      "markdown": "## draftjs_exporter is an HTML exporter for [Draft.js](https://github.com/facebook/draft-js) content\n\n> Try it out by \"running\" this file!\n\n### Features 📝🍸\n\nThe exporter aims to provide sensible defaults from basic block types and inline styles to HTML, that can easily be customised when required. For more advanced scenarios, an API is provided (mimicking React's [`createElement`](https://facebook.github.io/react/docs/top-level-api.html#react.createelement)) to create custom rendering components of arbitrary complexity.\n\n---\n\nHere are some features worth highlighting:\n\n- Convert line breaks to `<br>`\nelements.\n- Automatic conversion of entity data to HTML attributes (int & boolean to string, [`style object` to `style string`](https://facebook.github.io/react/docs/jsx-in-depth.html)).\n- Wrapped blocks (`<li> `elements go inside `<ul>` or `<ol>`).\n  - With arbitrary nesting.\n    - Common text styles: **Bold**, _Italic_, <u>Underline</u>, `Monospace`, ~Strikethrough.~ <kbd>cmd + b</kbd>\n    - ~Overlapping ~**~te~****_xt_**_ styles. _<strong style=\"text-decoration: underline;\">Custom styles</strong> too!\n      - \\#hashtag support via [#CompositeDecorators](https://github.com/wagtail/draftjs_exporter/pull/17).\n        - Linkify URLs too! [http://example.com/](http://example.com/)\n    - Depth can go back and forth, it works fiiine (1)\n  - Depth can go back and forth, it works fiiine (2)\n    - Depth can go back and forth, it works fiiine (3)\n  - Depth can go back and forth, it works fiiine (4)\n- Depth can go back and forth, it works fiiine (5)\n\n![Test image alt text](https://placekitten.com/g/300/200)\n\n### For developers 🚀\n\n1. Import the library\n2. Define your configuration\n3. Go!\n  1. Optionally, define your custom components.\n\n```\ndef Blockquote(props):\n    block_data = props['block']['data']\n    return DOM.create_element('blockquote', {\n        'cite': block_data.get('cite')\n    }, props['children'])\n\n```\n\nVoilà!\n\n"
+      "markdown": "## draftjs_exporter is an HTML exporter for [Draft.js](https://github.com/facebook/draft-js) content\n\n> Try it out by \"running\" this file!\n\n### Features 📝🍸\n\nThe exporter aims to provide sensible defaults from basic block types and inline styles to HTML, that can easily be customised when required. For more advanced scenarios, an API is provided (mimicking React's [`createElement`](https://facebook.github.io/react/docs/top-level-api.html#react.createelement)) to create custom rendering components of arbitrary complexity.\n\n---\n\nHere are some features worth highlighting:\n\n- Convert line breaks to `<br>`\nelements.\n- Automatic conversion of entity data to HTML attributes (int & boolean to string, [`style object` to `style string`](https://facebook.github.io/react/docs/jsx-in-depth.html)).\n- Wrapped blocks (`<li> `elements go inside `<ul>` or `<ol>`).\n  - With arbitrary nesting.\n    - Common text styles: **Bold**, _Italic_, <u>Underline</u>, `Monospace`, ~Strikethrough.~ <kbd>cmd + b</kbd>\n    - ~Overlapping~ **~te~****_xt_** _styles._ <strong style=\"text-decoration: underline;\">Custom styles</strong> too!\n      - \\#hashtag support via [#CompositeDecorators](https://github.com/wagtail/draftjs_exporter/pull/17).\n        - Linkify URLs too! [http://example.com/](http://example.com/)\n    - Depth can go back and forth, it works fiiine (1)\n  - Depth can go back and forth, it works fiiine (2)\n    - Depth can go back and forth, it works fiiine (3)\n  - Depth can go back and forth, it works fiiine (4)\n- Depth can go back and forth, it works fiiine (5)\n\n![Test image alt text](https://placekitten.com/g/300/200)\n\n### For developers 🚀\n\n1. Import the library\n2. Define your configuration\n3. Go!\n   1. Optionally, define your custom components.\n\n```\ndef Blockquote(props):\n    block_data = props['block']['data']\n    return DOM.create_element('blockquote', {\n        'cite': block_data.get('cite')\n    }, props['children'])\n\n```\n\nVoilà!\n\n"
     },
     "content_state": {
       "entityMap": {
@@ -1732,7 +1732,7 @@
         },
         {
           "key": "00012",
-          "text": "~Overlapping ~~te~xt styles. <strong style=\"text-decoration: underline;\">Custom styles</strong> too!",
+          "text": "~Overlapping~ ~te~xt styles. <strong style=\"text-decoration: underline;\">Custom styles</strong> too!",
           "type": "unordered-list-item",
           "depth": 2,
           "inlineStyleRanges": [
@@ -1744,16 +1744,16 @@
             {
               "offset": 18,
               "length": 2,
-              "style": "ITALIC"
+              "style": "BOLD"
             },
             {
               "offset": 18,
               "length": 2,
-              "style": "BOLD"
+              "style": "ITALIC"
             },
             {
-              "offset": 20,
-              "length": 9,
+              "offset": 21,
+              "length": 7,
               "style": "ITALIC"
             }
           ],
@@ -1899,6 +1899,20 @@
         }
       ],
       "entityMap": {
+        "0": {
+          "type": "LINK",
+          "mutability": "MUTABLE",
+          "data": {
+            "url": "https://github.com/facebook/draft-js"
+          }
+        },
+        "1": {
+          "type": "LINK",
+          "mutability": "MUTABLE",
+          "data": {
+            "url": "https://facebook.github.io/react/docs/top-level-api.html#react.createelement"
+          }
+        },
         "2": {
           "type": "HORIZONTAL_RULE",
           "mutability": "IMMUTABLE",
@@ -1911,11 +1925,11 @@
             "url": "https://facebook.github.io/react/docs/jsx-in-depth.html"
           }
         },
-        "0": {
+        "4": {
           "type": "LINK",
           "mutability": "MUTABLE",
           "data": {
-            "url": "https://github.com/facebook/draft-js"
+            "url": "https://github.com/wagtail/draftjs_exporter/pull/17"
           }
         },
         "5": {
@@ -1931,20 +1945,6 @@
           "data": {
             "src": "https://placekitten.com/g/300/200",
             "alt": "Test image alt text"
-          }
-        },
-        "4": {
-          "type": "LINK",
-          "mutability": "MUTABLE",
-          "data": {
-            "url": "https://github.com/wagtail/draftjs_exporter/pull/17"
-          }
-        },
-        "1": {
-          "type": "LINK",
-          "mutability": "MUTABLE",
-          "data": {
-            "url": "https://facebook.github.io/react/docs/top-level-api.html#react.createelement"
           }
         }
       }

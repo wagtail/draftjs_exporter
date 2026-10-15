@@ -42,7 +42,11 @@ from tests.strategies import (
     content_states,
     dangerous_content_states,
     escapable_text,
+    linked_styled_content_states,
+    long_list_content_states,
+    nested_list_content_states,
     roundtrip_content_states,
+    sparse_content_states,
 )
 from tests.test_entities import link
 
@@ -55,6 +59,50 @@ CONFIG: ExporterConfig = {
 # The HTML-producing engines (Markdown renders a different output format,
 # with its own config, and is checked separately below).
 HTML_ENGINES = [DOM.STRING, DOM.STRING_COMPAT, DOM.LXML, DOM.HTML5LIB]
+
+
+class TestContentStateContract(unittest.TestCase):
+    """Rendering tolerates blocks with the optional keys missing.
+
+    Per the ContentState contract (docs/contributing/architecture.md), a block
+    only has to be a mapping: every other key falls back to a default, and the
+    text still reaches the output.
+    """
+
+    @given(content_state=sparse_content_states())
+    @settings(deadline=None)
+    # Regression: a blockquote followed by a block with no `type` raised
+    # KeyError from the look-up of the following block's type.
+    @example(
+        content_state={
+            "entityMap": {},
+            "blocks": [
+                {
+                    "key": "aaaaa",
+                    "text": "",
+                    "type": BLOCK_TYPES.BLOCKQUOTE,
+                    "depth": 0,
+                    "inlineStyleRanges": [],
+                    "entityRanges": [],
+                },
+                {
+                    "key": "bbbbb",
+                    "text": "",
+                    "depth": 0,
+                    "inlineStyleRanges": [],
+                    "entityRanges": [],
+                },
+            ],
+        }
+    )
+    def test_missing_optional_keys_render(self, content_state):
+        expected = "".join(block.get("text", "") for block in content_state["blocks"])
+        for engine in HTML_ENGINES:
+            html = HTML({**CONFIG, "engine": engine}).render(content_state)
+            self.assertEqual(BeautifulSoup(html, "html5lib").get_text(), expected)
+        # Markdown has its own defaults and fallbacks; the contract promises
+        # crash safety rather than identical output.
+        HTML(MARKDOWN_CONFIG).render(content_state)
 
 
 class TestRenderCrashSafety(unittest.TestCase):
@@ -323,6 +371,90 @@ class TestMarkdownEscapingInvariants(unittest.TestCase):
         self.assertTrue(escaped.startswith(f"{m.group(1)}\\{m.group(2)}"))
 
 
+# A list item line as the Markdown exporter writes it: indentation, marker,
+# and a space before the item's content.
+_LIST_ITEM_LINE = re.compile(
+    r"^(?P<indent> *)(?P<marker>[-*+]|\d{1,9}[.)]) (?P<content>.*)$"
+)
+
+
+def assert_list_items_indented(markdown: str) -> None:
+    """Check nested list items are indented past their parent's marker.
+
+    CommonMark nests an item inside the preceding one only when its
+    indentation reaches past that item's marker, so indenting by less than the
+    parent's marker width silently flattens the list into a new top-level one.
+    Blank lines keep a list open; any other line closes it.
+    """
+    stack: list[tuple[int, int]] = []
+    for line in markdown.split("\n"):
+        match = _LIST_ITEM_LINE.match(line)
+        if match is None:
+            if line.strip():
+                stack.clear()
+            continue
+        indent = len(match.group("indent"))
+        marker_width = len(match.group("marker")) + 1
+        while stack and stack[-1][0] >= indent:
+            stack.pop()
+        if stack:
+            assert indent >= stack[-1][1], f"{line!r} in {markdown!r}"
+        stack.append((indent, marker_width))
+
+
+class TestMarkdownListInvariants(unittest.TestCase):
+    """Invariants of Markdown list rendering.
+
+    The exporter anchors nested items to the content column of the item they
+    are nested under, and renders nothing for the wrapper nodes it
+    synthesizes when a list starts at a depth with no preceding parent (see
+    wrapper_state.py). Both are checked on the rendered Markdown directly,
+    independently of the importer or any engine.
+    """
+
+    @given(content_state=nested_list_content_states())
+    @settings(deadline=None)
+    # Regression for the wrapper node of a list starting at depth 1 with no
+    # depth-0 item before it: rendering a marker for that wrapper produced a
+    # phantom empty list item (``"  - \n  - b"``).
+    @example(
+        content_state={
+            "entityMap": {},
+            "blocks": [
+                {
+                    "key": "aaaaa",
+                    "text": "a",
+                    "type": BLOCK_TYPES.UNSTYLED,
+                    "depth": 0,
+                    "inlineStyleRanges": [],
+                    "entityRanges": [],
+                },
+                {
+                    "key": "bbbbb",
+                    "text": "b",
+                    "type": BLOCK_TYPES.UNORDERED_LIST_ITEM,
+                    "depth": 1,
+                    "inlineStyleRanges": [],
+                    "entityRanges": [],
+                },
+            ],
+        }
+    )
+    def test_no_empty_list_marker(self, content_state):
+        # Every generated block has non-empty text, so any list marker with
+        # no content after it can only come from a wrapper node.
+        markdown = HTML(MARKDOWN_CONFIG).render(content_state)
+        for line in markdown.split("\n"):
+            match = _LIST_ITEM_LINE.match(line)
+            if match is not None:
+                self.assertNotEqual(match.group("content"), "", line)
+
+    @given(content_state=long_list_content_states())
+    @settings(deadline=None)
+    def test_nested_items_indent_past_their_parent_marker(self, content_state):
+        assert_list_items_indented(HTML(MARKDOWN_CONFIG).render(content_state))
+
+
 class TestImporterProperties(unittest.TestCase):
     @given(roundtrip_content_states())
     def test_round_trip_preserves_block_types_and_text(self, content_state):
@@ -365,3 +497,37 @@ class TestImporterProperties(unittest.TestCase):
         once = filter_.apply(content_state)
         twice = filter_.apply(once)
         self.assertEqual(once, twice)
+
+    @given(linked_styled_content_states())
+    # Regression for splitting text at link and style boundaries: an inline
+    # style left with only the whitespace a nested style had already moved
+    # outside its delimiters rendered empty delimiters (``"**0000000** ****0"``),
+    # which no longer imports back as the same text.
+    @example(
+        content_state={
+            "entityMap": {},
+            "blocks": [
+                {
+                    "key": "aaaaa",
+                    "text": "0000000 0",
+                    "type": BLOCK_TYPES.UNSTYLED,
+                    "depth": 0,
+                    "inlineStyleRanges": [
+                        {"offset": 0, "length": 8, "style": INLINE_STYLES.BOLD},
+                        {"offset": 7, "length": 1, "style": INLINE_STYLES.ITALIC},
+                    ],
+                    "entityRanges": [],
+                }
+            ],
+        }
+    )
+    def test_round_trip_preserves_text_across_link_and_style_boundaries(
+        self, content_state
+    ):
+        """Export → import keeps the text when links and inline styles overlap."""
+        markdown = HTML(MARKDOWN_CONFIG).render(content_state)
+        result = MarkdownImporter().import_markdown(markdown)
+        self.assertEqual(
+            [b["text"] for b in result["blocks"]],
+            [b["text"] for b in content_state["blocks"]],
+        )

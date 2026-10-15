@@ -283,3 +283,146 @@ def roundtrip_content_states(draw: st.DrawFn) -> dict[str, Any]:
         "entityMap": {},
         "blocks": draw(st.lists(roundtrip_blocks(), min_size=0, max_size=4)),
     }
+
+
+LIST_ITEM_TYPES = [BLOCK_TYPES.UNORDERED_LIST_ITEM, BLOCK_TYPES.ORDERED_LIST_ITEM]
+
+OTHER_BLOCK_TYPES = [BLOCK_TYPES.UNSTYLED, BLOCK_TYPES.BLOCKQUOTE]
+
+
+@st.composite
+def nested_list_content_states(draw: st.DrawFn) -> dict[str, Any]:
+    """Blocks mixing lists, quotes, and paragraphs.
+
+    A list item either continues its predecessor's list (same depth, a nested
+    depth, or a shallower one), or starts a new list: at depth 0, or at depth
+    1 with no preceding parent, the shape the exporter handles by
+    synthesizing a wrapper node (see wrapper_state.py).
+    """
+    blocks: list[dict[str, Any]] = []
+    for _ in range(draw(st.integers(min_value=0, max_value=5))):
+        previous = blocks[-1] if blocks else None
+        if (
+            previous is not None
+            and previous["type"] in LIST_ITEM_TYPES
+            and draw(st.booleans())
+        ):
+            type_ = draw(st.sampled_from(LIST_ITEM_TYPES))
+            depth = draw(st.integers(min_value=0, max_value=previous["depth"] + 1))
+        else:
+            type_ = draw(st.sampled_from([*LIST_ITEM_TYPES, *OTHER_BLOCK_TYPES]))
+            depth = 0
+            if type_ in LIST_ITEM_TYPES and draw(st.booleans()):
+                depth = 1
+        blocks.append(
+            {
+                "key": f"{len(blocks):05d}",
+                "text": draw(safe_block_text),
+                "type": type_,
+                "depth": depth,
+                "inlineStyleRanges": [],
+                "entityRanges": [],
+            }
+        )
+    return {"entityMap": {}, "blocks": blocks}
+
+
+@st.composite
+def long_list_content_states(draw: st.DrawFn) -> dict[str, Any]:
+    """A single list long enough for its markers to reach multiple digits,
+    with optional items nested under it.
+    """
+    type_ = draw(st.sampled_from(LIST_ITEM_TYPES))
+    blocks = [
+        {
+            "key": f"{index:05d}",
+            "text": f"item {index}",
+            "type": type_,
+            "depth": 0,
+            "inlineStyleRanges": [],
+            "entityRanges": [],
+        }
+        for index in range(draw(st.integers(min_value=1, max_value=12)))
+    ]
+    for index in range(draw(st.integers(min_value=0, max_value=3))):
+        blocks.append(
+            {
+                "key": f"nested{index:05d}",
+                "text": f"nested {index}",
+                "type": draw(st.sampled_from(LIST_ITEM_TYPES)),
+                "depth": draw(st.integers(min_value=1, max_value=2)),
+                "inlineStyleRanges": [],
+                "entityRanges": [],
+            }
+        )
+    return {"entityMap": {}, "blocks": blocks}
+
+
+@st.composite
+def linked_styled_content_states(draw: st.DrawFn) -> dict[str, Any]:
+    """A block whose text is covered by a link and by inline styles.
+
+    Styles use unique styles per block, as real editors merge same-style
+    ranges (see roundtrip_blocks). The link and style boundaries do not
+    align, so the exporter has to split the text into segments.
+    """
+    text = draw(safe_block_text)
+    styles = []
+    for style in draw(
+        st.lists(st.sampled_from(ROUNDTRIP_STYLES), unique=True, max_size=2)
+    ):
+        offset = draw(st.integers(min_value=0, max_value=len(text) - 1))
+        length = draw(st.integers(min_value=1, max_value=len(text) - offset))
+        styles.append({"offset": offset, "length": length, "style": style})
+
+    offset = draw(st.integers(min_value=0, max_value=len(text)))
+    length = draw(st.integers(min_value=0, max_value=len(text) - offset))
+
+    return {
+        "entityMap": {
+            "0": {
+                "type": ENTITY_TYPE_VALUE,
+                "mutability": "MUTABLE",
+                "data": {"url": "https://example.com"},
+            }
+        },
+        "blocks": [
+            {
+                "key": "aaaaa",
+                "text": text,
+                "type": BLOCK_TYPES.UNSTYLED,
+                "depth": 0,
+                "inlineStyleRanges": styles,
+                "entityRanges": (
+                    [{"offset": offset, "length": length, "key": 0}] if length else []
+                ),
+            }
+        ],
+    }
+
+
+# Block keys the exporter falls back on when they are missing, per the
+# ContentState contract (docs/contributing/architecture.md).
+OPTIONAL_BLOCK_KEYS = (
+    "type",
+    "depth",
+    "text",
+    "data",
+    "inlineStyleRanges",
+    "entityRanges",
+)
+
+
+@st.composite
+def sparse_content_states(draw: st.DrawFn) -> dict[str, Any]:
+    """Content states with optional block keys removed at random.
+
+    The contract is that a block only has to be a mapping: these must render
+    like their fully specified equivalents rather than raising.
+    """
+    content_state = draw(content_states())
+    for block in content_state["blocks"]:
+        for key in OPTIONAL_BLOCK_KEYS:
+            if key in block and draw(st.booleans()):
+                del block[key]
+    return content_state

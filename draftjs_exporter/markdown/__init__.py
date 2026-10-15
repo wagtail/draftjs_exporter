@@ -11,6 +11,7 @@ from draftjs_exporter.defaults import BLOCK_MAP as HTML_BLOCK_MAP
 from draftjs_exporter.defaults import STYLE_MAP as HTML_STYLE_MAP
 from draftjs_exporter.html import ExporterConfig
 from draftjs_exporter.markdown.blocks import (
+    md_blockquote,
     md_list_wrapper,
     md_make_ol,
     md_make_ul,
@@ -72,7 +73,7 @@ BLOCK_MAP: ConfigMap = {
             "element": md_ol,
             "wrapper": md_list_wrapper,
         },
-        BLOCK_TYPES.BLOCKQUOTE: md_prefixed_block("> ", block_prefix=True),
+        BLOCK_TYPES.BLOCKQUOTE: md_blockquote,
         BLOCK_TYPES.CODE: {
             "element": md_code_element,
             "wrapper": md_code_wrapper,
@@ -147,7 +148,7 @@ def build_markdown_config(options: MarkdownOptions | None = None) -> ExporterCon
             "element": md_make_ol(ol_delimiter),
             "wrapper": md_list_wrapper,
         },
-        BLOCK_TYPES.BLOCKQUOTE: md_prefixed_block("> ", block_prefix=True),
+        BLOCK_TYPES.BLOCKQUOTE: md_blockquote,
         BLOCK_TYPES.CODE: {
             "element": md_make_code_element(),
             "wrapper": md_make_code_wrapper(fence),

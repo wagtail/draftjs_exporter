@@ -8,7 +8,7 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 ## Project architecture
 
-Review the [project architecture](contributing/architecture.md). Understanding the high-level architecture will help you navigate the codebase and find where to make changes.
+Review the [project architecture](contributing/architecture.md). Understanding the high-level architecture will help you navigate the codebase and find where to make changes. It also documents the [ContentState contract](contributing/architecture.md#contentstate-contract) – what the exporter tolerates and what it refuses.
 
 ## Development
 

@@ -7,6 +7,7 @@ from draftjs_exporter.markdown.entities import (
     md_link,
     md_make_horizontal_rule,
 )
+from draftjs_exporter.markdown.styles import md_inline_style
 
 
 class TestEntities(unittest.TestCase):
@@ -35,6 +36,20 @@ class TestEntities(unittest.TestCase):
         self.assertEqual(
             DOM.render(md_link({"url": "https://example.com/a(b)", "children": "x"})),
             "[x](https://example.com/a\\(b\\))",
+        )
+
+    def test_link_text_mixing_text_and_inline_style_keeps_spaces(self):
+        styled = md_inline_style("**")({"children": "bold"})
+        children = DOM.create_element("fragment", {}, ["click ", styled, " here"])
+        self.assertEqual(
+            DOM.render(md_link({"url": "http://x", "children": children})),
+            "[click **bold** here](http://x)",
+        )
+
+    def test_link_text_edges_moved_outside_brackets(self):
+        self.assertEqual(
+            DOM.render(md_link({"url": "http://x", "children": " spaced "})),
+            " [spaced](http://x) ",
         )
 
     def test_image_src_escaped(self):

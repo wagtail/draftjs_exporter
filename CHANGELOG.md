@@ -7,6 +7,7 @@
 ### Added
 
 - Re-export `md_escape_text` and `md_escape_link_destination` from the package root.
+- Add `md_blockquote` as a reusable blockquote component; it is now the default `blockquote` block in `MARKDOWN_CONFIG` and `build_markdown_config()`.
 
 ### Fixed
 
@@ -21,6 +22,11 @@
 - Rename the Markdown escaping helpers for user text (`escape_text` → `md_escape_text`) and for link destinations (`escape_link_destination` → `md_escape_link_destination`). This is a breaking change within the experimental Markdown support; import them from `draftjs_exporter` under their new names.
 - Using the html5lib engine without BeautifulSoup installed now fails with a clear import error rather than a `NameError` at render time.
 - Annotate inferred-`Any` attributes and empty containers in `WrapperState` and the Markdown resolvers, and document return types of `__init__` methods in the string and Markdown engines.
+- Nest Markdown list items to the content column of the item they are nested under, which depends on each ancestor's marker width (`- `, `1. `, `10. `), instead of a fixed two spaces per depth. Nested ordered lists under an ordered list, or under a multi-digit item, no longer collapse into separate top-level lists.
+- Keep Markdown ordered list numbering consistent across nested lists of other types, and only end a list when the next block genuinely does not belong to it. Previously a nested list of another type inserted a blank line that split the parent list in two.
+- Move whitespace at the edges of inline styles and link text outside their delimiters, so a style spanning a link or entity renders valid emphasis (`**bold** [**link**](…) **more**`) rather than `**bold **` or `[ spaced ](…)`.
+- Render consecutive `blockquote` blocks — one per paragraph in Draft.js — as a single Markdown blockquote separated by empty quote lines (`>`), instead of separate blockquotes separated by blank lines.
+- Do not render a list marker for the intermediate wrapper elements the exporter creates when a list starts at a depth greater than zero, which previously produced a phantom empty list item.
 
 ### Maintenance
 

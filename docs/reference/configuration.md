@@ -4,7 +4,7 @@ The exporter output is extensively configurable to cater for varied rich text re
 
 > This page documents the configuration shape. To see these options used in context, read [Custom components](../guides/custom-components.md) and [Fallback components](../guides/fallback-components.md). For alternative DOM backends, see [Alternative engines](../guides/alternative-engines.md).
 
-The configuration is a single dict passed to `HTML()`. It has four keys: `block_map`, `style_map`, `entity_decorators`, and `composite_decorators`. Each is optional and can be combined with the defaults the exporter provides.
+The configuration is a single dict passed to `HTML()`. It has four keys: `block_map`, `style_map`, `entity_decorators`, and `composite_decorators`. Each is optional: `block_map` and `style_map` start from the defaults the exporter provides, and `entity_decorators` and `composite_decorators` default to empty.
 
 ```python
 from draftjs_exporter import (

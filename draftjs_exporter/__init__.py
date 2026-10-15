@@ -33,6 +33,7 @@ from draftjs_exporter.html import ExporterConfig as ExporterConfig
 from draftjs_exporter.markdown import CONFIG as MARKDOWN_CONFIG
 from draftjs_exporter.markdown import MarkdownOptions as MarkdownOptions
 from draftjs_exporter.markdown import build_markdown_config as build_markdown_config
+from draftjs_exporter.markdown.blocks import md_blockquote as md_blockquote
 from draftjs_exporter.markdown.blocks import md_list_wrapper as md_list_wrapper
 from draftjs_exporter.markdown.blocks import md_make_ol as md_make_ol
 from draftjs_exporter.markdown.blocks import md_make_ul as md_make_ul
@@ -60,6 +61,7 @@ from draftjs_exporter.markdown.helpers import md_block as md_block
 from draftjs_exporter.markdown.helpers import md_inline as md_inline
 from draftjs_exporter.markdown.helpers import md_link_destination as md_link_destination
 from draftjs_exporter.markdown.helpers import md_mark_safe as md_mark_safe
+from draftjs_exporter.markdown.lists import md_make_list_item as md_make_list_item
 from draftjs_exporter.markdown.styles import md_code_span as md_code_span
 from draftjs_exporter.markdown.styles import md_inline_style as md_inline_style
 from draftjs_exporter.markdown_importer import ImporterConfig as ImporterConfig
@@ -111,6 +113,7 @@ __all__ = [
     # Markdown helpers
     "md_block",
     "md_block_fallback",
+    "md_blockquote",
     "md_code_element",
     "md_code_span",
     "md_code_wrapper",
@@ -127,6 +130,7 @@ __all__ = [
     "md_make_code_element",
     "md_make_code_wrapper",
     "md_make_horizontal_rule",
+    "md_make_list_item",
     "md_make_ol",
     "md_make_ul",
     "md_mark_safe",

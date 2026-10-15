@@ -1,7 +1,11 @@
 """Markdown block-level components: headings, lists, blockquotes, and plain paragraphs."""
 
+from draftjs_exporter.constants import BLOCK_TYPES
 from draftjs_exporter.markdown.helpers import md_block, md_inline, md_mark_safe
-from draftjs_exporter.markdown.lists import md_list_item, md_make_numbered_li_prefix
+from draftjs_exporter.markdown.lists import (
+    md_get_block_index,
+    md_make_list_item,
+)
 from draftjs_exporter.types import Component, Element, Props
 
 
@@ -21,8 +25,45 @@ def md_prefixed_block(prefix: str, block_prefix: bool = False) -> Component:
     )
 
 
+def md_blockquote(props: Props) -> Element:
+    """Render a blockquote paragraph, joining consecutive quote paragraphs.
+
+    Draft.js quotes are one block per paragraph, but a multi-paragraph quote
+    is a single Markdown blockquote: consecutive blockquote blocks are
+    separated by an empty quote line (``>``) rather than a blank line, which
+    would end the quote.
+
+    Parameters:
+        props: Render properties including the current block and all blocks.
+
+    Returns:
+        A blockquote paragraph element.
+    """
+    blocks = props["blocks"]
+    # A block with no usable key cannot be looked up: a falsy key would match
+    # any other block that lacks one.
+    key = props["block"].get("key")
+    index = md_get_block_index(blocks, key) if key else -1
+    next_type = (
+        blocks[index + 1].get("type")
+        if 0 <= index and index + 1 < len(blocks)
+        else None
+    )
+    trailing = "\n>\n" if next_type == BLOCK_TYPES.BLOCKQUOTE else "\n\n"
+    return md_inline(
+        [
+            md_mark_safe("> ", block_prefix=True),
+            props["children"],
+            md_mark_safe(trailing),
+        ]
+    )
+
+
 def md_make_ul(marker: str) -> Component:
     """Create an unordered list item component using the given marker.
+
+    The ordered delimiter is only used to measure the content column of
+    ordered ancestors, so the default one is enough here.
 
     Parameters:
         marker: The marker character to use for each list item.
@@ -30,12 +71,14 @@ def md_make_ul(marker: str) -> Component:
     Returns:
         A component that renders one unordered list item.
     """
-    prefix = f"{marker} "
-    return lambda props: md_list_item(prefix, props)
+    return md_make_list_item(marker, ".")
 
 
 def md_make_ol(delimiter: str) -> Component:
     """Create an ordered list item component using the given delimiter.
+
+    The unordered marker is only used to measure the content column of
+    unordered ancestors, so the default one is enough here.
 
     Parameters:
         delimiter: The delimiter to place after the item number.
@@ -43,8 +86,7 @@ def md_make_ol(delimiter: str) -> Component:
     Returns:
         A component that renders one ordered list item.
     """
-    get_prefix = md_make_numbered_li_prefix(delimiter)
-    return lambda props: md_list_item(get_prefix(props), props)
+    return md_make_list_item("-", delimiter)
 
 
 def md_list_wrapper(props: Props) -> Element:

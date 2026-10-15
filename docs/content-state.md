@@ -76,6 +76,8 @@ Draft.js represents each block with the following attributes:
 - `entityRanges`, indicating where entities are applied.
 - `data`, additional data or metadata stored alongside the block.
 
+Only `blocks` is required, and each block only has to be an object: `type` defaults to `unstyled`, `depth` to `0`, and missing text, ranges, or data render as empty. That tolerance is deliberate, because stored content tends to drift from the schema of the editor reading it. See the [ContentState contract](contributing/architecture.md#contentstate-contract) for the full list of defaults, and for what the exporter refuses instead.
+
 ## Block type
 
 The block `type` generally defines how a block is meant to be used in the editor, and displayed later on in the content lifecycle. Blocks are `unstyled` by default.
