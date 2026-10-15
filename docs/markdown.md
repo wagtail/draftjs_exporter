@@ -1,3 +1,7 @@
+---
+description: "Export Draft.js ContentState to Markdown with draftjs_exporter. Experimental renderer: supported blocks, styles, entities and escaping rules."
+---
+
 # Markdown support
 
 > ⚠️ Markdown support is **experimental**. There is no guarantee of API stability at this time.

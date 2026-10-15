@@ -1,3 +1,7 @@
+---
+description: "Documentation style guide for draftjs_exporter: tone, formatting, terminology, headings, linking and docstring conventions."
+---
+
 # Documentation style guide
 
 This style guide defines the standard we aim for across the draftjs_exporter documentation – the README, MkDocs site, contributor docs, and docstrings. Use it as the default for all new content, and as a reference when revising existing pages.

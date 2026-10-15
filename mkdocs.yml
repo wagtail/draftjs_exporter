@@ -1,7 +1,12 @@
-site_name: draftjs_exporter
+site_name: Draft.js exporter
 repo_url: https://github.com/wagtail/draftjs_exporter
 site_url: https://wagtail.github.io/draftjs_exporter/
 edit_uri: edit/main/docs/
+
+# Theme templates share a directory with theme assets, but are not site content.
+exclude_docs: |
+  theme/*.html
+  theme/sitemap.xml
 
 site_description: Library to convert rich text from Draft.js raw ContentState to HTML.
 repo_name: draftjs_exporter
@@ -35,6 +40,9 @@ markdown_extensions:
   - pymdownx.tilde
 plugins:
   - search
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: date
   - llmstxt:
       full_output: llms-full.txt
       # Only add docs pages that are relevant to users of the project.

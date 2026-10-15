@@ -1,3 +1,8 @@
+---
+title: "Draft.js exporter for Python (draftjs_exporter)"
+description: "Convert Draft.js ContentState to HTML in Python. Install with pip, configure block, style and entity maps, and write custom components."
+---
+
 # [Draft.js exporter](https://pypi.org/project/draftjs_exporter/)
 
 > Library to convert rich text from Draft.js raw ContentState to HTML.

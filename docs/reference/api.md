@@ -1,3 +1,7 @@
+---
+description: "API reference for draftjs_exporter: the HTML exporter, DOM namespace, constants, and the signatures of the public functions and classes."
+---
+
 # API reference
 
 ## HTML exporter

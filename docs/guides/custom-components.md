@@ -1,3 +1,7 @@
+---
+description: "Write draftjs_exporter components for entities, blocks and styles: DOM.create_element, props, nesting, and reusable block components."
+---
+
 # Custom components
 
 To generate arbitrary markup with dynamic data, the exporter comes with an API to create rendering components. This API mirrors React's [createElement](https://facebook.github.io/react/docs/top-level-api.html#react.createelement) API (what JSX compiles to). Components are referenced from your [configuration](../reference/configuration.md) under `block_map`, `style_map`, and `entity_decorators`.
@@ -27,7 +31,34 @@ def image(props):
     )
 ```
 
-Wire the component into your [configuration](../reference/configuration.md) under `entity_decorators`, keyed by the entity type it handles.
+A `LINK` entity works the same way, with one difference: entities that wrap text, like links, also receive the rendered text as `props["children"]`, which you pass as the last argument to `DOM.create_element`. For a `LINK` entity whose `data` is `{"url": ..., "target": ...}`:
+
+```python
+def link(props):
+    return DOM.create_element(
+        "a",
+        {
+            "href": props["url"],
+            "target": props.get("target"),
+        },
+        props["children"],
+    )
+```
+
+Wire each component into your [configuration](../reference/configuration.md) under `entity_decorators`, keyed by the entity type it handles:
+
+```python
+from draftjs_exporter import ENTITY_TYPES, HTML
+
+exporter = HTML(
+    {
+        "entity_decorators": {
+            ENTITY_TYPES.IMAGE: image,
+            ENTITY_TYPES.LINK: link,
+        }
+    }
+)
+```
 
 > The `entity` and `children` keys in `props` are reserved by the exporter and override any value your entity `data` might carry under the same key. See [Entity props override](../troubleshooting.md#entity-props-override) for details and workarounds.
 

@@ -1,3 +1,7 @@
+---
+description: "Handle unknown block types, styles and entities in draftjs_exporter with fallback components, for content schema changes and migrations."
+---
+
 # Fallback components
 
 When dealing with changes in the content schema, as part of ongoing development or migrations, some content can go stale. To solve this, the exporter allows the definition of fallback components for blocks, styles, and entities. A fallback is just a regular [custom component](custom-components.md) wired to the special `BLOCK_TYPES.FALLBACK`, `INLINE_STYLES.FALLBACK`, or `ENTITY_TYPES.FALLBACK` key in your [configuration](../reference/configuration.md).

@@ -1,3 +1,7 @@
+---
+description: "Install draftjs_exporter with pip, then render a Draft.js ContentState to HTML in a few lines of Python. Covers the block, style and entity maps."
+---
+
 # Getting started
 
 Draft.js stores data in a JSON representation based on blocks, representing lines of content in the editor, annotated with entities and styles to represent rich text. To understand the data model in depth, read [Content state](content-state.md) first.

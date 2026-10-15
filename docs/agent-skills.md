@@ -1,3 +1,7 @@
+---
+description: "Agent Skills published by draftjs_exporter for AI coding assistants: direct links, catalogs, and how to install them in your project."
+---
+
 # Agent skills
 
 Draft.js exporter ships [Agent Skills](https://agentskills.io/) that help users get better results with agentic coding. They’re published in multiple ways so you can reuse them easily with a wide range of tools.

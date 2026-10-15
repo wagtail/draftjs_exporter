@@ -1,3 +1,7 @@
+---
+description: "How to contribute to draftjs_exporter: development setup, commands, coding style, testing, and the pull request workflow."
+---
+
 # Contribution Guidelines
 
 Thank you for considering to help this project.

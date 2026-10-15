@@ -1,3 +1,7 @@
+---
+description: "Security policy for draftjs_exporter: supported versions and how to report a vulnerability responsibly."
+---
+
 # Security policy
 
 We take security issues seriously. We appreciate your efforts to responsibly disclose your findings, and will make every effort to acknowledge your contributions.

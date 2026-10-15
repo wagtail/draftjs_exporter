@@ -1,3 +1,7 @@
+---
+description: "Architecture of draftjs_exporter: module organization, how ContentState flows through the exporter, wrapper state and the DOM engines."
+---
+
 # Project architecture
 
 Understanding the high-level architecture will help you navigate the codebase and find where to make changes.

@@ -1,3 +1,7 @@
+---
+description: "Configure draftjs_exporter with block_map, style_map, entity_decorators and composite_decorators. Defaults, shapes and examples."
+---
+
 # Configuration
 
 The exporter output is extensively configurable to cater for varied rich text requirements.

@@ -1,7 +1,33 @@
-{% extends "base.html" %} {% block extrahead %} {{ super() }} {%- if page -%}
+{% extends "base.html" %} {% block htmltitle %}
+<title>
+  {%- if page and page.meta.title and page.is_homepage -%} {{ page.meta.title }}
+  {%- else -%} {{ super() | striptags | trim }} {%- endif -%}
+</title>
+{% endblock %} {% block extrahead %} {{ super() }} {%- if page -%}
 <link
   rel="alternate"
   type="text/markdown; charset=utf-8"
   href="{{ page.canonical_url }}index.md"
 />
+{%- set og_title = page.meta.title or page.title or config.site_name -%} {%- if
+not page.is_homepage and og_title != config.site_name -%} {%- set og_title =
+og_title ~ " - " ~ config.site_name -%} {%- endif -%} {%- set og_description =
+page.meta.description or config.site_description -%} {%- set og_image =
+config.site_url ~ "theme/social-card.png" -%}
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="{{ config.site_name }}" />
+<meta property="og:title" content="{{ og_title }}" />
+<meta property="og:description" content="{{ og_description }}" />
+<meta property="og:url" content="{{ page.canonical_url }}" />
+<meta property="og:image" content="{{ og_image }}" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta
+  property="og:image:alt"
+  content="Draft.js exporter: convert Draft.js ContentState to HTML in Python"
+/>
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="{{ og_title }}" />
+<meta name="twitter:description" content="{{ og_description }}" />
+<meta name="twitter:image" content="{{ og_image }}" />
 {%- endif -%} {% endblock %}

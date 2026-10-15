@@ -1,3 +1,7 @@
+---
+description: "Known draftjs_exporter issues and behaviors: entity props override, whitespace handling, engine differences, and how to work around them."
+---
+
 # Troubleshooting
 
 Here are known issues, implementation details, and engine-specific behaviors. For background on engine differences, see [Alternative engines](guides/alternative-engines.md).

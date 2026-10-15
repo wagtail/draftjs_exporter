@@ -1,3 +1,7 @@
+---
+description: "Implement a custom draftjs_exporter engine through the DOM API, to generate output other than HTML or reuse an existing tree library."
+---
+
 # Custom engines
 
 The exporter supports using custom engines to generate its output via the `DOM` API. This can be useful to implement custom export formats, e.g. [to Markdown (experimental)](../markdown.md).

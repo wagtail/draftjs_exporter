@@ -1,3 +1,7 @@
+---
+description: "Roadmap for draftjs_exporter: planned changes, likely improvements and longer-term ideas for the project."
+---
+
 # Roadmap
 
 This file provides an overview of the direction this project is heading. It contains both likely and more aspirational changes. For more granular improvements, see the [project’s issues backlog](https://github.com/wagtail/draftjs_exporter/issues).

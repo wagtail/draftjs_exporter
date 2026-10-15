@@ -1,3 +1,7 @@
+---
+description: "How Draft.js models rich text as ContentState: blocks, entities, inline styles and ranges, and what each means for HTML export."
+---
+
 # Content state
 
 [Draft.js](https://draftjs.org/) stores rich text in a structured JSON representation called ContentState. The exporter takes this ContentState as input and converts it to HTML (or Markdown), based on its [configuration](reference/configuration.md). This page explains how Draft.js models content, so you know what to feed the exporter and what to expect from each block, entity, and inline style.

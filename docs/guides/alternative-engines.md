@@ -1,3 +1,7 @@
+---
+description: "Choose a draftjs_exporter DOM engine: string, string_compat, lxml or html5lib. Trade-offs in speed, dependencies, and output."
+---
+
 # Alternative engines
 
 By default, the exporter uses a dependency-free engine called `string` to build the DOM tree. There are alternatives:

@@ -1,3 +1,7 @@
+---
+description: "Get help with draftjs_exporter: documentation, where to ask questions, how to report bugs and request features."
+---
+
 # Support
 
 > This project follows a [Code of Conduct](https://wagtail.org/code-of-conduct/).

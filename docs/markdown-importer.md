@@ -1,3 +1,7 @@
+---
+description: "Import Markdown into a Draft.js ContentState with draftjs_exporter. Experimental parser and content policy filter, with configuration options."
+---
+
 # Markdown importer
 
 > ⚠️ Markdown import is **experimental**. There is no guarantee of API stability at this time.

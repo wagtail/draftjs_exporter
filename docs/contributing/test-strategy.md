@@ -1,3 +1,7 @@
+---
+description: "Test strategy for draftjs_exporter: unit, integration and snapshot tests, property-based tests with Hypothesis, and coverage targets."
+---
+
 # Test strategy
 
 We aim for 100% test coverage on all changes, with coverage at multiple layers. Tests are run with `pytest` and configured in `pyproject.toml`.
