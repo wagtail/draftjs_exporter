@@ -44,7 +44,7 @@ class Elt:
         """
         self.type = type_
         self.attr = attr
-        self.children: list["str | Elt"] = []
+        self.children: list[str | Elt] = []
         self.markup = markup
 
     @staticmethod

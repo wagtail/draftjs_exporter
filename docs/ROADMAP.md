@@ -54,7 +54,7 @@ Explore a streaming API that yields HTML incrementally (sync/async) to reduce me
 
 ### Python 3.12+ only refactor
 
-After dropping 3.10/3.11, adopt 3.12+ features (faster f-strings, `typing.Self`/`TypeAliasType`, better `match` exhaustiveness) to simplify Options/State internals and improve runtime speed.
+After dropping 3.11, adopt 3.12+ features (faster f-strings, `typing.Self`/`TypeAliasType`, better `match` exhaustiveness) to simplify Options/State internals and improve runtime speed.
 
 ### More advanced tests
 

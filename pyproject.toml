@@ -4,7 +4,7 @@ version = "7.1.0"
 description = "Library to convert rich text from Draft.js raw ContentState to HTML"
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 classifiers = [
   "Environment :: Web Environment",
   "Intended Audience :: Developers",
@@ -12,7 +12,6 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
@@ -37,12 +36,12 @@ Changelog = "https://github.com/wagtail/draftjs_exporter/blob/main/CHANGELOG.md"
 [project.optional-dependencies]
 # Lower version bound for lxml - choose a version with:
 # - lxml>=4.4.0 attribute sorting
-# - Pre-built wheels on the lowest-supported Python version.
+# - Pre-built wheels on the lowest-supported Python version (3.11).
 # - The last patch release of a given minor version to benefit from bug fixes.
-# Check pre-built wheels: https://pypi.org/project/lxml/4.6.5/#files
+# Check pre-built wheels: https://pypi.org/project/lxml/4.9.4/#files
 # Upper version bound for lxml: avoid breaking changes without testing to confirm
 # there are no output changes in the new version.
-lxml = ["lxml>=4.6.5,<7"]
+lxml = ["lxml>=4.9.4,<7"]
 html5lib = ["beautifulsoup4>=4.4.1,<5", "html5lib>=0.999,<2"]
 
 [dependency-groups]
@@ -63,7 +62,7 @@ dev = [
   "memray>=1.15.0",
   "psutil>=5.9.7",
   # HTML builders.
-  "lxml>=4.6.5,<7",
+  "lxml>=4.9.4,<7",
   "types-lxml>=2026.2.16",
   "beautifulsoup4>=4.4.1,<5",
   "types-beautifulsoup4>=4.12.0",
@@ -87,7 +86,7 @@ module-name = "draftjs_exporter"
 module-root = ""
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 # E: pycodestyle errors
@@ -99,7 +98,8 @@ target-version = "py310"
 # C4: flake8-comprehensions
 # B006: Do not use mutable data structures for argument defaults
 # B904: Within an `except` clause, raise exceptions with `raise ... from err`
-select = ["E", "F", "I", "S", "T20", "BLE", "C4", "B006", "B904", "D"]
+# UP: pyupgrade
+select = ["E", "F", "I", "S", "T20", "BLE", "C4", "B006", "B904", "D", "UP"]
 ignore = ["E501"]
 
 [tool.ruff.lint.pydocstyle]
@@ -174,7 +174,7 @@ source_modules = [
 forbidden_modules = ["draftjs_exporter.*"]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 # Skip gitignored directories (site/, .venv/, ...) when discovering files to check.
 exclude_gitignore = true
 # https://mypy.readthedocs.io/en/latest/config_file.html
@@ -232,7 +232,8 @@ enable_error_code = [
   # Flag "type: ignore" comments without an error code.
   "ignore-without-code",
   # Flag methods overriding a parent method without the @override decorator.
-  # TODO Enable once we depend on typing_extensions for Python 3.10 support.
+  # TODO Enable once we depend on typing_extensions, as `typing.override`
+  # requires Python 3.12.
   # "explicit-override",
   # Flag use of a deprecated feature.
   "deprecated",
@@ -269,7 +270,7 @@ unsound-yield = "error"
 
 [tool.pyright]
 # https://microsoft.github.io/pyright/#/configuration
-pythonVersion = "3.10"
+pythonVersion = "3.11"
 # "standard" adds cross-module checks mypy lacks, like TypedDict required-key access.
 typeCheckingMode = "standard"
 # Generated output of the docs build, also gitignored. Unlike ty and pyrefly,
@@ -282,7 +283,7 @@ executionEnvironments = [
 
 [tool.pyrefly]
 # https://pyrefly.org/en/docs/configuration/
-python-version = "3.10"
+python-version = "3.11"
 # Flag reassignment of ALL_CAPS constants.
 treat-all-caps-as-final = true
 

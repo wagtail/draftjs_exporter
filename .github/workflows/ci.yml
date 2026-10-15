@@ -64,14 +64,14 @@ jobs:
       matrix:
         python-version:
           # Skip oldest supported version, checked in the "test_lower_bound" job.
-          # - "3.10"
-          - "3.11"
+          # - "3.11"
           - "3.12"
           - "3.13"
-          # Skip latest version, tested in the main "test" job.
-          # - "3.14"
-          # Skip future version, tested in the "test_experimental" job.
+          - "3.14"
+          # Skip latest supported version, tested in the main "test" job.
           # - "3.15"
+          # Skip future version, tested in the "test_experimental" job.
+          # - "3.16"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -94,7 +94,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: "3.10"
+          python-version: "3.11"
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
       - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
       - run: just test-compatibility
@@ -110,7 +110,7 @@ jobs:
         with:
           # See available versions:
           # https://github.com/actions/python-versions/tags
-          python-version: "3.15-dev"
+          python-version: "3.16-dev"
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
       - run: uv run --no-group dev --with 'beautifulsoup4>=4.4.1,<5, html5lib==1.1' python -X dev example.py
   deploy_site:

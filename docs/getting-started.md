@@ -12,7 +12,7 @@ This exporter takes the Draft.js ContentState data as input, and outputs HTML ba
 pip install draftjs_exporter
 ```
 
-We support the following Python versions: 3.10, 3.11, 3.12, 3.13, 3.14, 3.15. For legacy Python versions, find compatible releases in the [CHANGELOG](https://github.com/wagtail/draftjs_exporter/blob/main/CHANGELOG.md).
+We support all [supported Python versions](https://devguide.python.org/versions/). For legacy Python versions, find compatible releases in the [CHANGELOG](https://github.com/wagtail/draftjs_exporter/blob/main/CHANGELOG.md).
 
 In your code, create an exporter and use the `render` method to produce HTML. Pass an empty config dict to use the default block and style maps — see [Configuration](reference/configuration.md) to customize them, and to register the entity decorators (links, images, embeds) that have no defaults.
 

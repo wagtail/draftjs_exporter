@@ -14,7 +14,7 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -66,7 +66,7 @@ def _sha256(path: Path) -> str:
 
 def _iso_date(path: Path) -> str:
     """Format a file's last-modified time as ``YYYY-MM-DDTHH:MM:SSZ``."""
-    ts = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+    ts = datetime.fromtimestamp(path.stat().st_mtime, tz=UTC)
     return ts.strftime("%Y-%m-%dT00:00:00Z")
 
 

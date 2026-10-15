@@ -6,7 +6,7 @@ configuration maps consumed by the exporter.
 
 import re
 from collections.abc import Callable
-from typing import Any, Literal, TypeAlias, TypedDict
+from typing import Any, Literal, Required, TypeAlias, TypedDict
 
 Element: TypeAlias = Any
 """Engine-specific element produced by a renderable."""
@@ -30,9 +30,7 @@ HTML = str
 class RenderableConfig(TypedDict, total=False):
     """Configuration describing how to render a single renderable."""
 
-    # TODO Use typing.Required when dropping Python 3.10 support.
-    # See https://peps.python.org/pep-0655/.
-    element: RenderableType
+    element: Required[RenderableType]
     props: Props
     wrapper: RenderableType
     wrapper_props: Props
