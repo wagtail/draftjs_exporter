@@ -113,6 +113,102 @@ class TestRenderCrashSafety(unittest.TestCase):
         exporter.render(content_state)
 
 
+class TestRenderContentInvariants(unittest.TestCase):
+    """Block text must survive rendering, whatever the block depths are.
+
+    Blocks are nested into wrapper elements by depth (see `WrapperState`).
+    Depths the wrapper stack cannot nest as-is must still be rendered: a
+    block at depth > 0 with no preceding parent, a block type without a
+    wrapper (a list item's continuation paragraph, a heading, a blockquote),
+    and a nested wrapper replacing one of another type at the same depth all
+    used to be left out of the document and dropped.
+    """
+
+    @given(content_state=content_states())
+    @settings(deadline=None)
+    # Regression for a nested run starting above depth 0: its top-level
+    # wrapper has no depth-0 block to attach to, and was dropped when the run
+    # ended before the document did.
+    @example(
+        content_state={
+            "entityMap": {},
+            "blocks": [
+                {
+                    "key": "aaaaa",
+                    "text": "a",
+                    "type": BLOCK_TYPES.UNORDERED_LIST_ITEM,
+                    "depth": 1,
+                    "inlineStyleRanges": [],
+                    "entityRanges": [],
+                },
+                {
+                    "key": "bbbbb",
+                    "text": "b",
+                    "type": BLOCK_TYPES.UNSTYLED,
+                    "depth": 0,
+                    "inlineStyleRanges": [],
+                    "entityRanges": [],
+                },
+            ],
+        }
+    )
+    # Regression for a list item's continuation paragraph: a block at depth
+    # > 0 whose type has no wrapper was never added to the document.
+    @example(
+        content_state={
+            "entityMap": {},
+            "blocks": [
+                {
+                    "key": "aaaaa",
+                    "text": "item",
+                    "type": BLOCK_TYPES.UNORDERED_LIST_ITEM,
+                    "depth": 0,
+                    "inlineStyleRanges": [],
+                    "entityRanges": [],
+                },
+                {
+                    "key": "bbbbb",
+                    "text": "continuation",
+                    "type": BLOCK_TYPES.UNSTYLED,
+                    "depth": 1,
+                    "inlineStyleRanges": [],
+                    "entityRanges": [],
+                },
+            ],
+        }
+    )
+    # Regression for a nested list changing type at its depth: the
+    # replacement wrapper was created but never nested into its parent.
+    @example(
+        content_state={
+            "entityMap": {},
+            "blocks": [
+                {
+                    "key": "aaaaa",
+                    "text": "a",
+                    "type": BLOCK_TYPES.ORDERED_LIST_ITEM,
+                    "depth": 1,
+                    "inlineStyleRanges": [],
+                    "entityRanges": [],
+                },
+                {
+                    "key": "bbbbb",
+                    "text": "b",
+                    "type": BLOCK_TYPES.UNORDERED_LIST_ITEM,
+                    "depth": 1,
+                    "inlineStyleRanges": [],
+                    "entityRanges": [],
+                },
+            ],
+        }
+    )
+    def test_block_text_is_never_dropped(self, content_state):
+        expected = "".join(block["text"] for block in content_state["blocks"])
+        for engine in HTML_ENGINES:
+            html = HTML({**CONFIG, "engine": engine}).render(content_state)
+            self.assertEqual(BeautifulSoup(html, "html5lib").get_text(), expected)
+
+
 class TestCommandGroupingInvariants(unittest.TestCase):
     """Invariants of HTML.build_command_groups, independent of any engine.
 

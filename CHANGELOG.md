@@ -12,6 +12,8 @@
 
 - Require the `type`, `data`, and `mutability` keys in the `Entity` TypedDict, matching the Draft.js format. Entities without `mutability` are still tolerated at runtime, and rendered with a mutability of `None`.
 - Markdown links and images no longer require a `url` or `src`: missing or `None` destinations render as `[text]()` and `![alt]()` instead of raising an error.
+- Render blocks at a depth greater than zero even when no block at depth zero comes before them, and when their block type has no wrapper element. Such blocks — a list item's continuation paragraph, a heading, a blockquote, or a nested list starting above depth zero — were dropped from the output entirely, in every engine.
+- Nest a wrapper replacing another one of a different type at the same depth inside its parent wrapper, instead of leaving the new wrapper out of the document.
 
 ### Changed
 

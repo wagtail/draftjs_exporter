@@ -149,6 +149,29 @@ class WrapperState:
         """Return a string representation of the wrapper state."""
         return f"<WrapperState: {self.stack}>"
 
+    def options_for(self, block: Block) -> Options:
+        """Return the rendering options for the given block.
+
+        Parameters:
+            block: The block to look up.
+
+        Returns:
+            The options configured for the block's type.
+        """
+        type_ = block.get("type", "unstyled")
+        return Options.get(self.block_options, type_, BLOCK_TYPES.FALLBACK)
+
+    def has_wrapper(self, block: Block) -> bool:
+        """Return whether the given block is rendered inside a wrapper.
+
+        Parameters:
+            block: The block to look up.
+
+        Returns:
+            True if the block's options define a wrapper element.
+        """
+        return bool(self.options_for(block).wrapper)
+
     def element_for(
         self, block: Block, block_content: Element | list[Element]
     ) -> Element:
@@ -161,9 +184,8 @@ class WrapperState:
         Returns:
             The block element, nested inside any required wrapper elements.
         """
-        type_ = block.get("type", "unstyled")
         depth = block.get("depth", 0)
-        options = Options.get(self.block_options, type_, BLOCK_TYPES.FALLBACK)
+        options = self.options_for(block)
         props = dict(options.props)
         props["block"] = block
         props["blocks"] = self.blocks
@@ -230,31 +252,40 @@ class WrapperState:
             depth_levels = range(self.stack.length(), depth + 1)
 
             for level in depth_levels:
-                new_wrapper = Wrapper(level, options)
-
-                # Determine where to append the new wrapper.
-                if self.stack.head().last_child is None:
-                    # If there is no content in the current wrapper, we need
-                    # to add an intermediary node.
-                    props = dict(options.props)
-                    block: dict[str, Any] = {
-                        "type": options.type,
-                        "depth": depth,
-                        "data": {},
-                    }
-                    props["block"] = block
-                    props["blocks"] = self.blocks
-
-                    wrapper_parent = DOM.create_element(options.element, props, "")
-                    self.dom.append_child(self.stack.head().elt, wrapper_parent)
-                else:
-                    # Otherwise we can append at the end of the last child.
-                    wrapper_parent = self.stack.head().last_child
-
-                self.dom.append_child(wrapper_parent, new_wrapper.elt)
-
-                self.stack.append(new_wrapper)
+                self.push_wrapper(options, level)
         else:
             # Cut the stack to where it now stops, and add new wrapper.
             self.stack.slice(depth)
-            self.stack.append(Wrapper(depth, options))
+            self.push_wrapper(options, depth)
+
+    def push_wrapper(self, options: Options, depth: int) -> None:
+        """Add a wrapper at the given depth, nested inside the current one.
+
+        Parameters:
+            options: The block options defining the wrapper.
+            depth: The depth of the wrapper to add.
+        """
+        new_wrapper = Wrapper(depth, options)
+
+        # Determine where to append the new wrapper.
+        if self.stack.head().last_child is None:
+            # If there is no content in the current wrapper, we need
+            # to add an intermediary node.
+            props = dict(options.props)
+            block: dict[str, Any] = {
+                "type": options.type,
+                "depth": depth,
+                "data": {},
+            }
+            props["block"] = block
+            props["blocks"] = self.blocks
+
+            wrapper_parent = DOM.create_element(options.element, props, "")
+            self.dom.append_child(self.stack.head().elt, wrapper_parent)
+        else:
+            # Otherwise we can append at the end of the last child.
+            wrapper_parent = self.stack.head().last_child
+
+        self.dom.append_child(wrapper_parent, new_wrapper.elt)
+
+        self.stack.append(new_wrapper)

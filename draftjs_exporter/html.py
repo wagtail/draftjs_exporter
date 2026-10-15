@@ -85,23 +85,38 @@ class HTML:
             wrapper_state = WrapperState(self.block_options, blocks, dom)
             document = DOM.create_element()
             entity_map = content_state.get("entityMap", {})
-            min_depth = 0
+
+            # A run of wrapped blocks starting above depth 0 has no depth-0
+            # block to attach its top-level wrapper to the document, so the
+            # wrapper is held here until the run ends.
+            detached: Element | None = None
+            # Whether the open run's top-level wrapper is already in the document.
+            attached = False
 
             for block in blocks:
                 # Assume a depth of 0 if it's not specified, like Draft.js would.
                 depth = block.get("depth", 0)
+                wrapped = wrapper_state.has_wrapper(block)
+                nested = wrapped and depth > 0
+
+                if not nested and detached is not None:
+                    # A nested run is ending: its wrapper belongs before this block.
+                    dom.append_child(document, detached)
+                    detached = None
+
                 elt = self.render_block(block, entity_map, wrapper_state, dom)
 
-                if depth > min_depth:
-                    min_depth = depth
-
-                # At level 0, append the element to the document.
-                if depth == 0:
+                if nested:
+                    if not attached and wrapper_state.stack.length() != 0:
+                        detached = wrapper_state.stack.tail().elt
+                else:
+                    # Blocks without a wrapper, at any depth, are added to the
+                    # document directly.
                     dom.append_child(document, elt)
+                    attached = wrapped and depth == 0
 
-            # If there is no block at depth 0, we need to add the wrapper that contains the whole tree to the document.
-            if min_depth > 0 and wrapper_state.stack.length() != 0:
-                dom.append_child(document, wrapper_state.stack.tail().elt)
+            if detached is not None:
+                dom.append_child(document, detached)
 
             return dom.render(document)
 
