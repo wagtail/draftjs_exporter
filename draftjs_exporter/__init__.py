@@ -24,6 +24,7 @@ from draftjs_exporter.defaults import STYLE_MAP as STYLE_MAP
 from draftjs_exporter.defaults import code_block as code_block
 from draftjs_exporter.defaults import render_children as render_children
 from draftjs_exporter.dom import DOM as DOM
+from draftjs_exporter.engines.base import DOMEngine as DOMEngine
 from draftjs_exporter.entity_state import (
     ExporterEntityException as ExporterEntityException,
 )
@@ -104,6 +105,7 @@ __all__ = [
     "ExporterConfig",
     "ContentState",
     "DOM",
+    "DOMEngine",
     "ExporterEntityException",
     # Configs
     "HTML_CONFIG",

@@ -37,6 +37,11 @@ class TestTopLevelAPI(unittest.TestCase):
     def test_html_exporter_is_html(self):
         self.assertIs(HTMLExporter, HTML)
 
+    def test_dom_engine_reexport(self):
+        from draftjs_exporter.engines.base import DOMEngine as DOMEngineBase
+
+        self.assertIs(draftjs_exporter.DOMEngine, DOMEngineBase)
+
     def test_code_block_reexport(self):
         self.assertIs(code_block, defaults_code_block)
 
