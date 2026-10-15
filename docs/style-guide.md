@@ -87,9 +87,9 @@ Keep callouts to one or two sentences. Use them when the information directly af
 
 ## Formatting
 
-- Do not hard-wrap lines in prose. Let the editor handle wrapping. Prettier is configured with `proseWrap: "preserve"` and will not rewrap prose for you, so wrapping is a review-level concern rather than something `just format` fixes.
-- Match the formatting of the document you are editing: heading levels, list styles, sentence structure, and how code spans and links are used. When an existing document and this guide disagree, prefer the document's conventions.
-- Comments in code blocks follow the source code rule: avoid hard-wrapping, except at full stops or other natural punctuation breaks.
+- Do not hard-wrap lines in prose, including comments in code. Let the editor handle wrapping. Comments should be concise anyway; if it requires full sentences of explanation then it probably needs a rewrite or documentation in a design doc.
+- Break a line only at a full stop or another natural punctuation point, never mid-sentence to hit a column. Column-aligned tables and lists are not prose and stay as they are.
+- Match the formatting of the document you are editing: heading levels, list styles, sentence structure, and how code spans and links are used. When an existing document and this guide disagree, prefer the guide.
 
 ## Links
 

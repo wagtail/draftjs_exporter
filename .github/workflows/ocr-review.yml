@@ -1,8 +1,6 @@
 # OpenCodeReview - GitHub Actions PR Auto-Review Demo
 #
-# Demonstrates invoking the reusable action for both automatic PR review
-# (pull_request_target: opened/synchronize/reopened) and on-demand re-review
-# via comments starting with '/open-code-review' or '@open-code-review'.
+# Demonstrates invoking the reusable action for both automatic PR review (pull_request_target: opened/synchronize/reopened) and on-demand re-review via comments starting with '/open-code-review' or '@open-code-review'.
 #
 # Required secrets/vars (Settings -> Secrets and variables -> Actions):
 #   secret    OCR_LLM_URL            LLM API endpoint
@@ -10,24 +8,17 @@
 #   variable  OCR_LLM_MODEL          model name
 #   variable  OCR_LLM_USE_ANTHROPIC  'true' for Anthropic, 'false' for OpenAI-compatible
 #
-# For the full list of action inputs/outputs and the four comment-posting modes
-# (sticky / incremental), see action.yml at the repo root.
+# The review rules live in .opencodereview: README.md for the integration, rule.json for the rules file mapping, python.md for the guidelines. Follow the documentation style guide in docs/style-guide.md when editing this file or those.
+#
+# For the full list of action inputs/outputs and the four comment-posting modes (sticky / incremental), see action.yml at the repo root.
 
 name: OpenCodeReview PR Review
 
 # Conditional concurrency group.
 #
-# GitHub Actions evaluates concurrency BEFORE job-level if-conditions. With a
-# flat group (ocr-<pr_number>), every comment on the PR — even an unrelated
-# conversation reply that will be skipped — enters the same group and, because
-# cancel-in-progress is true, cancels any in-progress review. The result: a
-# single normal comment kills a running review, and you see "two runs, one
-# cancelled" in the Actions tab.
+# Actions evaluates concurrency BEFORE job-level if-conditions. So a flat group (ocr-<pr_number>) puts every comment on the PR, including replies the job will skip, into one group; with cancel-in-progress on, one normal comment kills a running review and you see "two runs, one cancelled" in the Actions tab.
 #
-# Fix: matching events (PR events + /open-code-review comments) share a per-PR
-# group so a new review cancels any stale one for the same PR. Non-matching
-# comments land in a unique noop-<run_id> group that can never collide with a
-# real review, so they are skipped instantly without disrupting anything.
+# Fix: matching events (PR events and /open-code-review comments) share a per-PR group so a new review cancels a stale one for the same PR. Non-matching comments land in a unique noop-<run_id> group that cannot collide with a real review, so they are skipped without disrupting anything.
 concurrency:
   group: >-
     ${{
@@ -53,12 +44,14 @@ concurrency:
     }}
   cancel-in-progress: true
 
+# ⚠️ pull_request_target, so secrets reach PRs from forks. That trust is safe only while this workflow never executes PR code: no step checks out or runs it, no PR value reaches a shell, and rules come from main. Break any of those and this becomes a pwn request vector. See the GitHub guide on securely using pull_request_target: https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target
 on: # zizmor: ignore[dangerous-triggers] -- never runs untrusted code, only reads it.
   pull_request_target:
     types: [opened, synchronize, reopened]
   issue_comment:
     types: [created]
 
+# Least privilege for a privileged event: contents: read covers the diff, pull-requests: write covers posting. No write token or cache is exposed to PR code, because none runs here.
 permissions:
   contents: read
   pull-requests: write
@@ -67,15 +60,7 @@ jobs:
   code-review:
     runs-on: ubuntu-26.04-arm
     timeout-minutes: 30
-    # Run on PR events, or on human-authored comments starting with trigger
-    # keywords. Bot comments are excluded as a safety net: GITHUB_TOKEN already
-    # suppresses events from bot-posted comments, but a PAT/App token would not.
-    # issue_comment triggers are further gated on author_association so only
-    # MEMBER/OWNER/COLLABORATOR users can spend LLM quota via re-review.
-    # Renovate PRs are excluded here rather than with branches-ignore on the
-    # trigger: pull_request_target branch filters match the PR's base branch
-    # (which renovate PRs always target, main), so they can never exclude the
-    # renovate/* head branch.
+    # Run on PR events, or on human comments starting with a trigger keyword. The bot-author check is a safety net: GITHUB_TOKEN already suppresses bot-posted comment events, a PAT or App token would not. Renovate PRs are excluded here rather than via branches-ignore on the trigger, because pull_request_target branch filters match the PR's base branch (renovate PRs always target main) and so can never exclude the renovate/* head branch.
     if: |
       (
         github.event_name == 'pull_request_target'
@@ -96,6 +81,7 @@ jobs:
         )
       )
     steps:
+      # pull_request_target already carries the refs in its payload, but an issue_comment payload has none, so this fills head_sha and title from the API instead. head_sha only names a git object to diff and title only reaches the prompt as background, so neither reaches a shell. The title is fork-controlled, so treat it as review-quality input, not trusted input.
       - name: Resolve PR context
         id: pr-context
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
@@ -112,10 +98,13 @@ jobs:
               core.setOutput('title', pullRequest.title);
             }
 
+      # Always read the rules from main, whatever the PR changes in .opencodereview, or a PR could edit them to steer its own review or switch off the checks that flag it.
+      #
+      # curl rather than actions/checkout because the reusable action runs its own checkout, which git-cleans GITHUB_WORKSPACE and would wipe a rules directory placed inside it. Fetching also keeps the rules out of any work tree, and a failure fails the job instead of falling back to the untrusted copy in the workspace.
       - name: Fetch trusted rules from base branch
         shell: bash
         run: |
-          # Download review rules from the base branch, never from the PR branch.
+          # Pinned to main, never the PR branch: the URL is what makes the rules trustworthy, not the host.
           REPO="${{ github.repository }}"
           RULES_DIR="${{ runner.temp }}/trusted-rules/.opencodereview"
           mkdir -p "$RULES_DIR"
@@ -127,15 +116,15 @@ jobs:
       - name: Run OpenCodeReview
         uses: alibaba/open-code-review@bccbc15f785269400735d5255540c231e6c02b6d # v1.12.9
         with:
+          # Passed as inputs, never interpolated into a shell, so the values cannot be read as commands.
           llm_url: ${{ secrets.OCR_LLM_URL }}
           llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
           llm_model: ${{ vars.OCR_LLM_MODEL }}
           llm_use_anthropic: ${{ vars.OCR_LLM_USE_ANTHROPIC }}
-          # Point at the trusted rules file fetched from the base branch.
           rule: ${{ runner.temp }}/trusted-rules/.opencodereview/rule.json
-          # For issue_comment triggers, pass the resolved refs; for
-          # pull_request_target the action resolves them from the event.
+          # Hard-coded, matching the rules fetch above: a PR opened against another branch must not pick its own base.
           base_ref: main
+          # Set only for issue_comment, by the step above; under pull_request_target the action reads it from the event, so empty is deliberate.
           head_sha: ${{ steps.pr-context.outputs.head_sha }}
           # Particularly useful when PR titles follow semantic conventions (e.g., feat(auth): add OAuth2 support).
           background: ${{ steps.pr-context.outputs.title || github.event.pull_request.title }}

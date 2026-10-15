@@ -88,7 +88,7 @@ We follow [PEP 8](https://peps.python.org/pep-0008/) for Python code style, enfo
 - **Performance**: core classes should use `__slots__` to reduce memory overhead.
 - **Imports**: organized automatically by `ruff` (isort rules in `pyproject.toml`).
 - **Error handling**: use specific exception types; avoid bare `except:` clauses (BLE rules).
-- **Comments and docs**: avoid hard-wrapping lines, except at full stops, or other punctuation like commas if must be.
+- **Comments and docs**: do not hard-wrap lines. Break only at a full stop or other natural punctuation point; see the [documentation style guide](style-guide.md#formatting).
 
 Additionally, we follow:
 
