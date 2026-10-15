@@ -60,6 +60,17 @@ class TestDOM(unittest.TestCase):
         with self.assertRaises(ImportError):
             DOM.use("test")
 
+    def test_use_shorthand(self):
+        DOM.use("string")
+        self.assertEqual(DOM._dom(), DOMString)
+
+    def test_engine_context_manager_shorthand(self):
+        DOM.use("html5lib")
+        self.assertEqual(DOM._dom(), DOM_HTML5LIB)
+        with DOM.engine("string"):
+            self.assertEqual(DOM._dom(), DOMString)
+        self.assertEqual(DOM._dom(), DOM_HTML5LIB)
+
     def test_create_element(self):
         self.assertEqual(
             DOM.render_debug(DOM.create_element("p", {"class": "intro"}, "Test test")),

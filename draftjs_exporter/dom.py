@@ -36,6 +36,35 @@ class DOM:
     STRING_COMPAT = "draftjs_exporter.engines.string_compat.DOMStringCompat"
     """Identifier for the string compatibility DOM engine."""
 
+    _BUILTIN_ENGINES = {
+        "html5lib": HTML5LIB,
+        "lxml": LXML,
+        "markdown": MARKDOWN,
+        "string": STRING,
+        "string_compat": STRING_COMPAT,
+    }
+    """Short names accepted as engine identifiers, mapped to their dotted paths."""
+
+    @classmethod
+    def _resolve_engine(cls, engine: str) -> type[DOMEngine]:
+        """Resolve an engine identifier to the engine class.
+
+        Accepts the short names of the built-in engines (``"string"``,
+        ``"lxml"``, ...), or a dotted import path for any other engine.
+
+        Parameters:
+            engine: A short name or dotted import path of a DOM engine.
+
+        Returns:
+            The resolved engine class.
+
+        Raises:
+            ImportError: If the name is not a built-in engine and not a
+                valid dotted import path.
+        """
+        dotted_path = cls._BUILTIN_ENGINES.get(engine, engine)
+        return cast(type[DOMEngine], import_string(dotted_path))
+
     @staticmethod
     def camel_to_dash(camel_cased_str: str) -> str:
         """Convert a camelCase string to a dashed-case attribute name."""
@@ -58,9 +87,7 @@ class DOM:
         try:
             resolved = _engine_cache[engine]
         except KeyError:
-            resolved = _engine_cache[engine] = cast(
-                type[DOMEngine], import_string(engine)
-            )
+            resolved = _engine_cache[engine] = cls._resolve_engine(engine)
         _engine_var.set(resolved)
 
     @staticmethod
@@ -70,9 +97,7 @@ class DOM:
         try:
             resolved = _engine_cache[engine]
         except KeyError:
-            resolved = _engine_cache[engine] = cast(
-                type[DOMEngine], import_string(engine)
-            )
+            resolved = _engine_cache[engine] = DOM._resolve_engine(engine)
         token = _engine_var.set(resolved)
         try:
             yield

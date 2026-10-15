@@ -196,7 +196,7 @@ Engines are pluggable serialization strategies selected at runtime via the `engi
 
 **Engines are not guaranteed to produce byte-identical output.** Real differences: attribute ordering (alphabetical for `lxml`/`html5lib`, insertion order for `string`), quote escaping in attributes, attribute-name validation. Expect minor output differences when switching engines — re-check tests that compare rendered HTML exactly. See [troubleshooting: exporter behavior](https://wagtail.github.io/draftjs_exporter/troubleshooting/#exporter-behavior).
 
-To build a custom engine, subclass `DOMEngine` (`draftjs_exporter.engines.base`) and implement `create_tag`, `append_child`, `render`. Reference it by dotted path: `"engine": "my_project.example.DOMListTree"`. See [custom engines](https://wagtail.github.io/draftjs_exporter/custom-engines/).
+To build a custom engine, subclass `DOMEngine` and implement `create_tag`, `append_child`, `render`. Reference it by dotted path: `"engine": "my_project.example.DOMListTree"`. Built-in engines also accept short names: `"engine": "string"` etc. See [custom engines](https://wagtail.github.io/draftjs_exporter/custom-engines/).
 
 ## Markdown
 
@@ -329,7 +329,7 @@ All imported from `draftjs_exporter` directly:
 - **Filter**: `ContentStateFilter(rules).apply(content_state)`, `FilterRule` (`type`: `block`/`inline_style`/`entity`; `match`; `action`: `remove`/`keep`/`demote`/callable).
 - **Errors**: `MarkdownParseError` (with `.line` and `.message`).
 - **Type aliases**: `Props`, `Element`, `Component`, `ContentState`, `Block`, `Entity`, `EntityMap`, `EntityRange`, `InlineStyleRange`, `RenderableConfig`, `ExporterConfig`, plus internals (`CompositeDecorators`, `ConfigMap`, `Decorator`, `EntityKey`, `Mutability`, `RenderableType`, `Tag`).
-- **`DOMEngine`** — abstract base for custom engines. Import from `draftjs_exporter.engines.base` (not re-exported at top level).
+- **`DOMEngine`** — abstract base for custom engines, re-exported at the top level.
 
 For every `BLOCK_TYPES.*`, `INLINE_STYLES.*`, `ENTITY_TYPES.*` value, see [the API reference](https://wagtail.github.io/draftjs_exporter/api/) or [`constants.py`](https://github.com/wagtail/draftjs_exporter/blob/main/draftjs_exporter/constants.py).
 

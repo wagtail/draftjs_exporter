@@ -8,6 +8,7 @@
 
 - Re-export `md_escape_text` and `md_escape_link_destination` from the package root.
 - Add `md_blockquote` as a reusable blockquote component; it is now the default `blockquote` block in `MARKDOWN_CONFIG` and `build_markdown_config()`.
+- Re-export `DOMEngine` from the package root, so custom engines can be defined with `from draftjs_exporter import DOMEngine` instead of importing from `draftjs_exporter.engines.base`.
 
 ### Fixed
 
@@ -18,6 +19,7 @@
 
 ### Changed
 
+- Accept short names of the built-in engines in the `engine` config and `DOM.use()` / `DOM.engine()`: `"string"`, `"string_compat"`, `"html5lib"`, `"lxml"`, and `"markdown"`. Dotted import paths keep working for custom engines; unknown names still raise `ImportError`.
 - Rename `EntityException` to `ExporterEntityException`, keeping `EntityException` as a compatibility alias.
 - Rename the Markdown escaping helpers for user text (`escape_text` → `md_escape_text`) and for link destinations (`escape_link_destination` → `md_escape_link_destination`). This is a breaking change within the experimental Markdown support; import them from `draftjs_exporter` under their new names.
 - Using the html5lib engine without BeautifulSoup installed now fails with a clear import error rather than a `NameError` at render time.

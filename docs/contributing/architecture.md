@@ -90,7 +90,7 @@ A block only has to be a mapping. Every other key has a default, and unknown key
 
 ## Engine system
 
-The exporter uses a **Strategy pattern** for output generation. All engines implement the `DOMEngine` interface (five static methods: `create_tag`, `parse_html`, `append_child`, `render`, `render_debug`). The `DOM` class delegates to the active engine, selected at runtime via dotted-path strings stored as class constants (`DOM.STRING`, `DOM.HTML5LIB`, `DOM.LXML`, `DOM.MARKDOWN`, `DOM.STRING_COMPAT`). Engine selection is thread-safe through a `ContextVar`.
+The exporter uses a **Strategy pattern** for output generation. All engines implement the `DOMEngine` interface (five static methods: `create_tag`, `parse_html`, `append_child`, `render`, `render_debug`). The `DOM` class delegates to the active engine, selected at runtime via strings stored as class constants (`DOM.STRING`, `DOM.HTML5LIB`, `DOM.LXML`, `DOM.MARKDOWN`, `DOM.STRING_COMPAT`), short names of the built-in engines (`"string"`), or dotted import paths for custom engines. Engine selection is thread-safe through a `ContextVar`.
 
 Engines share the same interface and general behavior, but **are not guaranteed to produce byte-identical output** for the same input. Each engine delegates serialization to a different underlying library (or none, for `string`), so real, accepted differences exist.
 
