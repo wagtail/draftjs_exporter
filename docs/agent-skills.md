@@ -53,25 +53,24 @@ Five open-weight models (DeepSeek V4.1 Flash, DeepSeek V4 Flash Speed, GLM 5.3, 
 
 ### Skill improvements
 
-How much the skill changes things, compared with the model answering from memory (no docs, no skill). Pass rate is the change in points; duration and cost are the change relative to the baseline, as a percentage.
+How much the skill changes things, compared with the model answering from memory (no docs, no skill). Each cell shows the baseline value, the value with the skill, and the change in parentheses. Pass rate is in points, duration in seconds per answer, cost in US cents per answer.
 
-| Model                   | Pass rate | Duration | Cost  |
-| ----------------------- | --------- | -------- | ----- |
-| Haiku 5.5               | +55.9 pts | −29%     | +69%  |
-| Sonnet 5.5              | +42.9 pts | −32%     | +100% |
-| Opus 5.5                | +16.7 pts | −51%     | +26%  |
-| Fable 5.1               | +36.2 pts | −69%     | −21%  |
-| DeepSeek V4.1 Flash     | +62.9 pts | −66%     | −71%  |
-| DeepSeek V4 Flash Speed | +61.9 pts | +85%     | +614% |
-| GLM 5.3                 | +59.0 pts | −64%     | −62%  |
-| GLM 5.3 Flash           | +47.6 pts | −73%     | −68%  |
-| Mimo V2.6 Pro           | +78.1 pts | −57%     | −54%  |
+| Model               | Pass rate | Duration              | Cost                 |
+| ------------------- | --------- | --------------------- | -------------------- |
+| Haiku 5.5           | +55.9 pts | 13.2s → 9.4s (−29%)   | 0.16¢ → 0.27¢ (+69%) |
+| Sonnet 5.5          | +42.9 pts | 13.1s → 8.9s (−32%)   | 1.6¢ → 3.2¢ (+100%)  |
+| Opus 5.5            | +16.7 pts | 18.9s → 9.3s (−51%)   | 3.8¢ → 4.8¢ (+26%)   |
+| Fable 5.1           | +36.2 pts | 44.0s → 13.5s (−69%)  | 25.1¢ → 19.8¢ (−21%) |
+| DeepSeek V4.1 Flash | +62.9 pts | 66.5s → 22.3s (−66%)  | 0.18¢ → 0.05¢ (−71%) |
+| GLM 5.3             | +59.0 pts | 180.3s → 64.5s (−64%) | 3.0¢ → 1.1¢ (−62%)   |
+| GLM 5.3 Flash       | +47.6 pts | 130.1s → 34.9s (−73%) | 0.22¢ → 0.07¢ (−68%) |
+| Mimo V2.6 Pro       | +78.1 pts | 98.4s → 42.7s (−57%)  | 0.67¢ → 0.31¢ (−53%) |
 
-The biggest pass-rate gains are on the weakest baselines: Haiku and the open-weight models gain 48 to 78 points, while Opus, already strong on its own, gains the least. The absolute figures tell that story more honestly than percentages would, since the same finish line looks like a much larger relative jump from a low start.
+The biggest pass-rate gains are on the weakest baselines: Haiku and the open-weight models gain 48 to 78 points, while Opus, already strong on its own, gains the least.
 
-The open-weight costs are computed from each model's list rates on [models.dev](https://models.dev/) applied to the tokens the eval recorded. Without the skill these models spend most of their budget on reasoning tokens, so the skill usually costs less, not more. The one exception, DeepSeek V4 Flash Speed, has no reasoning lane and its baseline was already so cheap that the skill's larger context is a large relative increase on a very small base.
+The open-weight costs are computed from each model's list rates on [models.dev](https://models.dev/) applied to the tokens the eval recorded. Without the skill these models spend most of their budget on reasoning tokens, so the skill usually costs less, not more.
 
-The skill is usually faster even though it costs a few extra turns to load, because the model stops guessing and spends fewer tokens. The exception is DeepSeek V4 Flash Speed, whose baseline was already very quick but scored low. On Fable and most of the open-weight models the skill is also cheaper, because the no-skill answers spend far more on reasoning or run much longer.
+The skill is usually faster even though it costs a few extra turns to load, because the model stops guessing and spends fewer tokens. On Fable and most of the open-weight models the skill is also cheaper, because the no-skill answers spend far more on reasoning or run much longer.
 
 What the results suggest in practice:
 
