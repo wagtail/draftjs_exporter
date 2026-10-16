@@ -5,8 +5,6 @@
 # Required secrets/vars (Settings -> Secrets and variables -> Actions):
 #   secret    OCR_LLM_URL            LLM API endpoint
 #   secret    OCR_LLM_AUTH_TOKEN     LLM auth token (mapped to OCR_LLM_TOKEN)
-#   variable  OCR_LLM_MODEL          model name
-#   variable  OCR_LLM_USE_ANTHROPIC  'true' for Anthropic, 'false' for OpenAI-compatible
 #
 # The review rules live in .opencodereview: README.md for the integration, rule.json for the rules file mapping, python.md for the guidelines. Follow the documentation style guide in docs/style-guide.md when editing this file or those.
 #
@@ -119,8 +117,8 @@ jobs:
           # Passed as inputs, never interpolated into a shell, so the values cannot be read as commands.
           llm_url: ${{ secrets.OCR_LLM_URL }}
           llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
-          llm_model: ${{ vars.OCR_LLM_MODEL }}
-          llm_use_anthropic: ${{ vars.OCR_LLM_USE_ANTHROPIC }}
+          llm_model: MiniMax-M3
+          llm_use_anthropic: false
           rule: ${{ runner.temp }}/trusted-rules/.opencodereview/rule.json
           # Hard-coded, matching the rules fetch above: a PR opened against another branch must not pick its own base.
           base_ref: main
