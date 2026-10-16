@@ -55,19 +55,21 @@ Five open-weight models (DeepSeek V4.1 Flash, DeepSeek V4 Flash Speed, GLM 5.3, 
 
 How much the skill changes things, compared with the model answering from memory (no docs, no skill). Pass rate is the change in points; speed is the change in seconds per answer; cost is the change in US cents per answer.
 
-| Model                   | Pass rate | Speed   | Cost         |
-| ----------------------- | --------- | ------- | ------------ |
-| Haiku 5.5               | +55.9 pts | −3.8s   | +0.11¢       |
-| Sonnet 5.5              | +42.9 pts | −4.2s   | +1.6¢        |
-| Opus 5.5                | +16.7 pts | −9.6s   | +1.0¢        |
-| Fable 5.1               | +36.2 pts | −30.5s  | −5.3¢        |
-| DeepSeek V4.1 Flash     | +62.9 pts | −44.2s  | not measured |
-| DeepSeek V4 Flash Speed | +61.9 pts | +4.7s   | not measured |
-| GLM 5.3                 | +59.0 pts | −115.8s | not measured |
-| GLM 5.3 Flash           | +47.6 pts | −95.2s  | not measured |
-| Mimo V2.6 Pro           | +78.1 pts | −55.7s  | not measured |
+| Model                   | Pass rate | Speed   | Cost   |
+| ----------------------- | --------- | ------- | ------ |
+| Haiku 5.5               | +55.9 pts | −3.8s   | +0.11¢ |
+| Sonnet 5.5              | +42.9 pts | −4.2s   | +1.6¢  |
+| Opus 5.5                | +16.7 pts | −9.6s   | +1.0¢  |
+| Fable 5.1               | +36.2 pts | −30.5s  | −5.3¢  |
+| DeepSeek V4.1 Flash     | +62.9 pts | −44.2s  | −0.13¢ |
+| DeepSeek V4 Flash Speed | +61.9 pts | +4.7s   | +0.02¢ |
+| GLM 5.3                 | +59.0 pts | −115.8s | −1.89¢ |
+| GLM 5.3 Flash           | +47.6 pts | −95.2s  | −0.16¢ |
+| Mimo V2.6 Pro           | +78.1 pts | −55.7s  | −0.36¢ |
 
-The skill is usually faster even though it costs a few extra turns to load, because the model stops guessing and spends fewer tokens. The exception is DeepSeek V4 Flash Speed, whose baseline was already very quick but scored low. On Fable the skill is actually cheaper, because its no-skill answers are about five times longer. The open-weight eval did not record per-answer cost, so those rows leave it blank.
+The open-weight costs are computed from each model's list rates on [models.dev](https://models.dev/) applied to the tokens the eval recorded. They are the same order of magnitude as the Claude figures because the open-weight rates are much lower: without the skill these models spend most of their budget on reasoning tokens, so the skill usually costs less, not more. The one exception, DeepSeek V4 Flash Speed, has no reasoning lane and its baseline was already cheap.
+
+The skill is usually faster even though it costs a few extra turns to load, because the model stops guessing and spends fewer tokens. The exception is DeepSeek V4 Flash Speed, whose baseline was already very quick but scored low. On Fable and most of the open-weight models the skill is also cheaper, because the no-skill answers spend far more on reasoning or run much longer.
 
 What the results suggest in practice:
 

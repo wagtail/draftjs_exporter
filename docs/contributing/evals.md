@@ -78,6 +78,7 @@ just eval-view                       # dashboard for the latest run
 - **Compare arms at the same repeat count.** A 7-repeat mean and a 3-repeat mean are not directly comparable.
 - **The cases flatter the skill.** Many were written from the skill and docs rather than from real user questions, so a skill win is partly a win on coverage of the material the skill was written from.
 - **One library version, one harness.** Time and token figures come from one machine running several answers in parallel; they are for comparing arms, not absolute benchmarks.
+- **Cost is derived, not measured.** Provider-reported cost exists for the Claude eval. Open-weight costs are computed by applying each model's list rates from [models.dev](https://models.dev/) to the tokens the eval recorded, so they move with those listed rates rather than with what the API actually billed.
 - **A lone rubric failure is noise** until a repeat reproduces it; the rubric grader occasionally answers in prose instead of JSON.
 - **A provider error is not a model failure.** The configs assert non-empty output first, so an empty answer is labelled rather than graded as wrong.
 
