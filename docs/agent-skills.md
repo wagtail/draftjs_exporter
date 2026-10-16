@@ -53,18 +53,18 @@ Five open-weight models (DeepSeek V4.1 Flash, DeepSeek V4 Flash Speed, GLM 5.3, 
 
 ### Skill improvements
 
-How much the skill changes things, compared with the model answering from memory (no docs, no skill). Each cell shows the baseline value, the value with the skill, and the change in parentheses. Pass rate is in points, duration in seconds per answer, cost in US cents per answer, energy in watt-hours.
+How much the skill changes things, compared with the model answering from memory (no docs, no skill). Each cell shows the baseline value, the value with the skill, and the change in parentheses. Pass rate is in points, duration in seconds per answer, cost in US cents per answer, energy in watt-hours per answer.
 
-| Model               | Pass rate | Duration              | Cost                 | Energy (Wh)                  |
-| ------------------- | --------- | --------------------- | -------------------- | ---------------------------- |
-| Haiku 5.5           | +55.9 pts | 13.2s → 9.4s (−29%)   | 0.16¢ → 0.27¢ (+69%) | –                            |
-| Sonnet 5.5          | +42.9 pts | 13.1s → 8.9s (−32%)   | 1.6¢ → 3.2¢ (+100%)  | –                            |
-| Opus 5.5            | +16.7 pts | 18.9s → 9.3s (−51%)   | 3.8¢ → 4.8¢ (+26%)   | –                            |
-| Fable 5.1           | +36.2 pts | 44.0s → 13.5s (−69%)  | 25.1¢ → 19.8¢ (−21%) | –                            |
-| DeepSeek V4.1 Flash | +62.9 pts | 66.5s → 22.3s (−66%)  | 0.18¢ → 0.05¢ (−71%) | 23.28 Wh → 22.54 Wh (−3%)    |
-| GLM 5.3             | +59.0 pts | 180.3s → 64.5s (−64%) | 3.0¢ → 1.1¢ (−62%)   | 753.69 Wh → 396.24 Wh (−47%) |
-| GLM 5.3 Flash       | +47.6 pts | 130.1s → 34.9s (−73%) | 0.22¢ → 0.07¢ (−68%) | 55.70 Wh → 35.35 Wh (−37%)   |
-| Mimo V2.6 Pro       | +78.1 pts | 98.4s → 42.7s (−57%)  | 0.67¢ → 0.31¢ (−53%) | 292.96 Wh → 264.44 Wh (−10%) |
+| Model               | Pass rate | Duration              | Cost                 | Energy (Wh/answer)       |
+| ------------------- | --------- | --------------------- | -------------------- | ------------------------ |
+| Haiku 5.5           | +55.9 pts | 13.2s → 9.4s (−29%)   | 0.16¢ → 0.27¢ (+69%) | –                        |
+| Sonnet 5.5          | +42.9 pts | 13.1s → 8.9s (−32%)   | 1.6¢ → 3.2¢ (+100%)  | –                        |
+| Opus 5.5            | +16.7 pts | 18.9s → 9.3s (−51%)   | 3.8¢ → 4.8¢ (+26%)   | –                        |
+| Fable 5.1           | +36.2 pts | 44.0s → 13.5s (−69%)  | 25.1¢ → 19.8¢ (−21%) | –                        |
+| DeepSeek V4.1 Flash | +62.9 pts | 66.5s → 22.3s (−66%)  | 0.18¢ → 0.05¢ (−71%) | 0.22 Wh → 0.21 Wh (−3%)  |
+| GLM 5.3             | +59.0 pts | 180.3s → 64.5s (−64%) | 3.0¢ → 1.1¢ (−62%)   | 7.18 Wh → 3.77 Wh (−47%) |
+| GLM 5.3 Flash       | +47.6 pts | 130.1s → 34.9s (−73%) | 0.22¢ → 0.07¢ (−68%) | 0.53 Wh → 0.34 Wh (−37%) |
+| Mimo V2.6 Pro       | +78.1 pts | 98.4s → 42.7s (−57%)  | 0.67¢ → 0.31¢ (−53%) | 2.79 Wh → 2.52 Wh (−10%) |
 
 The biggest pass-rate gains are on the weakest baselines: Haiku and the open-weight models gain 48 to 78 points, while Opus, already strong on its own, gains the least.
 
@@ -72,7 +72,7 @@ The open-weight costs are computed from each model's list rates on [models.dev](
 
 The skill is usually faster even though it costs a few extra turns to load, because the model stops guessing and spends fewer tokens. On Fable and most of the open-weight models the skill is also cheaper, because the no-skill answers spend far more on reasoning or run much longer.
 
-Energy was measured per request against the provider's own accounting, for the four open-weight models only. It tracks duration more closely than cost: the longest-running, most reasoning-heavy models use the most, and GLM 5.3 more than halves its energy with the skill. Energy is not reported for the Claude models.
+Energy is measured per arm over three repeats of the 35 cases (105 answers), against the provider's own accounting, for the four open-weight models only. It tracks duration more closely than cost: the longest-running, most reasoning-heavy models use the most, and GLM 5.3 more than halves its energy with the skill. Energy is not reported for the Claude models.
 
 What the results suggest in practice:
 
