@@ -34,21 +34,40 @@ These figures are a snapshot from October 2026, against `draftjs_exporter` 7.1.0
 
 Pass rate on Claude models, skill versus no reference at all:
 
-| Arm                     | Haiku 5.5 | Sonnet 5.5 | Opus 5.5 | Fable 5.1 |
-| ----------------------- | --------- | ---------- | -------- | --------- |
-| No reference (baseline) | 33.5%     | 49.0%      | 77.1%    | 58.1%     |
-| Docs only               | 66.1%     | 66.1%      | 91.8%    | 79.0%     |
-| Skill only              | 89.4%     | 91.8%      | 93.9%    | 94.3%     |
-| Docs + skill            | 90.6%     | 94.3%      | 95.9%    | 93.3%     |
+| Model      | No docs (baseline) | Docs only | Skill only | Docs + skill |
+| ---------- | ------------------ | --------- | ---------- | ------------ |
+| Haiku 5.5  | 33.5%              | 66.1%     | 89.4%      | 90.6%        |
+| Sonnet 5.5 | 49.0%              | 66.1%     | 91.8%      | 94.3%        |
+| Opus 5.5   | 77.1%              | 91.8%     | 93.9%      | 95.9%        |
+| Fable 5.1  | 58.1%              | 79.0%     | 94.3%      | 93.3%        |
 
 Five open-weight models (DeepSeek V4.1 Flash, DeepSeek V4 Flash Speed, GLM 5.3, GLM 5.3 Flash, Mimo V2.6 Pro) showed the same pattern, with larger uplifts over their weaker baselines:
 
-| Arm                     | DeepSeek V4.1 Flash | DeepSeek V4 Flash Speed | GLM 5.3 | GLM 5.3 Flash | Mimo V2.6 Pro |
-| ----------------------- | ------------------- | ----------------------- | ------- | ------------- | ------------- |
-| No reference (baseline) | 24.8%               | 12.4%                   | 8.6%    | 26.7%         | 10.5%         |
-| Docs only               | 78.1%               | 74.3%                   | 76.2%   | 82.9%         | 82.9%         |
-| Skill only              | 87.6%               | 74.3%                   | 67.6%   | 74.3%         | 88.6%         |
-| Docs + skill            | 89.5%               | 84.8%                   | 85.7%   | 91.4%         | 93.3%         |
+| Model                   | No docs (baseline) | Docs only | Skill only | Docs + skill |
+| ----------------------- | ------------------ | --------- | ---------- | ------------ |
+| DeepSeek V4.1 Flash     | 24.8%              | 78.1%     | 87.6%      | 89.5%        |
+| DeepSeek V4 Flash Speed | 12.4%              | 74.3%     | 74.3%      | 84.8%        |
+| GLM 5.3                 | 8.6%               | 76.2%     | 67.6%      | 85.7%        |
+| GLM 5.3 Flash           | 26.7%              | 82.9%     | 74.3%      | 91.4%        |
+| Mimo V2.6 Pro           | 10.5%              | 82.9%     | 88.6%      | 93.3%        |
+
+### Skill improvements
+
+How much the skill changes things, compared with the model answering from memory (no docs, no skill). Pass rate is the change in points; speed is the change in seconds per answer; cost is the change in US cents per answer.
+
+| Model                   | Pass rate | Speed   | Cost         |
+| ----------------------- | --------- | ------- | ------------ |
+| Haiku 5.5               | +55.9 pts | −3.8s   | +0.11¢       |
+| Sonnet 5.5              | +42.9 pts | −4.2s   | +1.6¢        |
+| Opus 5.5                | +16.7 pts | −9.6s   | +1.0¢        |
+| Fable 5.1               | +36.2 pts | −30.5s  | −5.3¢        |
+| DeepSeek V4.1 Flash     | +62.9 pts | −44.2s  | not measured |
+| DeepSeek V4 Flash Speed | +61.9 pts | +4.7s   | not measured |
+| GLM 5.3                 | +59.0 pts | −115.8s | not measured |
+| GLM 5.3 Flash           | +47.6 pts | −95.2s  | not measured |
+| Mimo V2.6 Pro           | +78.1 pts | −55.7s  | not measured |
+
+The skill is usually faster even though it costs a few extra turns to load, because the model stops guessing and spends fewer tokens. The exception is DeepSeek V4 Flash Speed, whose baseline was already very quick but scored low. On Fable the skill is actually cheaper, because its no-skill answers are about five times longer. The open-weight eval did not record per-answer cost, so those rows leave it blank.
 
 What the results suggest in practice:
 
