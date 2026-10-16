@@ -79,6 +79,7 @@ just eval-view                       # dashboard for the latest run
 - **The cases flatter the skill.** Many were written from the skill and docs rather than from real user questions, so a skill win is partly a win on coverage of the material the skill was written from.
 - **One library version, one harness.** Time and token figures come from one machine running several answers in parallel; they are for comparing arms, not absolute benchmarks.
 - **Cost is derived, not measured.** Provider-reported cost exists for the Claude eval. Open-weight costs are computed by applying each model's list rates from [models.dev](https://models.dev/) to the tokens the eval recorded, so they move with those listed rates rather than with what the API actually billed.
+- **Energy is measured separately from the eval.** The provider exposes account-wide energy totals but not per-model figures, so the per-request watt-hours come from isolated measurement: with the account idle, snapshot the energy endpoint, send a handful of `draftjs_exporter`-style requests to one model, snapshot again. That is one short measurement session per model, and a single-turn request is lighter than the eval's multi-turn agent runs, so treat the relative ordering as the signal, not the absolute figures.
 - **A lone rubric failure is noise** until a repeat reproduces it; the rubric grader occasionally answers in prose instead of JSON.
 - **A provider error is not a model failure.** The configs assert non-empty output first, so an empty answer is labelled rather than graded as wrong.
 
