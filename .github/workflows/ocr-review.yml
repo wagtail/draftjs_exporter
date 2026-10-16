@@ -98,13 +98,17 @@ jobs:
 
       # Always read the rules from main, whatever the PR changes in .opencodereview, or a PR could edit them to steer its own review or switch off the checks that flag it.
       #
-      # curl rather than actions/checkout because the reusable action runs its own checkout, which git-cleans GITHUB_WORKSPACE and would wipe a rules directory placed inside it. Fetching also keeps the rules out of any work tree, and a failure fails the job instead of falling back to the untrusted copy in the workspace.
+      # Fetched over the checkout's own .opencodereview/ rather than to a directory of our own, because OCR resolves a rule entry's file value against different bases depending on how rule.json is reached: the repo root for the project layer at <repoDir>/.opencodereview/rule.json, but rule.json's own directory when the file is passed through the action's rule input. Overwriting in place keeps one base in play, so the ".opencodereview/python.md" value in the committed file stays correct, and the read stays inside the repo so OCR's own traversal confinement still applies.
+      #
+      # The action checks out the base branch (main), not the PR head, so this overwrite replaces main's rules with main's rules; it only ever discards a PR's tampered copy.
+      #
+      # curl rather than trusting the checkout alone so the rules are pinned to main by URL, and a failure fails the job rather than silently falling back to whatever the workspace holds.
       - name: Fetch trusted rules from base branch
         shell: bash
         run: |
           # Pinned to main, never the PR branch: the URL is what makes the rules trustworthy, not the host.
           REPO="${{ github.repository }}"
-          RULES_DIR="${{ runner.temp }}/trusted-rules/.opencodereview"
+          RULES_DIR="${{ github.workspace }}/.opencodereview"
           mkdir -p "$RULES_DIR"
           for file in rule.json python.md README.md; do
             curl -sSfL -o "$RULES_DIR/$file" \
@@ -119,7 +123,7 @@ jobs:
           llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
           llm_model: MiniMax-M3
           llm_use_anthropic: false
-          rule: ${{ runner.temp }}/trusted-rules/.opencodereview/rule.json
+          # No rule input: the rules fetched above land at <repoDir>/.opencodereview/, which OCR loads as the project layer by itself. Passing rule.json through the rule input would resolve its "rule" value against the rule file's directory instead, a different base that silently drops the guidelines.
           # Hard-coded, matching the rules fetch above: a PR opened against another branch must not pick its own base.
           base_ref: main
           # Set only for issue_comment, by the step above; under pull_request_target the action reads it from the event, so empty is deliberate.
