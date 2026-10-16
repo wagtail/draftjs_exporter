@@ -4,33 +4,36 @@
 
 ## [Unreleased]
 
+## [v7.2.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v7.2.0)
+
 ### Added
 
 - Re-export `md_escape_text` and `md_escape_link_destination` from the package root.
-- Add `md_blockquote` as a reusable blockquote component; it is now the default `blockquote` block in `MARKDOWN_CONFIG` and `build_markdown_config()`.
-- Re-export `DOMEngine` from the package root, so custom engines can be defined with `from draftjs_exporter import DOMEngine` instead of importing from `draftjs_exporter.engines.base`.
+- Add `md_blockquote` as a reusable blockquote component, used in the built-in markdown config.
+- Re-export `DOMEngine` from the package root, to simplify creating custom engines.
 
 ### Fixed
 
-- Require the `type`, `data`, and `mutability` keys in the `Entity` TypedDict, matching the Draft.js format. Entities without `mutability` are still tolerated at runtime, and rendered with a mutability of `None`.
+- Require the `type`, `data`, and `mutability` keys in the `Entity` TypedDict like they are in runtime code.
 - Markdown links and images no longer require a `url` or `src`: missing or `None` destinations render as `[text]()` and `![alt]()` instead of raising an error.
-- Render blocks at a depth greater than zero even when no block at depth zero comes before them, and when their block type has no wrapper element. Such blocks — a list item's continuation paragraph, a heading, a blockquote, or a nested list starting above depth zero — were dropped from the output entirely, in every engine.
+- Render blocks at a depth greater than zero even when no block at depth zero comes before them, and when their block type has no wrapper element.
 - Nest a wrapper replacing another one of a different type at the same depth inside its parent wrapper, instead of leaving the new wrapper out of the document.
+- Accept short names of the built-in engines in the `engine` config and `DOM.use()` / `DOM.engine()`: `"string"`, `"string_compat"`, `"html5lib"`, `"lxml"`, and `"markdown"`. Dotted import paths keep working for custom engines.
 
 ### Changed
 
-- Accept short names of the built-in engines in the `engine` config and `DOM.use()` / `DOM.engine()`: `"string"`, `"string_compat"`, `"html5lib"`, `"lxml"`, and `"markdown"`. Dotted import paths keep working for custom engines; unknown names still raise `ImportError`.
 - Raise the minimum supported Python version to 3.11: Python 3.10 is no longer supported, and Python 3.15 is now officially supported.
 - Raise the lower bound of the optional `lxml` dependency to `>=4.9.4`, the first release with pre-built wheels for Python 3.11 onwards.
 - Rename `EntityException` to `ExporterEntityException`, keeping `EntityException` as a compatibility alias.
-- Rename the Markdown escaping helpers for user text (`escape_text` → `md_escape_text`) and for link destinations (`escape_link_destination` → `md_escape_link_destination`). This is a breaking change within the experimental Markdown support; import them from `draftjs_exporter` under their new names.
+- Rename the Markdown escaping helpers for user text (`escape_text` → `md_escape_text`) and for link destinations (`escape_link_destination` → `md_escape_link_destination`).
 - Using the html5lib engine without BeautifulSoup installed now fails with a clear import error rather than a `NameError` at render time.
 - Annotate inferred-`Any` attributes and empty containers in `WrapperState` and the Markdown resolvers, and document return types of `__init__` methods in the string and Markdown engines.
-- Nest Markdown list items to the content column of the item they are nested under, which depends on each ancestor's marker width (`- `, `1. `, `10. `), instead of a fixed two spaces per depth. Nested ordered lists under an ordered list, or under a multi-digit item, no longer collapse into separate top-level lists.
-- Keep Markdown ordered list numbering consistent across nested lists of other types, and only end a list when the next block genuinely does not belong to it. Previously a nested list of another type inserted a blank line that split the parent list in two.
-- Move whitespace at the edges of inline styles and link text outside their delimiters, so a style spanning a link or entity renders valid emphasis (`**bold** [**link**](…) **more**`) rather than `**bold **` or `[ spaced ](…)`.
-- Render consecutive `blockquote` blocks — one per paragraph in Draft.js — as a single Markdown blockquote separated by empty quote lines (`>`), instead of separate blockquotes separated by blank lines.
-- Do not render a list marker for the intermediate wrapper elements the exporter creates when a list starts at a depth greater than zero, which previously produced a phantom empty list item.
+- More correct Markdown output:
+  - Nest Markdown list items to the content column of the item they are nested under, which depends on each ancestor's marker width (`- `, `1. `, `10. `), instead of a fixed two spaces per depth. Nested ordered lists under an ordered list, or under a multi-digit item, no longer collapse into separate top-level lists.
+  - Keep Markdown ordered list numbering consistent across nested lists of other types, and only end a list when the next block genuinely does not belong to it. Previously a nested list of another type inserted a blank line that split the parent list in two.
+  - Move whitespace at the edges of inline styles and link text outside their delimiters, so a style spanning a link or entity renders valid emphasis (`**bold** [**link**](…) **more**`) rather than `**bold **` or `[ spaced ](…)`.
+  - Render consecutive `blockquote` blocks as a single Markdown blockquote separated by empty quote lines (`>`), instead of separate blockquotes separated by blank lines, matching Draft.js behavior.
+  - Do not render a list marker for the intermediate wrapper elements the exporter creates when a list starts at a depth greater than zero, which previously produced a phantom empty list item.
 
 ### Maintenance
 

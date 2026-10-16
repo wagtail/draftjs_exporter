@@ -1,6 +1,6 @@
 [project]
 name = "draftjs_exporter"
-version = "7.1.0"
+version = "7.2.0"
 description = "Library to convert rich text from Draft.js raw ContentState to HTML"
 readme = "README.md"
 license = "MIT"
@@ -107,7 +107,7 @@ convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
 "docs/prompts/graders/*" = [
-  "T20", # Evals print their results
+  "T20",  # Evals print their results
   "D103", # Assertion helpers read better without repeating the annotation
 ]
 "tests/*" = [
@@ -136,20 +136,20 @@ root_packages = ["draftjs_exporter", "tests"]
 name = "Importer modules do not import exporter modules"
 type = "forbidden"
 source_modules = [
-    "draftjs_exporter.contentstate_filter",
-    "draftjs_exporter.markdown_importer",
-    "draftjs_exporter.markdown_parser",
+  "draftjs_exporter.contentstate_filter",
+  "draftjs_exporter.markdown_importer",
+  "draftjs_exporter.markdown_parser",
 ]
 forbidden_modules = [
-    "draftjs_exporter.composite_decorators",
-    "draftjs_exporter.defaults",
-    "draftjs_exporter.dom",
-    "draftjs_exporter.entity_state",
-    "draftjs_exporter.html",
-    "draftjs_exporter.markdown",
-    "draftjs_exporter.options",
-    "draftjs_exporter.style_state",
-    "draftjs_exporter.wrapper_state",
+  "draftjs_exporter.composite_decorators",
+  "draftjs_exporter.defaults",
+  "draftjs_exporter.dom",
+  "draftjs_exporter.entity_state",
+  "draftjs_exporter.html",
+  "draftjs_exporter.markdown",
+  "draftjs_exporter.options",
+  "draftjs_exporter.style_state",
+  "draftjs_exporter.wrapper_state",
 ]
 
 [[tool.importlinter.contracts]]
@@ -166,10 +166,10 @@ name = "Full-output integration tests use only the public root API"
 type = "forbidden"
 allow_indirect_imports = true
 source_modules = [
-    "tests.test_output",
-    "tests.test_exports",
-    "tests.test_imports",
-    "tests.test_properties",
+  "tests.test_output",
+  "tests.test_exports",
+  "tests.test_imports",
+  "tests.test_properties",
 ]
 forbidden_modules = ["draftjs_exporter.*"]
 
