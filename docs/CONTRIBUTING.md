@@ -154,6 +154,8 @@ Follow these conventions for all production code:
 
 Automated tests are crucial for the quality assurance of this project. We use a layered [testing strategy](./contributing/test-strategy.md). We aim for 100% test coverage on all changes, with coverage at multiple layers. Tests are run with `pytest` and configured in `pyproject.toml`.
 
+Separately from the unit tests, we run [skill and docs evals](./contributing/evals.md) to measure whether the agent skill and the published docs help a model write working `draftjs_exporter` code. The evals run through [promptfoo](https://promptfoo.dev/) via the `just eval-*` recipes.
+
 ## Pull request workflow
 
 1. Create a branch from `main` with a descriptive name.

@@ -95,6 +95,7 @@ nav:
       - Contributing: CONTRIBUTING.md
       - Project architecture: contributing/architecture.md
       - Test strategy: contributing/test-strategy.md
+      - Skill and docs evals: contributing/evals.md
       - Research notes: contributing/research.md
       - Documentation style guide: style-guide.md
   - Security policy: SECURITY.md
