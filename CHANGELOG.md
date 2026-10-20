@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [v7.3.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v7.3.0)
+
 ### Added
 
 - Add `md_line_break` as a reusable line break component. Markdown output now converts newlines in block text to CommonMark hard line breaks (`\` + newline), degrading to a space in headings, via a default composite decorator in `MARKDOWN_CONFIG` and `build_markdown_config`.
