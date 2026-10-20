@@ -209,3 +209,9 @@ def md_code_block_fence(content: str, fence_char: str) -> str:
         The fence string.
     """
     return fence_char * max(3, longest_run(content, fence_char) + 1)
+
+
+# Deprecated spelling of ``md_code_block_fence``, kept so callers using the
+# previous name keep working.
+code_block_fence = md_code_block_fence
+"""Compatibility alias for :func:`md_code_block_fence`."""

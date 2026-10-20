@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## [v7.3.1](https://github.com/wagtail/draftjs_exporter/releases/tag/v7.3.1)
+
+### Added
+
+- Add `code_block_fence` as a compatibility alias for `md_code_block_fence`, so callers using the previous name keep working.
+
 ## [v7.3.0](https://github.com/wagtail/draftjs_exporter/releases/tag/v7.3.0)
 
 ### Added
