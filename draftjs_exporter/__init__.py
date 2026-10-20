@@ -6,7 +6,7 @@ type aliases, and helpers so callers can import everything from
 """
 
 __title__ = "draftjs_exporter"
-__version__ = "7.3.0"
+__version__ = "7.3.1"
 __uri__ = "https://wagtail.github.io/draftjs_exporter/"
 __author__ = "Springload and Contributors"
 __license__ = "MIT"
