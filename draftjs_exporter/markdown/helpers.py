@@ -1,8 +1,9 @@
 """Low-level helper components for inline and block Markdown fragments."""
 
+from draftjs_exporter.constants import BLOCK_TYPES
 from draftjs_exporter.dom import DOM
 from draftjs_exporter.markdown.escape import md_escape_link_destination
-from draftjs_exporter.types import Element
+from draftjs_exporter.types import Element, Props
 
 
 def md_mark_safe(markup: str, block_prefix: bool = False) -> Element:
@@ -49,6 +50,27 @@ def md_inline(children: list[str | Element]) -> Element:
         A fragment containing the children without extra whitespace.
     """
     return DOM.create_element("fragment", {}, children)
+
+
+def md_line_break(props: Props) -> Element:
+    """Render a hard line break as Markdown syntax.
+
+    Headings are single-line Markdown constructs, so a hard break in a
+    heading degrades to a plain space. Code blocks are passed through
+    unmodified: their newlines already belong to the fenced output.
+
+    Parameters:
+        props: Render properties including the current block.
+
+    Returns:
+        An inline element to insert where the line break occurs.
+    """
+    type_ = props["block"].get("type", "")
+    if type_ == BLOCK_TYPES.CODE:
+        return props["children"]
+    if type_.startswith("header-"):
+        return md_inline([" "])
+    return md_mark_safe("\\\n")
 
 
 def md_block(children: list[str | Element]) -> Element:

@@ -6,6 +6,7 @@ CommonMark-compatible output.
 
 from typing import Literal, TypedDict
 
+from draftjs_exporter.composite_decorators import br_strategy
 from draftjs_exporter.constants import BLOCK_TYPES, ENTITY_TYPES, INLINE_STYLES
 from draftjs_exporter.defaults import BLOCK_MAP as HTML_BLOCK_MAP
 from draftjs_exporter.defaults import STYLE_MAP as HTML_STYLE_MAP
@@ -36,8 +37,9 @@ from draftjs_exporter.markdown.fallbacks import (
     md_entity_fallback,
     md_style_fallback,
 )
+from draftjs_exporter.markdown.helpers import md_line_break
 from draftjs_exporter.markdown.styles import md_code_span, md_inline_style
-from draftjs_exporter.types import Component, ConfigMap
+from draftjs_exporter.types import Component, CompositeDecorators, ConfigMap
 
 
 class MarkdownOptions(TypedDict, total=False):
@@ -100,12 +102,20 @@ ENTITY_DECORATORS: ConfigMap = {
     ENTITY_TYPES.FALLBACK: md_entity_fallback,
 }
 
+COMPOSITE_DECORATORS: CompositeDecorators = [
+    # Reuse br_strategy so should_render_decorators can skip decoration for
+    # newline-free blocks, the common case.
+    {"strategy": br_strategy, "component": md_line_break},
+]
+"""Default composite decorators, rendering line breaks as Markdown."""
+
 ENGINE = "draftjs_exporter.engines.markdown.DOMMarkdown"
 
 CONFIG: ExporterConfig = {
     "block_map": BLOCK_MAP,
     "style_map": STYLE_MAP,
     "entity_decorators": ENTITY_DECORATORS,
+    "composite_decorators": COMPOSITE_DECORATORS,
     "engine": ENGINE,
 }
 
@@ -196,6 +206,7 @@ def build_markdown_config(options: MarkdownOptions | None = None) -> ExporterCon
         "block_map": block_map,
         "style_map": style_map,
         "entity_decorators": entity_decorators,
+        "composite_decorators": COMPOSITE_DECORATORS,
         "engine": ENGINE,
     }
 

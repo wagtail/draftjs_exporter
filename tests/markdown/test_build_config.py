@@ -188,3 +188,31 @@ def test_all_options_combined():
         ],
     }
     assert HTML(config).render(content) == "__bold__ and *italic*\n\n+ item\n\n"
+
+
+# -- Composite decorators -----------------------------------------------------
+
+
+def test_line_break_renders_hard_break():
+    """A newline in block text renders as a Markdown hard break."""
+    assert _render({}, _block_content("one\ntwo", "unstyled")) == "one\\\ntwo\n\n"
+
+
+def test_line_break_renders_space_in_heading():
+    """Headings are single-line: a hard break degrades to a space."""
+    assert _render({}, _block_content("one\ntwo", "header-two")) == "## one two\n\n"
+
+
+def test_line_break_skipped_in_code_block():
+    """Code block content passes through unchanged inside its fence."""
+    assert (
+        _render({}, _block_content("x = 1\ny = 2", "code-block"))
+        == "```\nx = 1\ny = 2\n```\n\n"
+    )
+
+
+def test_config_without_line_break_decorator_keeps_raw_newlines():
+    """Replacing composite_decorators restores the previous raw-newline output."""
+    config = build_markdown_config()
+    config["composite_decorators"] = []
+    assert HTML(config).render(_block_content("one\ntwo", "unstyled")) == "one\ntwo\n\n"

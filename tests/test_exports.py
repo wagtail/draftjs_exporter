@@ -54,6 +54,7 @@ def make_config(engine: str) -> ExporterConfig:
                 ENTITY_TYPES.EMBED: None,
             },
             "composite_decorators": [
+                *MARKDOWN_CONFIG["composite_decorators"],
                 LINKIFY_MARKDOWN_DECORATOR,
             ],
         }

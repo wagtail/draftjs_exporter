@@ -189,6 +189,12 @@ class InlineParser:
                 i += 2
                 continue
 
+            # Hard line breaks: a backslash at the end of a line (CommonMark).
+            if ch == "\\" and i + 1 < n and text[i + 1] == "\n" and self.line_breaks:
+                out.append("\n")
+                i += 2
+                continue
+
             # Code spans: a backtick run opens; an equal-length run closes.
             if ch == "`" and self.code_inline:
                 run = 1

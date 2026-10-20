@@ -143,6 +143,21 @@ class TestHardBreaks(unittest.TestCase):
         text, _, _ = make_parser().parse("a  \nb")
         self.assertEqual(text, "a\nb")
 
+    def test_backslash_before_newline_is_stripped(self):
+        # CommonMark hard break: inverts the exporter's md_line_break.
+        text, _, _ = make_parser().parse("a\\\nb\n")
+        self.assertEqual(text, "a\nb\n")
+
+    def test_backslash_newline_disabled(self):
+        parser = make_parser(line_breaks=False)
+        text, _, _ = parser.parse("a\\\nb")
+        self.assertEqual(text, "a\\\nb")
+
+    def test_backslash_newline_at_end_kept(self):
+        # No newline follows, so this is a literal backslash, not a break.
+        text, _, _ = make_parser().parse("a\\")
+        self.assertEqual(text, "a\\")
+
     def test_soft_break_kept(self):
         text, _, _ = make_parser().parse("a\nb")
         self.assertEqual(text, "a\nb")

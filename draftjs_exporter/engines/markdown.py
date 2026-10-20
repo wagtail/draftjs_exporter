@@ -4,8 +4,8 @@ from html import escape
 
 from draftjs_exporter.engines.base import Attr, DOMEngine
 from draftjs_exporter.markdown.escape import (
-    code_block_fence,
     code_span_delimiters,
+    md_code_block_fence,
     md_escape_text,
 )
 from draftjs_exporter.types import HTML, Tag
@@ -222,7 +222,7 @@ class DOMMarkdown(DOMEngine):
             case "code_block":
                 content = DOMMarkdown.flatten_text(elt.children)
                 fence_char = (elt.attr or {}).get("fence", "`")
-                fence = code_block_fence(content, fence_char)
+                fence = md_code_block_fence(content, fence_char)
                 return f"{fence}\n{content}{fence}\n\n"
             case _ if type_ in VOID_ELEMENTS:
                 return f"<{type_}{attr}/>"

@@ -52,6 +52,9 @@ from draftjs_exporter.markdown.entities import (
     md_make_horizontal_rule as md_make_horizontal_rule,
 )
 from draftjs_exporter.markdown.escape import (
+    md_code_block_fence as md_code_block_fence,
+)
+from draftjs_exporter.markdown.escape import (
     md_escape_link_destination as md_escape_link_destination,
 )
 from draftjs_exporter.markdown.escape import md_escape_text as md_escape_text
@@ -60,6 +63,7 @@ from draftjs_exporter.markdown.fallbacks import md_entity_fallback as md_entity_
 from draftjs_exporter.markdown.fallbacks import md_style_fallback as md_style_fallback
 from draftjs_exporter.markdown.helpers import md_block as md_block
 from draftjs_exporter.markdown.helpers import md_inline as md_inline
+from draftjs_exporter.markdown.helpers import md_line_break as md_line_break
 from draftjs_exporter.markdown.helpers import md_link_destination as md_link_destination
 from draftjs_exporter.markdown.helpers import md_mark_safe as md_mark_safe
 from draftjs_exporter.markdown.lists import md_make_list_item as md_make_list_item
@@ -116,6 +120,7 @@ __all__ = [
     "md_block",
     "md_block_fallback",
     "md_blockquote",
+    "md_code_block_fence",
     "md_code_element",
     "md_code_span",
     "md_code_wrapper",
@@ -126,6 +131,7 @@ __all__ = [
     "md_image",
     "md_inline",
     "md_inline_style",
+    "md_line_break",
     "md_link",
     "md_link_destination",
     "md_list_wrapper",

@@ -108,13 +108,13 @@ class TestMarkdownEscaping(unittest.TestCase):
         self.assertEqual(self.render("a # b"), "a # b\n\n")
 
     def test_soft_break_line_start(self):
-        self.assertEqual(self.render("a\n# b"), "a\n\\# b\n\n")
+        self.assertEqual(self.render("a\n# b"), "a\\\n\\# b\n\n")
 
     def test_carriage_return_line_start(self):
         self.assertEqual(self.render("a\r# b"), "a\r\\# b\n\n")
 
     def test_crlf_line_start(self):
-        self.assertEqual(self.render("a\r\n- b"), "a\r\n\\- b\n\n")
+        self.assertEqual(self.render("a\r\n- b"), "a\r\\\n\\- b\n\n")
 
     def test_heading_like_text_after_spaces(self):
         self.assertEqual(self.render("   # heading"), "   \\# heading\n\n")
@@ -129,7 +129,7 @@ class TestMarkdownEscaping(unittest.TestCase):
         self.assertEqual(self.render("  1. item"), "  1\\. item\n\n")
 
     def test_setext_underline_like_text_after_spaces(self):
-        self.assertEqual(self.render("a\n ---"), "a\n \\---\n\n")
+        self.assertEqual(self.render("a\n ---"), "a\\\n \\---\n\n")
 
     def test_code_fence_like_text_after_spaces(self):
         self.assertEqual(self.render("   ~~~"), "   \\~~~\n\n")

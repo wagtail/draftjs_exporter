@@ -14,6 +14,7 @@ from draftjs_exporter import (
     code_block,
     md_block,
     md_image,
+    md_line_break,
     md_link,
     md_mark_safe,
     render_children,
@@ -27,6 +28,7 @@ from draftjs_exporter.defaults import (
 from draftjs_exporter.markdown.entities import md_image as entities_md_image
 from draftjs_exporter.markdown.entities import md_link as entities_md_link
 from draftjs_exporter.markdown.helpers import md_block as helpers_md_block
+from draftjs_exporter.markdown.helpers import md_line_break as helpers_md_line_break
 from draftjs_exporter.markdown.helpers import md_mark_safe as helpers_md_mark_safe
 
 
@@ -51,6 +53,7 @@ class TestTopLevelAPI(unittest.TestCase):
     def test_markdown_helpers_reexport(self):
         self.assertIs(md_block, helpers_md_block)
         self.assertIs(md_mark_safe, helpers_md_mark_safe)
+        self.assertIs(md_line_break, helpers_md_line_break)
         self.assertIs(md_image, entities_md_image)
         self.assertIs(md_link, entities_md_link)
 

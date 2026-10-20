@@ -301,6 +301,7 @@ if __name__ == "__main__":
                 BLOCK_TYPES.FALLBACK: block_fallback,
             },
             "composite_decorators": [
+                *MARKDOWN_CONFIG.get("composite_decorators", []),
                 {"strategy": LINKIFY_RE, "component": linkify_markdown},
             ],
         }

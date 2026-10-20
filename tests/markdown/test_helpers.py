@@ -5,6 +5,7 @@ from draftjs_exporter.markdown.helpers import (
     md_block,
     md_has_content,
     md_inline,
+    md_line_break,
     md_link_destination,
     md_mark_safe,
     md_split_edge_whitespace,
@@ -17,6 +18,32 @@ class TestHelpers(unittest.TestCase):
 
     def test_block(self):
         self.assertEqual(DOM.render(md_block(["test"])), "test\n\n")
+
+
+class TestLineBreak(unittest.TestCase):
+    def test_hard_break(self):
+        elt = md_line_break({"block": {"type": "unstyled"}, "children": ["\n"]})
+        self.assertEqual(DOM.render(md_inline([elt])), "\\\n")
+
+    def test_hard_break_in_list_item(self):
+        elt = md_line_break(
+            {"block": {"type": "unordered-list-item"}, "children": ["\n"]}
+        )
+        self.assertEqual(DOM.render(md_inline([elt])), "\\\n")
+
+    def test_space_in_header(self):
+        for type_ in ("header-one", "header-two", "header-six"):
+            elt = md_line_break({"block": {"type": type_}, "children": ["\n"]})
+            self.assertEqual(DOM.render(md_inline([elt])), " ", type_)
+
+    def test_passthrough_in_code_block(self):
+        children = ["\n"]
+        elt = md_line_break({"block": {"type": "code-block"}, "children": children})
+        self.assertIs(elt, children)
+
+    def test_missing_block_type(self):
+        elt = md_line_break({"block": {}, "children": ["\n"]})
+        self.assertEqual(DOM.render(md_inline([elt])), "\\\n")
 
 
 class TestMarkSafe(unittest.TestCase):

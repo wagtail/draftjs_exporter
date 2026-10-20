@@ -3,8 +3,8 @@
 import unittest
 
 from draftjs_exporter.markdown.escape import (
-    code_block_fence,
     code_span_delimiters,
+    md_code_block_fence,
     md_escape_link_destination,
     md_escape_text,
 )
@@ -190,16 +190,16 @@ class TestCodeSpanDelimiters(unittest.TestCase):
 
 class TestCodeBlockFence(unittest.TestCase):
     def test_plain_content(self):
-        self.assertEqual(code_block_fence("foo\n", "`"), "```")
+        self.assertEqual(md_code_block_fence("foo\n", "`"), "```")
 
     def test_fence_run_in_content(self):
-        self.assertEqual(code_block_fence("a```b\n", "`"), "````")
+        self.assertEqual(md_code_block_fence("a```b\n", "`"), "````")
 
     def test_minimum_length_three(self):
-        self.assertEqual(code_block_fence("a`b\n", "`"), "```")
+        self.assertEqual(md_code_block_fence("a`b\n", "`"), "```")
 
     def test_tilde_fence(self):
-        self.assertEqual(code_block_fence("a~~~b\n", "~"), "~~~~")
+        self.assertEqual(md_code_block_fence("a~~~b\n", "~"), "~~~~")
 
 
 if __name__ == "__main__":

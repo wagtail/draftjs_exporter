@@ -341,6 +341,14 @@ class BlockParser:
                 if unordered
                 else BLOCK_TYPES.ORDERED_LIST_ITEM
             )
-            self._add_text_block(type_, match.group(2), i, depth=len(stack) - 1)
+            content = match.group(2)
+            # A line ending in an unescaped backslash is a hard line break
+            # whose target is a continuation line, which is not supported:
+            # the next line becomes a separate block. Drop the marker rather
+            # than emitting a literal backslash the source did not contain.
+            backslashes = len(content) - len(content.rstrip("\\"))
+            if backslashes % 2 == 1:
+                content = content[:-1]
+            self._add_text_block(type_, content, i, depth=len(stack) - 1)
             i += 1
         return i

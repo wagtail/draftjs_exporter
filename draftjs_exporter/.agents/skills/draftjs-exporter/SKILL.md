@@ -323,7 +323,7 @@ All imported from `draftjs_exporter` directly:
 - **Default components**: `code_block` (`pre` > `code`), `render_children` (passthrough; used for atomic blocks).
 - **Constants**: `BLOCK_TYPES`, `INLINE_STYLES`, `ENTITY_TYPES` (each with a `FALLBACK` member).
 - **Markdown helper**: `build_markdown_config(options)`, plus the option type alias `MarkdownOptions`.
-- **Markdown components**: `md_block`, `md_inline`, `md_mark_safe`, `md_link_destination`, `md_link`, `md_image`, `md_prefixed_block`, `md_make_ul` / `md_ul`, `md_make_ol` / `md_ol`, `md_list_wrapper`, `md_code_element` / `md_code_wrapper`, `md_inline_style`, `md_code_span`, `md_horizontal_rule` / `md_make_horizontal_rule`, `md_*_fallback`.
+- **Markdown components**: `md_block`, `md_inline`, `md_mark_safe`, `md_line_break`, `md_escape_text`, `md_escape_link_destination`, `md_link_destination`, `md_link`, `md_image`, `md_prefixed_block`, `md_make_ul` / `md_ul`, `md_make_ol` / `md_ol`, `md_list_wrapper`, `md_code_element` / `md_code_wrapper` / `md_code_block_fence`, `md_inline_style`, `md_code_span`, `md_horizontal_rule` / `md_make_horizontal_rule`, `md_*_fallback`.
 - **Importer**: `MarkdownImporter(config).import_markdown(markdown)` — converts Markdown to ContentState. Config keys: `parser` (dotted path), `parser_config` (feature toggles, `link_resolvers`/`image_resolvers`, `inline_html_styles`), `filter_rules`.
 - **Parser**: `MarkdownParser(config).parse(markdown)`, `ParserConfig`, `scheme_resolver(scheme, type_map, coerce, label_key, mutability)`, `EntityResolver`, `EntityResolution`.
 - **Filter**: `ContentStateFilter(rules).apply(content_state)`, `FilterRule` (`type`: `block`/`inline_style`/`entity`; `match`; `action`: `remove`/`keep`/`demote`/callable).

@@ -212,13 +212,13 @@ The exporter aims to provide sensible defaults from basic block types and inline
 
 Here are some features worth highlighting:
 
-- Convert line breaks to `<br>`
+- Convert line breaks to `<br>`\
 elements.
 - Automatic conversion of entity data to HTML attributes (int & boolean to string, [`style object` to `style string`](https://facebook.github.io/react/docs/jsx-in-depth.html)).
 - Wrapped blocks (`<li>` elements go inside `<ul>` or `<ol>`).
   - With arbitrary nesting.
     - Common text styles: **Bold**, _Italic_, <u>Underline</u>, `Monospace`, ~Strikethrough.~ cmd + b
-    - ~Overlapping ~**~te~****_xt_**_ styles. _Custom styles too!
+    - ~Overlapping~ **~te~****_xt_** _styles._ Custom styles too!
       - \#hashtag support via [#CompositeDecorators](https://github.com/wagtail/draftjs_exporter/pull/17).
         - Linkify URLs too! [http://example.com/](http://example.com/)
     - Depth can go back and forth, it works fiiine (1)
@@ -234,7 +234,7 @@ elements.
 1. Import the library
 2. Define your configuration
 3. Go!
-  1. Optionally, define your custom components.
+   1. Optionally, define your custom components.
 
 ```
 def blockquote(props):

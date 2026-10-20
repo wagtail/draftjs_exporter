@@ -195,7 +195,7 @@ def code_span_delimiters(content: str) -> tuple[str, str]:
     return ticks + pad, pad + ticks
 
 
-def code_block_fence(content: str, fence_char: str) -> str:
+def md_code_block_fence(content: str, fence_char: str) -> str:
     """Compute a code fence that cannot be broken by the content.
 
     The fence is one character longer than the longest run of the fence

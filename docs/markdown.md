@@ -110,11 +110,19 @@ Styles that span a link or entity are rendered per text segment. Spaces at the e
 | `IMAGE`              | `![alt](src)`   |
 | `HORIZONTAL_RULE`    | `---`           |
 
+### Line breaks
+
+A newline (`\n`) inside block text renders as a CommonMark hard line break (`\` followed by a newline). In headings — which are single-line constructs in Markdown — it degrades to a plain space. Newlines inside code blocks are untouched: they belong to the fenced output.
+
+This is implemented as a composite decorator using `md_line_break`, included in `MARKDOWN_CONFIG` and `build_markdown_config` by default. To keep raw newlines instead, replace the `composite_decorators` config entry.
+
 ## Low-level API
 
 For cases where `build_markdown_config` is not flexible enough, you can build a config dict manually from the individual component functions. This is the same approach used by the default `CONFIG` and `build_markdown_config` internally. All Markdown helpers are re-exported from the package root with an `md_` prefix. List items are built with `md_make_list_item(marker, delimiter)`; `md_make_ul` and `md_make_ol` are shortcuts for the most common cases.
 
 ```python
+import re
+
 from draftjs_exporter import (
     BLOCK_MAP as HTML_BLOCK_MAP,
     BLOCK_TYPES,
@@ -127,6 +135,7 @@ from draftjs_exporter import (
     md_code_wrapper,
     md_image,
     md_inline_style,
+    md_line_break,
     md_link,
     md_list_wrapper,
     md_make_horizontal_rule,
@@ -170,6 +179,9 @@ config = {
         ENTITY_TYPES.LINK: md_link,
         ENTITY_TYPES.HORIZONTAL_RULE: md_make_horizontal_rule("***"),
     },
+    "composite_decorators": [
+        {"strategy": re.compile(r"\n"), "component": md_line_break},
+    ],
 }
 ```
 
