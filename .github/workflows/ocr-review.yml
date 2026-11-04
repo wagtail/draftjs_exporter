@@ -116,7 +116,7 @@ jobs:
           done
 
       - name: Run OpenCodeReview
-        uses: alibaba/open-code-review@bccbc15f785269400735d5255540c231e6c02b6d # v1.12.9
+        uses: alibaba/open-code-review@375f64cd6f67a48a135da83cfcf59c52669a09cb # v1.13.3
         with:
           # Passed as inputs, never interpolated into a shell, so the values cannot be read as commands.
           llm_url: ${{ secrets.OCR_LLM_URL }}
