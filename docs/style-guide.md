@@ -13,7 +13,7 @@ The guide is derived from how the project's documentation has historically been 
 - **Accurate, discoverable, maintainable.** Docs should describe the code as it is, be easy to find, and be cheap to keep up to date.
 - **Concise and practical.** Get to the point quickly. Prefer working code examples over long prose explanations. Every page should help the reader accomplish something or understand a concept they need.
 - **Two tracks, one voice.** User-facing documentation (getting started, guides, configuration reference) and contributor-facing documentation (architecture, test strategy, CONTRIBUTING) live side by side. The tone stays consistent across both.
-- **API docs in docstrings.** The public API is documented in docstrings so it can be extracted by tools like [Griffe](https://mkdocstrings.github.io/griffe/) and [mkdocstrings](https://mkdocstrings.github.io/). Prose docs link into the generated reference rather than duplicating it.
+- **API docs in docstrings.** The public API is documented in docstrings so it can be extracted by tools like [Griffe](https://mkdocstrings.github.io/griffe/) and [mkdocstrings](https://mkdocstrings.github.io/). The [API reference](reference/api.md) is generated from those docstrings, and we link to it from other relevant content.
 - **No type duplication.** Type information lives in annotations. Docstrings describe semantics, not types.
 
 ## Tone of voice
@@ -99,6 +99,18 @@ Keep callouts to one or two sentences. Use them when the information directly af
 - External links should point to **official, stable resources**: the project's own GitHub repository and blog posts, the Draft.js docs, Wagtail documentation, Python packaging guides. Avoid linking to transient content (forum threads, personal gists) unless there is no canonical alternative.
 - Link text should be descriptive. Avoid "click here" or "this link". Prefer the name of the target: "[introductory blog post](https://www.draftail.org/blog/2018/03/13/rethinking-rich-text-pipelines-with-draft-js)".
 - Do not add links inside headings. They are harder to identify for screen reader users and break heading navigation.
+
+### Linking to the API reference
+
+The [API reference](reference/api.md) is generated from the package's public API, with a stable anchor for every public name. Link to the specific object rather than the page, using the object's public path as the anchor fragment. Example relative to a page in `docs/guides/`:
+
+```markdown
+See [`HTML.render()`](../reference/api.md#draftjs_exporter.HTML.render) for the rendering entry point.
+```
+
+The anchor is always `draftjs_exporter.` followed by the public name. This also works for members (`draftjs_exporter.HTML.render`) and constants (`draftjs_exporter.BLOCK_TYPES`). This is stable over time as those anchors are derived from the Python code, `__init__.__all__`.
+
+The site also publishes a [Sphinx `objects.inv`](https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html) inventory at `objects.inv`, so other documentation sites can cross-reference this API with `intersphinx` or mkdocstrings' `inventories` option. When linking externally, keep to the public names exported at the package root only. Internal module paths can change at any time.
 
 ## Headings and titles
 

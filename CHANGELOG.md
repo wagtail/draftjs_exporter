@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- Generate the API reference from `draftjs_exporter.__all__` (`just docs-generate`), so it can no longer drift from the public API. `just docs-generate-check`, run in CI, fails when the committed page is out of date.
+
+### Changed
+
+- Document the whole public API in the reference, adding the 51 public names and 11 modules that were missing, such as the Markdown helpers, `MarkdownImporter`, `MarkdownParser`, `ContentStateFilter`, and `DOMEngine`.
+- Link prose documentation to specific API reference anchors, and publish a Sphinx `objects.inv` inventory so other documentation sites can cross-reference the API.
+
 ## [v7.3.1](https://github.com/wagtail/draftjs_exporter/releases/tag/v7.3.1)
 
 ### Added

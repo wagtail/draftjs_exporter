@@ -102,7 +102,7 @@ Draft.js comes with predefined types, which generally map to HTML elements:
 - `code-block`
 - `atomic`, used for embedded, mostly non-textual content.
 
-The exporter exposes these as the `BLOCK_TYPES` constants. See the [API reference](reference/api.md) for the full list, including the special `BLOCK_TYPES.FALLBACK` used to handle missing block types in your [configuration](reference/configuration.md).
+The exporter exposes these as the `BLOCK_TYPES` constants. See [`BLOCK_TYPES`](reference/api.md#draftjs_exporter.BLOCK_TYPES) for the full list, including the special `BLOCK_TYPES.FALLBACK` used to handle missing block types in your [configuration](reference/configuration.md).
 
 ## Inline styles
 
@@ -116,7 +116,7 @@ Draft.js comes with predefined inline styles:
 - `STRIKETHROUGH`
 - `UNDERLINE`
 
-The exporter recognizes these as the `INLINE_STYLES` constants, and supports additional styles such as `SUPERSCRIPT`, `SUBSCRIPT`, and `KEYBOARD`. See the [API reference](reference/api.md) for the full list.
+The exporter recognizes these as the `INLINE_STYLES` constants, and supports additional styles such as `SUPERSCRIPT`, `SUBSCRIPT`, and `KEYBOARD`. See [`INLINE_STYLES`](reference/api.md#draftjs_exporter.INLINE_STYLES) for the full list.
 
 ## Entities
 
@@ -128,13 +128,13 @@ In the `entityMap`, entities are stored as:
 - `mutability` (`MUTABLE` or `IMMUTABLE`), whether changes in the text the entity is applied on are allowed (links on arbitrary text vs. mentions containing a person's full name, for example).
 - `data`, to store arbitrary data for the entity.
 
-The exporter exposes common entity categories as the `ENTITY_TYPES` constants (`LINK`, `IMAGE`, `HORIZONTAL_RULE`, and more). See the [API reference](reference/api.md) for the full list, including the special `ENTITY_TYPES.FALLBACK`.
+The exporter exposes common entity categories as the `ENTITY_TYPES` constants (`LINK`, `IMAGE`, `HORIZONTAL_RULE`, and more). See [`ENTITY_TYPES`](reference/api.md#draftjs_exporter.ENTITY_TYPES) for the full list, including the special `ENTITY_TYPES.FALLBACK`.
 
 ## EditorState vs ContentState
 
 ContentState is what Draft.js uses to represent the editor's content, but content is only one part of the editor's state. [`EditorState`](https://www.draftail.org/docs/next/draft-js/api-reference/editor-state) stores everything else: text selection, the undo/redo stack, and more.
 
-The exporter only consumes ContentState. When an editor saves content, it converts its EditorState to a raw ContentState (the JSON shape above), and that is what you hand to [`HTML.render()`](reference/api.md). You do not need to handle EditorState on the Python side.
+The exporter only consumes ContentState. When an editor saves content, it converts its EditorState to a raw ContentState (the JSON shape above), and that is what you hand to [`HTML.render()`](reference/api.md#draftjs_exporter.HTML.render). You do not need to handle EditorState on the Python side.
 
 ## Next steps
 

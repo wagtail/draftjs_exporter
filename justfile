@@ -28,6 +28,8 @@ lint:
   uv run pyright
   uv run pyrefly check
   uv run lint-imports
+  uv run python docs/generate_api_reference.py --check
+  uv run python docs/check_api_breakage.py
 
 # Check the type completeness of the public API. Informational: the score
 # depends on how much of the API uses precise types, not on correctness.
@@ -70,6 +72,19 @@ benchmark runs="1":
 # Build the documentation.
 docs-build:
   uv run mkdocs build --strict
+
+# Regenerate the API reference pages from the package's public API.
+# Run after changing draftjs_exporter/__init__.py's __all__ or public docstrings.
+docs-generate:
+  uv run python docs/generate_api_reference.py
+
+# Verify the committed API reference matches the public API, for CI.
+docs-generate-check:
+  uv run python docs/generate_api_reference.py --check
+
+# Check the public API for breaking changes since the last release.
+api-check:
+  uv run python docs/check_api_breakage.py
 
 # Build the documentation and serve it locally.
 docs-serve:

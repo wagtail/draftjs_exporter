@@ -40,6 +40,8 @@ jobs:
       - run: uv run pyright --verifytypes draftjs_exporter --ignoreexternal
         continue-on-error: true
       - run: uv run lint-imports
+      - run: just docs-generate-check
+      - run: just api-check
       - run: just benchmark 10
       - run: just build
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
