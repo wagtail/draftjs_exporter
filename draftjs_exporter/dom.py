@@ -5,7 +5,7 @@ rendering engines such as HTML5lib, lxml, string, and Markdown.
 """
 
 import re
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import Any, cast
@@ -92,7 +92,7 @@ class DOM:
 
     @staticmethod
     @contextmanager
-    def engine(engine: str) -> Iterator[None]:
+    def engine(engine: str) -> Generator[None, None, None]:
         """Temporarily set the DOM engine for the current context."""
         try:
             resolved = _engine_cache[engine]
