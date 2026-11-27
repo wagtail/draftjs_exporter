@@ -201,7 +201,7 @@ All Python code is type-checked by four checkers, and all four must pass in CI. 
 | Checker                                         | Role in this project                                                                                                                                           | Configured in     |
 | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
 | [mypy](https://mypy.readthedocs.io/)            | Reference checker, with a near-strict configuration.                                                                                                           | `[tool.mypy]`     |
-| [ty](https://docs.astral.sh/ty/)                | Fast checker from the Ruff team, plus opt-in soundness rules like `unsound-return-statement`.                                                                  | `[tool.ty.rules]` |
+| [ty](https://docs.astral.sh/ty/)                | Fast checker from the Ruff team, plus opt-in soundness rules.                                                                                                  | `[tool.ty.rules]` |
 | [pyright](https://microsoft.github.io/pyright/) | Cross-module checks mypy lacks, like required-key TypedDict access. Also reports the type completeness of the public API (`just verify-types`, informational). | `[tool.pyright]`  |
 | [pyrefly](https://pyrefly.org/)                 | Meta's checker, configured to mirror mypy's annotation requirements.                                                                                           | `[tool.pyrefly]`  |
 
