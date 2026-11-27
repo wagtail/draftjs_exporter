@@ -265,7 +265,7 @@ disallow_untyped_defs = false
 disjoint-cast = "error"
 # Flag assignments, returns, and yields of `Any` values where a precise type is declared.
 unsound-assignment = "error"
-unsound-return-statement = "error"
+unsound-return = "error"
 unsound-yield = "error"
 
 [tool.pyright]
