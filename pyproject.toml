@@ -81,6 +81,10 @@ dev = [
 requires = ["uv_build>=0.13.6,<0.14.0"]
 build-backend = "uv_build"
 
+[tool.uv]
+# Set a different range for maintainers to avoid vulnerable dependencies in lockfile.
+environments = ["python_full_version >= '3.11.5'"]
+
 [tool.uv.build-backend]
 module-name = "draftjs_exporter"
 module-root = ""
